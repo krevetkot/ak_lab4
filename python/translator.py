@@ -101,15 +101,23 @@ variables_queue = {} # переменные будут сохранены в к�
 # чтобы гарантированно не мешать коду
 
 def translate_stage_1(text, memory):
+    """Первый этап трансляции.
+    Убираются все токены, которые не отображаются напрямую в команды, 
+    переменные заносятся в память (после кода),
+    создается условная таблица линковки для лейблов функций и названий переменных.
+    """
     terms = text2terms(text)
 
     # Транслируем термы в машинный код.
     code = []
-    return_stack = []
-    # надо бы сделать отдельный файлик который управляет память. инициализирует например
+    brackets_stack = [] 
+    addresses_in_conditious = {} # код, куда нужно вставить аргумент - аргумент
+    # надо бы сделать отдельный файлик который управляет памятью. инициализирует например
     # стек у нас стопроц в общей памяти, просто с конца добавляется
+    # или память это просто битовый файл?
 
     i = 0
+    address = 0
     while i < len(terms):
         term = terms[i]
         hex_number_pattern = r'^0[xX][0-9A-Fa-f]+$'
@@ -118,7 +126,7 @@ def translate_stage_1(text, memory):
         if re.fullmatch(hex_number_pattern, term.word) or re.fullmatch(dec_number_pattern, term.word):
             arg = int(term.word)
             assert arg <= 67108863 and arg >= -67108864, "Argument is not in range!"
-            code.append({"opcode": Opcode.LOAD_IMM, "arg": arg, "term": term})
+            code.append({"address": address, "opcode": Opcode.LOAD_IMM, "arg": arg, "term": term})
 
         # если встретили определение слова
         if term.word == "VARIABLE":
@@ -128,19 +136,39 @@ def translate_stage_1(text, memory):
             variables_queue[label] = value
             i += 1 # перепрыгиваем через лейбл, тк  мы его обработали
 
-        # если встретили переменную
+        # если встретили определение функции 
+        if term.word == ":":
+            label = terms[i+1].word
+            functions_map[label] = address
+            i += 1
+
+        # обработка if - else - then, чтобы вставить им потом в аругменты адреса переходов 
+        if term.word == "IF":
+            brackets_stack.append({"address": address, "opcode": Opcode.IF})
+            code.append({"address": address, "opcode": Opcode.IF, "arg": -1, "term": term})
+        if term.word == "ELSE":
+            addresses_in_conditious[brackets_stack.pop.address] = address + 1
+            brackets_stack.append({"address": address, "opcode": Opcode.ELSE})
+            code.append({"address": address, "opcode": Opcode.ELSE, "arg": -1, "term": term})
+        if term.word == "THEN":
+            addresses_in_conditious[brackets_stack.pop.address] = address
+        
+                
+        
+
+        # если встретили переменную или вызов функции
         if term.word not in instructions():
             arg = term.word
             if arg in variables_map:
-                code.append({"opcode": Opcode.LOAD_ADDR, "arg": arg, "term": term})
+                code.append({"address": address, "opcode": Opcode.LOAD_ADDR, "arg": arg, "term": term})
             elif arg in functions_map:
-                code.append({"opcode": Opcode.CALL, "arg": arg, "term": term})
+                code.append({"address": address, "opcode": Opcode.CALL, "arg": arg, "term": term})
             else:
                 assert arg in variables_map or arg in functions_map, "Label is not defined!"
 
 
-        if term in instructions():
-            
+        else:
+            code.append({"address": address, "opcode": symbol2opcode(term.symbol), "term": term})
 
 
 
@@ -159,7 +187,8 @@ def translate_stage_1(text, memory):
             # Обработка тривиально отображаемых операций.
             code.append({"index": pc, "opcode": symbol2opcode(term.symbol), "term": term})
 
-        i = i+1
+        i += 1
+        address += 1
 
     # Добавляем инструкцию остановки процессора в конец программы.
     code.append({"index": len(code), "opcode": Opcode.HALT})
