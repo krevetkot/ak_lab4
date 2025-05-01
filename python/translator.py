@@ -15,14 +15,14 @@ from memory import Memory
 
 
 def instructions():
-    return {"@", "@@", "!", "VARIABLE", "IF", "ELSE", "THEN", "BEGIN", "WHILE", "REPEAT", ":", ";", "+", "-", "*", "/", "%",
+    return {"@", "!", "VARIABLE", "IF", "ELSE", "THEN", "BEGIN", "WHILE", "REPEAT", ":", ";", "+", "-", "*", "/", "%",
             "and", "or", "not", "=", ">", "<", "HALT"}
 
 def first_type_instructions(): # без аргумента
     return {"@", "!", ";", "+", "-", "*", "/", "%","and", "or", "not", "=", ">", "<", "HALT"}
 
 def seconf_type_instructions(): # с аргументом + LOAD_IMM
-    return {"@@", "!", "IF", "ELSE", "WHILE", "REPEAT", ":", ";", "+", "-", "*", "/", "%",
+    return {"!", "IF", "ELSE", "WHILE", "REPEAT", ":", ";", "+", "-", "*", "/", "%",
         "and", "or", "not", "=", ">", "<"}
 
 
@@ -31,7 +31,6 @@ def word_to_opcode(symbol):
     """Отображение операторов исходного кода в коды операций."""
     return {
         "@": Opcode.LOAD,
-        "@@": Opcode.LOAD_ADDR,
         "!": Opcode.SAVE,
         "VARIABLE": Opcode.VARIABLE,
         "IF": Opcode.IF,
@@ -50,7 +49,8 @@ def word_to_opcode(symbol):
         "not": Opcode.NOT,
         "=": Opcode.EQUAL,
         ">": Opcode.GREATER,
-        "<": Opcode.LESS
+        "<": Opcode.LESS,
+        "HALT": Opcode.HALT
     }.get(symbol)
 
 
@@ -80,27 +80,32 @@ def text_to_terms(text):
     whileFlag = 0
     for term in terms:
         if term.word == "IF":
-            ifFlag += 1
+            ifFlag += 2
+        if term.word == "ELSE":
+            ifFlag -= 1
         if term.word == "THEN":
             ifFlag -= 1
-        assert ifFlag >= 0, "Unbalanced IF-THEN!"
+        assert ifFlag >= 0, "Unbalanced IF-ELSE-THEN!"
 
+        if term.word == "BEGIN":
+            whileFlag += 2
         if term.word == "WHILE":
-            whileFlag += 1
+            whileFlag -= 1
         if term.word == "REPEAT":
             whileFlag -= 1
-        assert whileFlag >= 0, "Unbalanced WHILE-REPEAT!"
-    assert ifFlag == 0, "Unbalanced IF-THEN!"
-    assert whileFlag == 0, "Unbalanced WHILE-REPEAT!"
+        assert whileFlag >= 0, "Unbalanced BEGIN-WHILE-REPEAT!"
+    assert ifFlag == 0, "Unbalanced IF-ELSE-THEN!"
+    assert whileFlag == 0, "Unbalanced BEGIN-WHILE-REPEAT!"
 
     return terms
 
 variables_map = {} # имя - адрес
 functions_map = {}
 variables_queue = {} # переменные будут сохранены в конце кода, после хальта, 
-# чтобы гарантированно не мешать коду
+# чтобы гарантированно не мешать коду; имя - значение
+addresses_in_conditions = {} # код, куда нужно вставить аргумент - аргумент
 
-def translate_stage_1(text, memory):
+def translate_stage_1(text):
     """Первый этап трансляции.
     Убираются все токены, которые не отображаются напрямую в команды, 
     переменные заносятся в память (после кода),
@@ -111,7 +116,6 @@ def translate_stage_1(text, memory):
     # Транслируем термы в машинный код.
     code = []
     brackets_stack = [] 
-    addresses_in_conditions = {} # код, куда нужно вставить аргумент - аргумент
     # надо бы сделать отдельный файлик который управляет памятью. инициализирует например
     # стек у нас стопроц в общей памяти, просто с конца добавляется
     # или память это просто битовый файл?
@@ -178,7 +182,7 @@ def translate_stage_1(text, memory):
             if arg in variables_queue:
                 code.append({"address": address, "opcode": Opcode.LOAD_ADDR, "arg": arg, "term": term})
             elif arg in functions_map:
-                code.append({"address": address, "opcode": Opcode.CALL, "arg": arg, "term": term})
+                code.append({"address": address, "opcode": Opcode.CALL, "arg": functions_map[arg], "term": term})
             else:
                 assert arg in variables_map or arg in functions_map, "Label is not defined!"
 
@@ -189,9 +193,35 @@ def translate_stage_1(text, memory):
         i += 1
         address += 1
 
-    # Добавляем инструкцию остановки процессора в конец программы.
-    code.append({"index": len(code), "opcode": Opcode.HALT})
     return code
+
+
+def translate_stage_2(code):
+    """
+    Вместо лейблов подставляются адреса,
+    в if и while подставляются адреса переходов,
+    переменные сохраняются после halt. 
+    """
+    # сначала сохраним переменные в конце кода, чтобы потом подставлять их адреса
+    # ПОКА ЧТО адресация идет односительно ячеек в массиве, но позже я переделаю под байты
+    curr_address = code[-1]['address'] + 1
+    for label, value in variables_queue.items():
+        variables_map[label] = curr_address
+        # такой обосранный формат сохранения, пока я не придумаю что-то лучше
+        code.append({'address': curr_address, 'arg': value})
+        curr_address += 1
+
+    for instruction in code:
+        if 'arg' in instruction:
+            arg = instruction['arg']
+            if arg == -1:
+                instruction['arg'] = addresses_in_conditions[instruction['address']]
+            elif isinstance(arg, str):
+                instruction['arg'] = variables_map[arg]
+                # если переменной с таким именем нет, транслятор выдаст ошибку еще на первом этапе
+
+    return code
+
 
 
 def main(source, target):
@@ -201,10 +231,12 @@ def main(source, target):
 
     MEMORY_SIZE = 1000
     memory = Memory(MEMORY_SIZE)
-    code = translate_stage_1(source, memory)
+    # пока не могу придумать что сделать с памятью
+    code = translate_stage_1(source)
+    code = translate_stage_2(code)
     for el in code:
         print(el)
-    exit
+    return
     binary_code = to_bytes(code)
     hex_code = to_hex(code)
 
