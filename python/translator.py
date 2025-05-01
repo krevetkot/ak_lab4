@@ -6,7 +6,7 @@ import os
 import re
 import sys
 
-from isa import Opcode, Term, to_bytes, to_hex, write_json
+from isa import Opcode, Term, to_bytes, to_hex
 from memory import Memory 
 
 # у нас должна быть таблица линковки!!!!!!!!!!
@@ -16,10 +16,10 @@ from memory import Memory
 
 def instructions():
     return {"@", "@@", "!", "VARIABLE", "IF", "ELSE", "THEN", "BEGIN", "WHILE", "REPEAT", ":", ";", "+", "-", "*", "/", "%",
-            "and", "or", "not", "=", ">", "<"}
+            "and", "or", "not", "=", ">", "<", "HALT"}
 
 def first_type_instructions(): # без аргумента
-    return {"@", "!", ";", "+", "-", "*", "/", "%","and", "or", "not", "=", ">", "<"}
+    return {"@", "!", ";", "+", "-", "*", "/", "%","and", "or", "not", "=", ">", "<", "HALT"}
 
 def seconf_type_instructions(): # с аргументом + LOAD_IMM
     return {"@@", "!", "IF", "ELSE", "WHILE", "REPEAT", ":", ";", "+", "-", "*", "/", "%",
@@ -27,7 +27,7 @@ def seconf_type_instructions(): # с аргументом + LOAD_IMM
 
 
 
-def symbol2opcode(symbol):
+def word_to_opcode(symbol):
     """Отображение операторов исходного кода в коды операций."""
     return {
         "@": Opcode.LOAD,
@@ -54,7 +54,7 @@ def symbol2opcode(symbol):
     }.get(symbol)
 
 
-def text2terms(text):
+def text_to_terms(text):
     """Трансляция текста в последовательность операторов языка (токенов).
 
     Включает в себя:
@@ -79,15 +79,15 @@ def text2terms(text):
     ifFlag = 0
     whileFlag = 0
     for term in terms:
-        if term.symbol == "IF":
+        if term.word == "IF":
             ifFlag += 1
-        if term.symbol == "THEN":
+        if term.word == "THEN":
             ifFlag -= 1
         assert ifFlag >= 0, "Unbalanced IF-THEN!"
 
-        if term.symbol == "WHILE":
+        if term.word == "WHILE":
             whileFlag += 1
-        if term.symbol == "REPEAT":
+        if term.word == "REPEAT":
             whileFlag -= 1
         assert whileFlag >= 0, "Unbalanced WHILE-REPEAT!"
     assert ifFlag == 0, "Unbalanced IF-THEN!"
@@ -106,60 +106,76 @@ def translate_stage_1(text, memory):
     переменные заносятся в память (после кода),
     создается условная таблица линковки для лейблов функций и названий переменных.
     """
-    terms = text2terms(text)
+    terms = text_to_terms(text)
 
     # Транслируем термы в машинный код.
     code = []
     brackets_stack = [] 
-    addresses_in_conditious = {} # код, куда нужно вставить аргумент - аргумент
+    addresses_in_conditions = {} # код, куда нужно вставить аргумент - аргумент
     # надо бы сделать отдельный файлик который управляет памятью. инициализирует например
     # стек у нас стопроц в общей памяти, просто с конца добавляется
     # или память это просто битовый файл?
 
     i = 0
     address = 0
+    hex_number_pattern = r'^0[xX][0-9A-Fa-f]+$'
+    dec_number_pattern = r'^[0-9]+$'
+    last_begin = 0
     while i < len(terms):
         term = terms[i]
-        hex_number_pattern = r'^0[xX][0-9A-Fa-f]+$'
-        dec_number_pattern = r'^[0-9]+$'
-        # load_imm
-        if re.fullmatch(hex_number_pattern, term.word) or re.fullmatch(dec_number_pattern, term.word):
+
+        # если это 16 cc число - load_imm
+        if re.fullmatch(hex_number_pattern, term.word):
+            arg = int(term.word, 16)
+            assert arg <= 67108863 and arg >= -67108864, "Argument is not in range!"
+            code.append({"address": address, "opcode": Opcode.LOAD_IMM, "arg": arg, "term": term})
+        # или 10 сс
+        elif re.fullmatch(dec_number_pattern, term.word):
             arg = int(term.word)
             assert arg <= 67108863 and arg >= -67108864, "Argument is not in range!"
             code.append({"address": address, "opcode": Opcode.LOAD_IMM, "arg": arg, "term": term})
 
         # если встретили определение слова
-        if term.word == "VARIABLE":
+        elif term.word == "VARIABLE":
             # после обработки всех термов, мы добавим его в конец
-            value = terms[i-1]
-            label = terms[i+1]
+            value = code[-1]['arg'] # берем отсюда, так как тут число уже прошло конвертацию
+            label = terms[i+1].word
             variables_queue[label] = value
             i += 1 # перепрыгиваем через лейбл, тк  мы его обработали
+            address -= 1
 
         # если встретили определение функции 
-        if term.word == ":":
+        elif term.word == ":":
             label = terms[i+1].word
             functions_map[label] = address
             i += 1
 
         # обработка if - else - then, чтобы вставить им потом в аругменты адреса переходов 
-        if term.word == "IF":
+        elif term.word == "IF":
             brackets_stack.append({"address": address, "opcode": Opcode.IF})
             code.append({"address": address, "opcode": Opcode.IF, "arg": -1, "term": term})
-        if term.word == "ELSE":
-            addresses_in_conditious[brackets_stack.pop.address] = address + 1
+        elif term.word == "ELSE":
+            addresses_in_conditions[brackets_stack.pop()['address']] = address + 1
             brackets_stack.append({"address": address, "opcode": Opcode.ELSE})
             code.append({"address": address, "opcode": Opcode.ELSE, "arg": -1, "term": term})
-        if term.word == "THEN":
-            addresses_in_conditious[brackets_stack.pop.address] = address
-        
-                
-        
+        elif term.word == "THEN":
+            addresses_in_conditions[brackets_stack.pop()['address']] = address
+            address -= 1
 
+        elif term.word == "BEGIN":
+            last_begin = address
+            address -= 1
+        elif term.word == "WHILE":
+            brackets_stack.append({"address": address, "opcode": Opcode.WHILE})
+            code.append({"address": address, "opcode": Opcode.WHILE, "arg": -1, "term": term})
+        elif term.word == "REPEAT":
+            addresses_in_conditions[brackets_stack.pop()['address']] = address 
+            code.append({"address": address, "opcode": Opcode.REPEAT, "arg": last_begin, "term": term})
+        
         # если встретили переменную или вызов функции
-        if term.word not in instructions():
+        elif term.word not in instructions():
             arg = term.word
-            if arg in variables_map:
+            if arg in variables_queue:
                 code.append({"address": address, "opcode": Opcode.LOAD_ADDR, "arg": arg, "term": term})
             elif arg in functions_map:
                 code.append({"address": address, "opcode": Opcode.CALL, "arg": arg, "term": term})
@@ -168,24 +184,7 @@ def translate_stage_1(text, memory):
 
 
         else:
-            code.append({"address": address, "opcode": symbol2opcode(term.symbol), "term": term})
-
-
-
-        if term.word == "[":
-            # оставляем placeholder, который будет заменён в конце цикла
-            code.append(None)
-            return_stack.append(pc)
-        elif term.word == "]":
-            # формируем цикл с началом из jmp_stack
-            begin_pc = return_stack.pop()
-            begin = {"opcode": Opcode.JZ, "arg": pc + 1, "term": terms[begin_pc]}
-            end = {"opcode": Opcode.JMP, "arg": begin_pc, "term": term}
-            code[begin_pc] = begin
-            code.append(end)
-        else:
-            # Обработка тривиально отображаемых операций.
-            code.append({"index": pc, "opcode": symbol2opcode(term.symbol), "term": term})
+            code.append({"address": address, "opcode": word_to_opcode(term.word), "term": term})
 
         i += 1
         address += 1
@@ -203,20 +202,20 @@ def main(source, target):
     MEMORY_SIZE = 1000
     memory = Memory(MEMORY_SIZE)
     code = translate_stage_1(source, memory)
+    for el in code:
+        print(el)
+    exit
     binary_code = to_bytes(code)
     hex_code = to_hex(code)
 
     # Убедимся, что каталог назначения существует
     os.makedirs(os.path.dirname(os.path.abspath(target)) or ".", exist_ok=True)
 
-    # Запишим выходные файлы
-    if target.endswith(".bin"):
-        with open(target, "wb") as f:
-            f.write(binary_code)
-        with open(target + ".hex", "w") as f:
-            f.write(hex_code)
-    else:
-        write_json(target, code)
+    # Запишем выходные файлы
+    with open(target, "wb") as f:
+        f.write(binary_code)
+    with open(target + ".hex", "w") as f:
+        f.write(hex_code)
 
     # Обратите внимание, что память данных не экспортируется в файл, так как
     # в случае brainfuck она может быть инициализирована только 0.

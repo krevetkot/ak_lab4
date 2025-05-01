@@ -45,6 +45,7 @@ class Opcode(str, Enum):
     IF = "if"
     ELSE = "else"
     THEN = "then"
+    BEGIN = "begin"
     WHILE = "while"
     REPEAT = "repeat"
 
