@@ -18,7 +18,7 @@ def instructions():
     return {"@", "!", "VARIABLE", "IF", "ELSE", "THEN", "BEGIN", "WHILE", "REPEAT", ":", ";", "+", "-", "*", "/", "%",
             "and", "or", "not", "=", ">", "<", "HALT"}
 
-def first_type_instructions(): # без аргумента
+def instr_without_arg(): # без аргумента
     return {"@", "!", ";", "+", "-", "*", "/", "%","and", "or", "not", "=", ">", "<", "HALT"}
 
 def seconf_type_instructions(): # с аргументом + LOAD_IMM
@@ -146,13 +146,14 @@ def translate_stage_1(text):
             label = terms[i+1].word
             variables_queue[label] = value
             i += 1 # перепрыгиваем через лейбл, тк  мы его обработали
-            address -= 1
+            address -= 3
 
         # если встретили определение функции 
         elif term.word == ":":
             label = terms[i+1].word
             functions_map[label] = address
             i += 1
+            address -= 3
 
         # обработка if - else - then, чтобы вставить им потом в аругменты адреса переходов 
         elif term.word == "IF":
@@ -164,11 +165,11 @@ def translate_stage_1(text):
             code.append({"address": address, "opcode": Opcode.ELSE, "arg": -1, "term": term})
         elif term.word == "THEN":
             addresses_in_conditions[brackets_stack.pop()['address']] = address
-            address -= 1
+            address -= 3
 
         elif term.word == "BEGIN":
             last_begin = address
-            address -= 1
+            address -= 3
         elif term.word == "WHILE":
             brackets_stack.append({"address": address, "opcode": Opcode.WHILE})
             code.append({"address": address, "opcode": Opcode.WHILE, "arg": -1, "term": term})
@@ -190,8 +191,11 @@ def translate_stage_1(text):
         else:
             code.append({"address": address, "opcode": word_to_opcode(term.word), "term": term})
 
+        if term.word in instr_without_arg():
+            address -=2
+
         i += 1
-        address += 1
+        address += 3
 
     return code
 
@@ -209,7 +213,7 @@ def translate_stage_2(code):
         variables_map[label] = curr_address
         # такой обосранный формат сохранения, пока я не придумаю что-то лучше
         code.append({'address': curr_address, 'arg': value})
-        curr_address += 1
+        curr_address += 2
 
     for instruction in code:
         if 'arg' in instruction:
@@ -236,9 +240,8 @@ def main(source, target):
     code = translate_stage_2(code)
     for el in code:
         print(el)
-    return
     binary_code = to_bytes(code)
-    hex_code = to_hex(code)
+    hex_code = to_hex(code, variables_map)
 
     # Убедимся, что каталог назначения существует
     os.makedirs(os.path.dirname(os.path.abspath(target)) or ".", exist_ok=True)
@@ -248,10 +251,6 @@ def main(source, target):
         f.write(binary_code)
     with open(target + ".hex", "w") as f:
         f.write(hex_code)
-
-    # Обратите внимание, что память данных не экспортируется в файл, так как
-    # в случае brainfuck она может быть инициализирована только 0.
-    print("source LoC:", len(source.split("\n")), "code instr:", len(code))
 
 
 if __name__ == "__main__":

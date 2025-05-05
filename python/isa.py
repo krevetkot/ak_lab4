@@ -29,27 +29,11 @@ class Opcode(str, Enum):
         - `HALT` -- остановка машины.
     """
 
-    VARIABLE = "variable"
-    DEFINE_FUNC = "define_func" #: word code ;
+    # спец опкод для сохранения в памяти (больше для отладки и трансляции)
+    VARIABLE_IN_MEMORY = "variable_in_memory"
 
-    CALL = "call"
-    RETURN = "return" # НИЖЕ ЕГО ЕЩЕ НЕТ. ЭТО КОД ОПЕРАЦИИ ;
-    JUMP = "jmp"
-    LOAD_ADDR = "loadaddr " # НИЖЕ ЕГО ЕЩЕ НЕТ. 
-    # ЭТО ЗАГРУЗКА ПО лейблу / адресу
-
-    LOAD_IMM = "loadimm" # синтаксис - просто число
-    LOAD = "load" # использует @ загружает по адресу, портит DR
-    SAVE = "save"
-
-    IF = "if"
-    ELSE = "else"
-    THEN = "then"
-    BEGIN = "begin"
-    WHILE = "while"
-    REPEAT = "repeat"
-
-    # все математическиеи и логические операции вторым аргументом принимают ПЕРЕМЕННУЮ
+    # инструкции без аргумента
+    LOAD = "load"
     PLUS = "+"
     MINUS = "-"
     MULT = "*"
@@ -61,9 +45,25 @@ class Opcode(str, Enum):
     EQUAL = "="
     LESS = "<"
     GREATER = ">"
-
     HALT = "halt"
+    RETURN = "return"
 
+    # инструкции, которые не отображаются в память
+    VARIABLE = "variable"
+    DEFINE_FUNC = "define_func"
+    THEN = "then"
+    BEGIN = "begin"
+
+    # инструкции с аргументом
+    LOAD_IMM = "loadimm"
+    LOAD_ADDR = "loadaddr"
+    SAVE = "save"
+    IF = "if"
+    ELSE = "else"
+    WHILE = "while"
+    REPEAT = "repeat"
+    CALL = "call"
+  
 
     def __str__(self):
         """Переопределение стандартного поведения `__str__` для `Enum`: вместо
@@ -82,92 +82,62 @@ class Term(namedtuple("Term", "line pos word")):
 
 # Словарь соответствия кодов операций их бинарному представлению
 opcode_to_binary = {
-    Opcode.VARIABLE: 0x0, #00000
-    Opcode.DEFINE_FUNC: 0x1,  # 00001
-    Opcode.LOAD_IMM: 0x2,  # 00010
-    Opcode.LOAD: 0x3,  # 00011
-    Opcode.SAVE: 0x4,  # 00100
+    # с 1 или нет?
+    Opcode.LOAD: 0x2,      #00000010  
+    Opcode.PLUS: 0x4,      #00000100 
+    Opcode.MINUS: 0x6,     #00000110 
+    Opcode.MULT: 0x8,      #00001000   
+    Opcode.DIV: 0x10,      #00001010  
+    Opcode.MOD: 0x12,      #00001100 
+    Opcode.AND: 0x14,      #00001110 
+    Opcode.OR: 0x16,       #00010000  
+    Opcode.NOT: 0x18,      #00010010 
+    Opcode.EQUAL: 0x20,    #00010100   
+    Opcode.LESS: 0x22,     #00010110  
+    Opcode.GREATER: 0x24,  #00011000 
+    Opcode.HALT: 0x26,     #00011010 
+    Opcode.RETURN: 0x28,   #00011100 
+    Opcode.SAVE: 0x30,      #00011110
 
-    Opcode.IF: 0x5,  # 00101
-    Opcode.THEN: 0x6,    # 00110
-    Opcode.WHILE: 0x7,   # 00111
-    Opcode.REPEAT: 0x8,  # 01000
-
-    Opcode.PLUS: 0x9,    # 01001
-    Opcode.MINUS: 0xA,   # 01010
-    Opcode.MULT: 0xB,    # 01011
-    Opcode.DIV: 0xC,     # 01100
-    Opcode.MOD: 0xD,     # 01101
-    Opcode.AND: 0xE,     # 01110
-    Opcode.OR: 0xF,      # 01111
-    Opcode.NOT: 0x10,    # 10000
-    Opcode.EQUAL: 0x11,  # 10001
-    Opcode.LESS: 0x12,   # 10010
-    Opcode.GREATER: 0x13,# 10011
-    Opcode.HALT: 0x14    # 10100
-
-    # получается : это WORD
-    # а ; это jump на адрес возврата
-    # и при вызове какого-то слова, мы джампимся на адрес, где оно определено
+    Opcode.LOAD_IMM: 0x3,  #00000011  
+    Opcode.LOAD_ADDR: 0x5, #00000101 
+    Opcode.CALL: 0x7,      #00000111 
+    Opcode.IF: 0x9,        #00001001   
+    Opcode.ELSE: 0x11,     #00001011  
+    Opcode.WHILE: 0x13,    #00001101 
+    Opcode.REPEAT: 0x15,   #00001111 
 }
 
-binary_to_opcode = {
-    0x0: Opcode.VARIABLE,  # 00000
-    0x1: Opcode.DEFINE_FUNC,     # 00001
-    0x2: Opcode.LOAD_IMM, # 00010
-    0x3: Opcode.LOAD,     # 00011
-    0x4: Opcode.SAVE,     # 00100
-    0x5: Opcode.IF,       # 00101
-    0x6: Opcode.THEN,     # 00110
-    0x7: Opcode.WHILE,    # 00111
-    0x8: Opcode.REPEAT,   # 01000
-
-    0x9: Opcode.PLUS,     # 01001
-    0xA: Opcode.MINUS,    # 01010
-    0xB: Opcode.MULT,     # 01011
-    0xC: Opcode.DIV,      # 01100
-    0xD: Opcode.MOD,      # 01101
-    0xE: Opcode.AND,      # 01110
-    0xF: Opcode.OR,       # 01111
-    0x10: Opcode.NOT,     # 10000
-    0x11: Opcode.EQUAL,   # 10001
-    0x12: Opcode.LESS,    # 10010
-    0x13: Opcode.GREATER, # 10011
-    0x14: Opcode.HALT     # 10100
-}
+binary_to_opcode = {binary: opcode for opcode, binary in opcode_to_binary.items()}
 
 
 def to_bytes(code):
     """Преобразует машинный код в бинарное представление.
 
     Бинарное представление инструкций:
+    ВОЗМОЖНО НАДО БУДЕТ РАСШИРИТЬ АРГУМЕНТ ДО 32 БИТ НО МНЕ СЕЙЧАС ЛЕНЬ
 
     ┌─────────┬─────────────────────────────────────────────────────────────┐
-    │ 31...27 │ 26                                                        0 │
+    │ 23...16 │ 15                                                        0 │
     ├─────────┼─────────────────────────────────────────────────────────────┤
-    │  опкод  │                      адрес перехода                         │
+    │  опкод  │                      аргумент                               │
     └─────────┴─────────────────────────────────────────────────────────────┘
     """
     binary_bytes = bytearray()
     for instr in code:
-        # Получаем бинарный код операции
-        opcode_bin = opcode_to_binary[instr["opcode"]] << 27
+        if "opcode" in instr:
+            opcode_bin = opcode_to_binary[instr["opcode"]]
+            binary_bytes.append(opcode_bin)
 
-        # Добавляем адрес перехода, если он есть
-        arg = instr.get("arg", 0)
-
-        # Формируем 32-битное слово: опкод (5 бит) + адрес (27 бит)
-        binary_instr = opcode_bin | (arg & 0x07FFFFFF)
-
-        # Преобразуем 32-битное целое число в 4 байта (big-endian)
-        binary_bytes.extend(
-            ((binary_instr >> 24) & 0xFF, (binary_instr >> 16) & 0xFF, (binary_instr >> 8) & 0xFF, binary_instr & 0xFF)
-        )
+        if "arg" in instr:
+            arg = instr.get("arg", 0)
+            binary_bytes.extend(((arg >> 8) & 0xFF, arg & 0xFF))
 
     return bytes(binary_bytes)
 
 
-def to_hex(code):
+def to_hex(code, variables_map):
+    addr_to_var = {addr: name for name, addr in variables_map.items()}
     """Преобразует машинный код в текстовый файл с шестнадцатеричным представлением.
 
     Формат вывода:
@@ -177,27 +147,33 @@ def to_hex(code):
     """
     binary_code = to_bytes(code)
     result = []
+    after_halt = False
 
-    for i in range(0, len(binary_code), 4):
-        if i + 3 >= len(binary_code):
+    i = 0
+    while i < len(binary_code):
+        has_argument = (binary_code[i]) & 0x1 == 1
+
+        if has_argument  & (not after_halt) & i + 3 >= len(binary_code):
             break
 
-        # Формируем 32-битное слово из 4 байтов
-        word = (binary_code[i] << 24) | (binary_code[i + 1] << 16) | (binary_code[i + 2] << 8) | binary_code[i + 3]
-
-        # Получаем опкод и адрес
-        opcode_bin = (word >> 27) & 0xF
-        arg = word & 0x07FFFFFF
-
-        # Преобразуем опкод и адрес в мнемонику
-        mnemonic = binary_to_opcode[opcode_bin].value
- 
-        if opcode_bin in (0x2):  # load_imm требует аргумент
-            mnemonic = f"{mnemonic} {arg}"
+        address = i
+        if after_halt:
+            word = (binary_code[i] << 8) | binary_code[i + 1]
+            mnemonic = addr_to_var[address]
+            i += 2
+        else:
+            mnemonic = binary_to_opcode[binary_code[address]].value
+            if binary_to_opcode[binary_code[address]] == Opcode.HALT:
+                after_halt = True
+            if has_argument:
+                word = (binary_code[i] << 16) | (binary_code[i + 2] << 8) | binary_code[i + 3]
+                i += 3
+            else:
+                word = binary_code[i]
+                i += 1
 
         # Формируем строку в требуемом формате
         hex_word = f"{word:08X}"
-        address = i // 4
         line = f"{address} - {hex_word} - {mnemonic}"
         result.append(line)
 
@@ -205,12 +181,13 @@ def to_hex(code):
 
 
 def from_bytes(binary_code):
+    # пока не поняла для чего эта функция
     """Преобразует бинарное представление машинного кода в структурированный формат.
 
     Бинарное представление инструкций:
 
     ┌─────────┬─────────────────────────────────────────────────────────────┐
-    │ 31...27 │ 26                                                        0 │
+    │ 23...16 │ 15                                                        0 │
     ├─────────┼─────────────────────────────────────────────────────────────┤
     │  опкод  │                      адрес перехода                         │
     └─────────┴─────────────────────────────────────────────────────────────┘
