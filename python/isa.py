@@ -1,34 +1,13 @@
 """Представление исходного и машинного кода.
-
-Определено два представления:
-- Бинарное
-- JSON
 """
 
-import json
 from collections import namedtuple
 from enum import Enum
 
 
 class Opcode(str, Enum):
     """Opcode для инструкций.
-
-    Можно разделить на две группы:
-
-    1. Непосредственно представленные на уровне языка: `RIGHT`, `LEFT`, `INC`, `DEC`, `INPUT`, `PRINT`.
-    2. Инструкции для управления, где:
-        - `JMP`, `JZ` -- безусловный и условный переходы:
-
-            | Operator Position | Исходный код | Машинный код |
-            |-------------------|--------------|--------------|
-            | n                 | `[`          | `JZ (k+1)`   |
-            | ...               | ...          |              |
-            | k                 |              |              |
-            | k+1               | `]`          | `JMP n`      |
-
-        - `HALT` -- остановка машины.
     """
-
     # спец опкод для сохранения в памяти (больше для отладки и трансляции)
     VARIABLE_IN_MEMORY = "variable_in_memory"
 
@@ -75,8 +54,6 @@ class Opcode(str, Enum):
 
 class Term(namedtuple("Term", "line pos word")):
     """Описание выражения из исходного текста программы.
-
-    Сделано через класс, чтобы был docstring.
     """
 
 
@@ -142,8 +119,6 @@ def to_hex(code, variables_map):
 
     Формат вывода:
     <address> - <HEXCODE> - <mnemonic>
-    Например:
-    20 - 03340301 - add #01 <- 34 + #03
     """
     binary_code = to_bytes(code)
     result = []
@@ -166,15 +141,19 @@ def to_hex(code, variables_map):
             if binary_to_opcode[binary_code[address]] == Opcode.HALT:
                 after_halt = True
             if has_argument:
-                word = (binary_code[i] << 16) | (binary_code[i + 2] << 8) | binary_code[i + 3]
+                word = (binary_code[i] << 16) | (binary_code[i + 1] << 8) | binary_code[i + 2]
+                arg = (binary_code[i + 1] << 8) | binary_code[i + 2]
                 i += 3
             else:
                 word = binary_code[i]
                 i += 1
 
         # Формируем строку в требуемом формате
-        hex_word = f"{word:08X}"
-        line = f"{address} - {hex_word} - {mnemonic}"
+        hex_word = f"{word:06X}" # количество символов в строке
+        if has_argument:
+            line = f"{address} - {hex_word} - {mnemonic} #{arg:04X}"
+        else:
+            line = f"{address} - {hex_word} - {mnemonic}"
         result.append(line)
 
     return "\n".join(result)

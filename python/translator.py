@@ -9,21 +9,17 @@ import sys
 from isa import Opcode, Term, to_bytes, to_hex
 from memory import Memory 
 
-# у нас должна быть таблица линковки!!!!!!!!!!
-# комментарии если и будут разрешены, то только после #
-# нужен двухэтапный проход транслятора: сначала вычленяем инструкции, потом подставляем адреса
-
+# комментарии разрешенытолько после #
 
 def instructions():
     return {"@", "!", "VARIABLE", "IF", "ELSE", "THEN", "BEGIN", "WHILE", "REPEAT", ":", ";", "+", "-", "*", "/", "%",
             "and", "or", "not", "=", ">", "<", "HALT"}
 
 def instr_without_arg(): # без аргумента
-    return {"@", "!", ";", "+", "-", "*", "/", "%","and", "or", "not", "=", ">", "<", "HALT"}
+    return {"@", "!", ";", "+", "-", "*", "/", "%","AND", "OR", "NOT", "=", ">", "<", "HALT"}
 
-def seconf_type_instructions(): # с аргументом + LOAD_IMM
-    return {"!", "IF", "ELSE", "WHILE", "REPEAT", ":", ";", "+", "-", "*", "/", "%",
-        "and", "or", "not", "=", ">", "<"}
+def second_type_instructions(): # с аргументом + LOAD_IMM + LOAD_ADDR + CALL
+    return {"!", "IF", "ELSE", "WHILE", "REPEAT"}
 
 
 
@@ -44,9 +40,9 @@ def word_to_opcode(symbol):
         "*": Opcode.MULT,
         "/": Opcode.DIV,
         "%": Opcode.MOD,
-        "and": Opcode.AND,
-        "or": Opcode.OR,
-        "not": Opcode.NOT,
+        "AND": Opcode.AND,
+        "OR": Opcode.OR,
+        "NOT": Opcode.NOT,
         "=": Opcode.EQUAL,
         ">": Opcode.GREATER,
         "<": Opcode.LESS,
