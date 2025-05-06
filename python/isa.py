@@ -13,17 +13,17 @@ class Opcode(str, Enum):
 
     # инструкции без аргумента
     LOAD = "load"
-    PLUS = "+"
-    MINUS = "-"
-    MULT = "*"
-    DIV = "/"
-    MOD = "%"
+    PLUS = "add"
+    MINUS = "sub"
+    MULT = "mul"
+    DIV = "div"
+    MOD = "mod"
     AND = "and"
     OR = "or"
     NOT = "not"
-    EQUAL = "="
-    LESS = "<"
-    GREATER = ">"
+    EQUAL = "equal"
+    LESS = "less"
+    GREATER = "greater"
     HALT = "halt"
     RETURN = "return"
 
@@ -92,10 +92,9 @@ def to_bytes(code):
     """Преобразует машинный код в бинарное представление.
 
     Бинарное представление инструкций:
-    ВОЗМОЖНО НАДО БУДЕТ РАСШИРИТЬ АРГУМЕНТ ДО 32 БИТ НО МНЕ СЕЙЧАС ЛЕНЬ
 
     ┌─────────┬─────────────────────────────────────────────────────────────┐
-    │ 23...16 │ 15                                                        0 │
+    │ 39...32 │ 31                                                        0 │
     ├─────────┼─────────────────────────────────────────────────────────────┤
     │  опкод  │                      аргумент                               │
     └─────────┴─────────────────────────────────────────────────────────────┘
@@ -108,7 +107,7 @@ def to_bytes(code):
 
         if "arg" in instr:
             arg = instr.get("arg", 0)
-            binary_bytes.extend(((arg >> 8) & 0xFF, arg & 0xFF))
+            binary_bytes.extend(((arg >> 24) & 0xFF, (arg >> 16) & 0xFF, (arg >> 8) & 0xFF, arg & 0xFF))
 
     return bytes(binary_bytes)
 
@@ -128,32 +127,32 @@ def to_hex(code, variables_map):
     while i < len(binary_code):
         has_argument = (binary_code[i]) & 0x1 == 1
 
-        if has_argument  & (not after_halt) & i + 3 >= len(binary_code):
+        if has_argument  & (not after_halt) & i + 5 >= len(binary_code):
             break
 
         address = i
         if after_halt:
-            word = (binary_code[i] << 8) | binary_code[i + 1]
+            word = (binary_code[i] << 24) | (binary_code[i+1] << 16) | (binary_code[i+2] << 8) | binary_code[i + 3]
             mnemonic = addr_to_var[address]
-            i += 2
+            i += 4
         else:
             mnemonic = binary_to_opcode[binary_code[address]].value
             if binary_to_opcode[binary_code[address]] == Opcode.HALT:
                 after_halt = True
             if has_argument:
-                word = (binary_code[i] << 16) | (binary_code[i + 1] << 8) | binary_code[i + 2]
-                arg = (binary_code[i + 1] << 8) | binary_code[i + 2]
-                i += 3
+                word = (binary_code[i] << 32) | (binary_code[i+1] << 24) | (binary_code[i+2] << 16) | (binary_code[i+3] << 8) | binary_code[i + 4]
+                arg = (binary_code[i+1] << 24) | (binary_code[i+2] << 16) | (binary_code[i+3] << 8) | binary_code[i + 4]
+                i += 5
             else:
                 word = binary_code[i]
                 i += 1
 
         # Формируем строку в требуемом формате
-        hex_word = f"{word:06X}" # количество символов в строке
+        hex_word = f"{word:10X}" # количество символов в строке
         if has_argument:
-            line = f"{address} - {hex_word} - {mnemonic} #{arg:04X}"
+            line = f"{hex(address)} - {hex_word} - {mnemonic} ({arg:08X})"
         else:
-            line = f"{address} - {hex_word} - {mnemonic}"
+            line = f"{hex(address)} - {hex_word} - {mnemonic}"
         result.append(line)
 
     return "\n".join(result)
@@ -161,14 +160,15 @@ def to_hex(code, variables_map):
 
 def from_bytes(binary_code):
     # пока не поняла для чего эта функция
+    # как будто она нам и не нужна
     """Преобразует бинарное представление машинного кода в структурированный формат.
 
     Бинарное представление инструкций:
 
     ┌─────────┬─────────────────────────────────────────────────────────────┐
-    │ 23...16 │ 15                                                        0 │
+    │ 39...32 │ 31                                                        0 │
     ├─────────┼─────────────────────────────────────────────────────────────┤
-    │  опкод  │                      адрес перехода                         │
+    │  опкод  │                      аргумент                               │
     └─────────┴─────────────────────────────────────────────────────────────┘
     """
     structured_code = []

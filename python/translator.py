@@ -142,14 +142,14 @@ def translate_stage_1(text):
             label = terms[i+1].word
             variables_queue[label] = value
             i += 1 # перепрыгиваем через лейбл, тк  мы его обработали
-            address -= 3
+            address -= 5
 
         # если встретили определение функции 
         elif term.word == ":":
             label = terms[i+1].word
             functions_map[label] = address
             i += 1
-            address -= 3
+            address -= 5
 
         # обработка if - else - then, чтобы вставить им потом в аругменты адреса переходов 
         elif term.word == "IF":
@@ -161,11 +161,11 @@ def translate_stage_1(text):
             code.append({"address": address, "opcode": Opcode.ELSE, "arg": -1, "term": term})
         elif term.word == "THEN":
             addresses_in_conditions[brackets_stack.pop()['address']] = address
-            address -= 3
+            address -= 5
 
         elif term.word == "BEGIN":
             last_begin = address
-            address -= 3
+            address -= 5
         elif term.word == "WHILE":
             brackets_stack.append({"address": address, "opcode": Opcode.WHILE})
             code.append({"address": address, "opcode": Opcode.WHILE, "arg": -1, "term": term})
@@ -188,10 +188,10 @@ def translate_stage_1(text):
             code.append({"address": address, "opcode": word_to_opcode(term.word), "term": term})
 
         if term.word in instr_without_arg():
-            address -=2
+            address -=4
 
         i += 1
-        address += 3
+        address += 5
 
     return code
 
@@ -209,7 +209,7 @@ def translate_stage_2(code):
         variables_map[label] = curr_address
         # такой обосранный формат сохранения, пока я не придумаю что-то лучше
         code.append({'address': curr_address, 'arg': value})
-        curr_address += 2
+        curr_address += 4
 
     for instruction in code:
         if 'arg' in instruction:
@@ -229,13 +229,8 @@ def main(source, target):
     with open(source, encoding="utf-8") as f:
         source = f.read()
 
-    MEMORY_SIZE = 1000
-    memory = Memory(MEMORY_SIZE)
-    # пока не могу придумать что сделать с памятью
     code = translate_stage_1(source)
     code = translate_stage_2(code)
-    for el in code:
-        print(el)
     binary_code = to_bytes(code)
     hex_code = to_hex(code, variables_map)
 

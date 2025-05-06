@@ -4,7 +4,7 @@
 
 : FUNC one + ;
 
-BEGIN
+BEGIN # это комментарий
 input_addr @
 WHILE 
 output_addr !
