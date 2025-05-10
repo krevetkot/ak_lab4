@@ -15,9 +15,11 @@ import logging
 import sys
 
 from isa import Opcode, from_bytes, opcode_to_binary
+from alu import ALU
 
 MEMORY_MAPPED_INPUT_ADDRESS = 128
 MEMORY_MAPPED_INPUT_ADDRESS = 132
+
 
 
 class DataPath:
@@ -35,11 +37,17 @@ class DataPath:
     data_memory_size = None
     "Размер памяти данных."
 
+    stack_size = None
+
     data_memory = None
     "Память данных. Инициализируется нулевыми значениями."
 
     data_address = None
-    "Адрес в памяти данных. Инициализируется нулём."
+    "чисто для симуляции хранится информация - откуда поступил адрес, иза AR или PC"
+
+    ALU = None
+
+    CR = None
 
     AC = None
 
@@ -48,6 +56,8 @@ class DataPath:
     PC = None
 
     IR = None
+
+    BR = None
 
     AR = None
 
@@ -59,98 +69,45 @@ class DataPath:
     output_buffer = None
     "Буфер выходных данных."
 
-    def __init__(self, data_memory_size, input_buffer):
+    def __init__(self, data_memory_size, stack_size, input_buffer):
         assert data_memory_size > 0, "Data_memory size should be non-zero"
+        assert stack_size > 0, "Stack size should be non-zero"
         self.data_memory_size = data_memory_size
-        self.data_memory = [0] * data_memory_size
+        self.stack_size = stack_size
+        self.data_memory = bytearray(data_memory_size)
         self.data_address = 0
+        self.PC = 0
         self.AC = 0
-
-
+        self.SP = data_memory_size
         self.input_buffer = input_buffer
         self.output_buffer = []
+        self.AlU = ALU()
 
-    def signal_latch_data_addr(self, sel):
-        """Защёлкнуть адрес в памяти данных. Защёлкивание осуществляется на
-        основе селектора `sel` в котором указывается `Opcode`:
+    def signal_latch_PC(self, sel):
+        if sel == 1:
+            self.PC += 4
+        elif sel == 0:
+            self.PC = self.BR
 
-        - `Opcode.LEFT.value` -- сдвиг влево;
+    def signal_latch_CR(self):
+        self.CR = self.data_memory[self.data_address] << 24
+        self.CR |= self.data_memory[self.data_address+1] << 16
+        self.CR |= self.data_memory[self.data_address+2] << 8
+        self.CR |= self.data_memory[self.data_address+3]
 
-        - `Opcode.RIGHT.value` -- сдвиг вправо.
+    def signal_latch_IR(self):
+        self.IR = (self.CR >> 24) & 0xFF
 
-        При выходе за границы памяти данных процесс моделирования останавливается.
-        """
-        assert sel in {Opcode.LEFT.value, Opcode.RIGHT.value}, "internal error, incorrect selector: {}".format(sel)
+    def signal_latch_BR(self):
+        self.BR = (self.CR) & 0xFFFFFF
 
-        if sel == Opcode.LEFT.value:
-            self.data_address -= 1
-        elif sel == Opcode.RIGHT.value:
-            self.data_address += 1
-
-        assert 0 <= self.data_address < self.data_memory_size, "out of memory: {}".format(self.data_address)
-
+    def signal_do_ALU(self, sel):
+        
+    
     def signal_latch_acc(self):
-        """Защёлкнуть слово из памяти (`oe` от Output Enable) и защёлкнуть его в
-        аккумулятор. Сигнал `oe` выставляется неявно `ControlUnit`-ом.
-        """
-        self.AC = self.data_memory[self.data_address]
-
-    def signal_wr(self, sel):
-        """wr (от WRite), сохранить в память.
-
-        Запись в память осуществляется на основе селектора `sel` в котором указывается `Opcode`:
-
-        - `Opcode.INC.value` -- инкремент аккумулятора;
-
-        - `Opcode.DEC.value` -- декремент аккумулятора;
-
-        - `Opcode.INPUT.value` -- ввод из буфера входных данных. При исчерпании
-          буфера -- выбрасывается исключение `EOFError`.
-
-        В примере ниже имитируется переполнение ячейки при инкременте. Данный
-        текст является doctest-ом, корректность которого проверяется во время
-        загрузки модуля или командой: `python3 -m doctest -v machine.py`
-
-        >>> dp = DataPath(10, [chr(127)])
-        >>> dp.signal_wr(Opcode.INPUT.value)
-        >>> dp.signal_latch_acc()
-        >>> dp.acc
-        127
-        >>> dp.signal_wr(Opcode.INC.value)
-        >>> dp.signal_latch_acc()
-        >>> dp.acc
-        -128
-
-        """
-        assert sel in {
-            Opcode.INC.value,
-            Opcode.DEC.value,
-            Opcode.INPUT.value,
-        }, "internal error, incorrect selector: {}".format(sel)
-
-        if sel == Opcode.INC.value:
-            self.data_memory[self.data_address] = self.AC + 1
-            if self.data_memory[self.data_address] == 128:
-                self.data_memory[self.data_address] = -128
-        elif sel == Opcode.DEC.value:
-            self.data_memory[self.data_address] = self.AC - 1
-            if self.data_memory[self.data_address] == -129:
-                self.data_memory[self.data_address] = 127
-        elif sel == Opcode.INPUT.value:
-            if len(self.input_buffer) == 0:
-                raise EOFError()
-            symbol = self.input_buffer.pop(0)
-            symbol_code = ord(symbol)
-            assert -128 <= symbol_code <= 127, "input token is out of bound: {}".format(symbol_code)
-            self.data_memory[self.data_address] = symbol_code
-            logging.debug("input: %s", repr(symbol))
+        self.AC = self.ALU.get_result()
 
     def signal_output(self):
-        """Вывести значение аккумулятора в порт вывода.
-
-        Вывод осуществляется путём конвертации значения аккумулятора в символ по
-        ASCII-таблице.
-        """
         symbol = chr(self.AC)
         logging.debug("output: %s << %s", repr("".join(self.output_buffer)), repr(symbol))
         self.output_buffer.append(symbol)
