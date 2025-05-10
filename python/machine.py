@@ -16,51 +16,12 @@ import sys
 
 from isa import Opcode, from_bytes, opcode_to_binary
 
+MEMORY_MAPPED_INPUT_ADDRESS = 128
+MEMORY_MAPPED_INPUT_ADDRESS = 132
+
 
 class DataPath:
     """Тракт данных (пассивный), включая: ввод/вывод, память и арифметику.
-
-    ```text
-     latch --------->+--------------+  addr   +--------+
-     data            | data_address |---+---->|  data  |
-     addr      +---->+--------------+   |     | memory |
-               |                        |     |        |
-           +-------+                    |     |        |
-    sel -->|  MUX  |         +----------+     |        |
-           +-------+         |                |        |
-            ^     ^          |                |        |
-            |     |          |        data_in |        | data_out
-            |     +---(+1)---+          +---->|        |-----+
-            |                |          |     |        |     |
-            +---------(-1)---+          |  oe |        |     |
-                                        | --->|        |     |
-                                        |     |        |     |
-                                        |  wr |        |     |
-                                        | --->|        |     |
-                                        |     +--------+     |
-                                        |                    v
-                                    +--------+  latch_acc +-----+
-                          sel ----> |  MUX   |  --------->| acc |
-                                    +--------+            +-----+
-                                     ^   ^  ^                |
-                                     |   |  |                +---(==0)---> zero
-                                     |   |  |                |
-                                     |   |  +---(+1)---------+
-                                     |   |                   |
-                                     |   +------(-1)---------+
-                                     |                       |
-            input -------------------+                       +---------> output
-    ```
-
-    - data_memory -- однопортовая, поэтому либо читаем, либо пишем.
-
-    - input/output -- токенизированная логика ввода-вывода. Не детализируется в
-      рамках модели.
-
-    - input -- чтение может вызвать остановку процесса моделирования, если буфер
-      входных значений закончился.
-
-    Реализованные методы соответствуют сигналам защёлкивания значений:
 
     - `signal_latch_data_addr` -- защёлкивание адреса в памяти данных;
     - `signal_latch_acc` -- защёлкивание аккумулятора;
@@ -80,8 +41,17 @@ class DataPath:
     data_address = None
     "Адрес в памяти данных. Инициализируется нулём."
 
-    acc = None
-    "Аккумулятор. Инициализируется нулём."
+    AC = None
+
+    DR = None
+
+    PC = None
+
+    IR = None
+
+    AR = None
+
+    SP = None
 
     input_buffer = None
     "Буфер входных данных. Инициализируется входными данными конструктора."
@@ -94,7 +64,9 @@ class DataPath:
         self.data_memory_size = data_memory_size
         self.data_memory = [0] * data_memory_size
         self.data_address = 0
-        self.acc = 0
+        self.AC = 0
+
+
         self.input_buffer = input_buffer
         self.output_buffer = []
 
@@ -121,7 +93,7 @@ class DataPath:
         """Защёлкнуть слово из памяти (`oe` от Output Enable) и защёлкнуть его в
         аккумулятор. Сигнал `oe` выставляется неявно `ControlUnit`-ом.
         """
-        self.acc = self.data_memory[self.data_address]
+        self.AC = self.data_memory[self.data_address]
 
     def signal_wr(self, sel):
         """wr (от WRite), сохранить в память.
@@ -157,11 +129,11 @@ class DataPath:
         }, "internal error, incorrect selector: {}".format(sel)
 
         if sel == Opcode.INC.value:
-            self.data_memory[self.data_address] = self.acc + 1
+            self.data_memory[self.data_address] = self.AC + 1
             if self.data_memory[self.data_address] == 128:
                 self.data_memory[self.data_address] = -128
         elif sel == Opcode.DEC.value:
-            self.data_memory[self.data_address] = self.acc - 1
+            self.data_memory[self.data_address] = self.AC - 1
             if self.data_memory[self.data_address] == -129:
                 self.data_memory[self.data_address] = 127
         elif sel == Opcode.INPUT.value:
@@ -179,13 +151,13 @@ class DataPath:
         Вывод осуществляется путём конвертации значения аккумулятора в символ по
         ASCII-таблице.
         """
-        symbol = chr(self.acc)
+        symbol = chr(self.AC)
         logging.debug("output: %s << %s", repr("".join(self.output_buffer)), repr(symbol))
         self.output_buffer.append(symbol)
 
     def zero(self):
         """Флаг нуля. Необходим для условных переходов."""
-        return self.acc == 0
+        return self.AC == 0
 
 
 class ControlUnit:
@@ -410,6 +382,7 @@ def main(code_file, input_file):
     with open(code_file, "rb") as file:
         binary_code = file.read()
     code = from_bytes(binary_code)
+    # у меня переменная длина инструкций, мне это не надо
 
     with open(input_file, encoding="utf-8") as file:
         input_text = file.read()

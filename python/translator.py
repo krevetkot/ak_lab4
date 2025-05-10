@@ -7,9 +7,8 @@ import re
 import sys
 
 from isa import Opcode, Term, to_bytes, to_hex
-from memory import Memory 
 
-# комментарии разрешенытолько после #
+# комментарии разрешены только после #
 
 def instructions():
     return {"@", "!", "VARIABLE", "IF", "ELSE", "THEN", "BEGIN", "WHILE", "REPEAT", ":", ";", "+", "-", "*", "/", "%",
@@ -142,7 +141,8 @@ def translate_stage_1(text):
             label = terms[i+1].word
             variables_queue[label] = value
             i += 1 # перепрыгиваем через лейбл, тк  мы его обработали
-            address -= 5
+            code.pop()
+            address -= 10
 
         # если встретили определение функции 
         elif term.word == ":":
@@ -203,7 +203,6 @@ def translate_stage_2(code):
     переменные сохраняются после halt. 
     """
     # сначала сохраним переменные в конце кода, чтобы потом подставлять их адреса
-    # ПОКА ЧТО адресация идет односительно ячеек в массиве, но позже я переделаю под байты
     curr_address = code[-1]['address'] + 1
     for label, value in variables_queue.items():
         variables_map[label] = curr_address
@@ -231,6 +230,8 @@ def main(source, target):
 
     code = translate_stage_1(source)
     code = translate_stage_2(code)
+    for el in code:
+        print(el)
     binary_code = to_bytes(code)
     hex_code = to_hex(code, variables_map)
 

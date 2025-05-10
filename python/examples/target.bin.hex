@@ -1,26 +1,23 @@
-0x0 -  300000080 - loadimm (00000080)
-0x5 -  300000084 - loadimm (00000084)
-0xa -  300000001 - loadimm (00000001)
-0xf -  50000005B - loadaddr (0000005B)
-0x14 -          4 - add
-0x15 -         28 - return
-0x16 -  500000053 - loadaddr (00000053)
-0x1b -          2 - load
-0x1c - 1300000027 - while (00000027)
-0x21 -  500000057 - loadaddr (00000057)
-0x26 -         30 - save
-0x27 - 1500000016 - repeat (00000016)
-0x2c -  300000001 - loadimm (00000001)
-0x31 -         24 - greater
-0x32 -  90000003E - if (0000003E)
-0x37 -  300000001 - loadimm (00000001)
-0x3c -          4 - add
-0x3d - 1100000048 - else (00000048)
-0x42 -  300000001 - loadimm (00000001)
-0x47 -          6 - sub
-0x48 -  30000002A - loadimm (0000002A)
-0x4d -  70000000F - call (0000000F)
-0x52 -         26 - halt
-0x53 -         80 - input_addr
-0x57 -         84 - output_addr
-0x5b -          1 - one
+0x0 -  50000004C - loadaddr (0000004C)
+0x5 -          4 - add
+0x6 -         28 - return
+0x7 -  500000044 - loadaddr (00000044)
+0xc -          2 - load
+0xd - 1300000018 - while (00000018)
+0x12 -  500000048 - loadaddr (00000048)
+0x17 -         30 - save
+0x18 - 1500000007 - repeat (00000007)
+0x1d -  300000001 - loadimm (00000001)
+0x22 -         24 - greater
+0x23 -  90000002F - if (0000002F)
+0x28 -  300000001 - loadimm (00000001)
+0x2d -          4 - add
+0x2e - 1100000039 - else (00000039)
+0x33 -  300000001 - loadimm (00000001)
+0x38 -          6 - sub
+0x39 -  30000002A - loadimm (0000002A)
+0x3e -  700000000 - call (00000000)
+0x43 -         26 - halt
+0x44 -         80 - input_addr
+0x48 -         84 - output_addr
+0x4c -          1 - one
