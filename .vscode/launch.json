@@ -8,11 +8,11 @@
             "name": "Python Debugger: Current File with Arguments",
             "type": "debugpy",
             "request": "launch",
-            //"program": "C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\translator.py",
-            "program": "C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\microcode_util.py",
+            "program": "C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\translator.py",
+            //"program": "C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\microcode_util.py",
             "console": "integratedTerminal",
-            //"args": "C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\examples\\hello.forth C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\examples\\target.bin"
-            "args": "C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\microcode.bin"
+            "args": "C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\examples\\hello.forth C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\examples\\target.bin"
+            //"args": "C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\microcode.bin"
         }
     ]
 }

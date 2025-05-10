@@ -142,14 +142,14 @@ def translate_stage_1(text):
             variables_queue[label] = value
             i += 1 # перепрыгиваем через лейбл, тк  мы его обработали
             code.pop()
-            address -= 10
+            address -= 8
 
         # если встретили определение функции 
         elif term.word == ":":
             label = terms[i+1].word
             functions_map[label] = address
             i += 1
-            address -= 5
+            address -= 4
 
         # обработка if - else - then, чтобы вставить им потом в аругменты адреса переходов 
         elif term.word == "IF":
@@ -161,11 +161,11 @@ def translate_stage_1(text):
             code.append({"address": address, "opcode": Opcode.ELSE, "arg": -1, "term": term})
         elif term.word == "THEN":
             addresses_in_conditions[brackets_stack.pop()['address']] = address
-            address -= 5
+            address -= 4
 
         elif term.word == "BEGIN":
             last_begin = address
-            address -= 5
+            address -= 4
         elif term.word == "WHILE":
             brackets_stack.append({"address": address, "opcode": Opcode.WHILE})
             code.append({"address": address, "opcode": Opcode.WHILE, "arg": -1, "term": term})
@@ -188,10 +188,10 @@ def translate_stage_1(text):
             code.append({"address": address, "opcode": word_to_opcode(term.word), "term": term})
 
         if term.word in instr_without_arg():
-            address -=4
+            address -=3
 
         i += 1
-        address += 5
+        address += 4
 
     return code
 

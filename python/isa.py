@@ -94,7 +94,7 @@ def to_bytes(code):
     Бинарное представление инструкций:
 
     ┌─────────┬─────────────────────────────────────────────────────────────┐
-    │ 39...32 │ 31                                                        0 │
+    │ 31...24 │ 23                                                        0 │
     ├─────────┼─────────────────────────────────────────────────────────────┤
     │  опкод  │                      аргумент                               │
     └─────────┴─────────────────────────────────────────────────────────────┘
@@ -104,10 +104,12 @@ def to_bytes(code):
         if "opcode" in instr:
             opcode_bin = opcode_to_binary[instr["opcode"]]
             binary_bytes.append(opcode_bin)
+        else:
+            binary_bytes.append(0)
 
         if "arg" in instr:
             arg = instr.get("arg", 0)
-            binary_bytes.extend(((arg >> 24) & 0xFF, (arg >> 16) & 0xFF, (arg >> 8) & 0xFF, arg & 0xFF))
+            binary_bytes.extend(((arg >> 16) & 0xFF, (arg >> 8) & 0xFF, arg & 0xFF))
 
     return bytes(binary_bytes)
 
@@ -127,7 +129,7 @@ def to_hex(code, variables_map):
     while i < len(binary_code):
         has_argument = (binary_code[i]) & 0x1 == 1
 
-        if has_argument  & (not after_halt) & i + 5 >= len(binary_code):
+        if has_argument  & (not after_halt) & i + 4 >= len(binary_code):
             break
 
         address = i
@@ -140,9 +142,9 @@ def to_hex(code, variables_map):
             if binary_to_opcode[binary_code[address]] == Opcode.HALT:
                 after_halt = True
             if has_argument:
-                word = (binary_code[i] << 32) | (binary_code[i+1] << 24) | (binary_code[i+2] << 16) | (binary_code[i+3] << 8) | binary_code[i + 4]
-                arg = (binary_code[i+1] << 24) | (binary_code[i+2] << 16) | (binary_code[i+3] << 8) | binary_code[i + 4]
-                i += 5
+                word = (binary_code[i] << 24) | (binary_code[i+1] << 16) | (binary_code[i+2] << 8) | binary_code[i + 3]
+                arg = (binary_code[i+1] << 16) | (binary_code[i+2] << 8) | binary_code[i + 3]
+                i += 4
             else:
                 word = binary_code[i]
                 i += 1
