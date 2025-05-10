@@ -88,6 +88,7 @@ class DataPath:
             self.PC += 4
         elif sel == 0:
             self.PC = self.BR
+        self.data_address = self.PC
 
     def signal_latch_CR(self):
         self.CR = self.data_memory[self.data_address] << 24
@@ -101,68 +102,58 @@ class DataPath:
     def signal_latch_BR(self):
         self.BR = (self.CR) & 0xFFFFFF
 
-    def signal_do_ALU(self, sel):
-        
+    def signal_do_ALU(self, mux_sel, operation):
+        if mux_sel == 0:
+            left = self.DR
+        if mux_sel == 1:
+            left = self.PC
+        if mux_sel == 2:
+            left = self.BR
+        if mux_sel == 3:
+            left = self.CR
+        self.ALU.do_ALU(self.AC, left, operation)
     
     def signal_latch_acc(self):
         self.AC = self.ALU.get_result()
 
-    def signal_output(self):
-        symbol = chr(self.AC)
-        logging.debug("output: %s << %s", repr("".join(self.output_buffer)), repr(symbol))
-        self.output_buffer.append(symbol)
+    def signal_latch_DR(self):
+        self.DR = self.AC
 
-    def zero(self):
-        """Флаг нуля. Необходим для условных переходов."""
-        return self.AC == 0
+    def signal_latch_AR(self, sel):
+        if sel == 0:
+            self.AR = self.AC
+        elif sel == 1:
+            self.AR = self.SP
+        self.data_address = self.AR
+
+    def signal_latch_SP(self, sel):
+        if sel == 0:
+            self.SP -= 4
+        elif sel == 1:
+            self.SP += 4
+
+    def signal_oe(self):
+        self.data_address = self.AR
+        assert 0 <= self.data_address < self.data_memory_size, "out of memory: {}".format(self.data_address)
+
+    def signal_wr(self, sel):
+        assert 0 <= self.AR < self.data_memory_size, "out of memory: {}".format(self.AR)
+        if sel == 0:
+            self.data_memory[self.AR] = self.DR
+        elif sel == 1:
+            self.data_memory[self.AR] = self.AC
+
+    "пока не знаю как примонтировать ячейку памяти на ввод/вывод"
 
 
 class ControlUnit:
     """Блок управления процессора. Выполняет декодирование инструкций и
     управляет состоянием модели процессора, включая обработку данных (DataPath).
-
-    Согласно варианту, любая инструкция может быть закодирована в одно слово.
-    Следовательно, индекс памяти команд эквивалентен номеру инструкции.
-
-    ```text
-    +------------------(+1)-------+
-    |                             |
-    |   +-----+                   |
-    +-->|     |     +---------+   |    +---------+
-        | MUX |---->| program |---+--->| program |
-    +-->|     |     | counter |        | memory  |
-    |   +-----+     +---------+        +---------+
-    |      ^                               |
-    |      | sel_next                      | current instruction
-    |      |                               |
-    +---------------(select-arg)-----------+
-           |                               |      +---------+
-           |                               |      |  step   |
-           |                               |  +---| counter |
-           |                               |  |   +---------+
-           |                               v  v        ^
-           |                       +-------------+     |
-           +-----------------------| instruction |-----+
-                                   |   decoder   |
-                                   |             |<-------+
-                                   +-------------+        |
-                                           |              |
-                                           | signals      |
-                                           v              |
-                                     +----------+  zero   |
-                                     |          |---------+
-                                     | DataPath |
-                      input -------->|          |----------> output
-                                     +----------+
-    ```
-
     """
 
-    program = None
-    "Память команд."
+    microprogram = None
 
-    program_counter = None
-    "Счётчик команд. Инициализируется нулём."
+    mPC = None
 
     data_path = None
     "Блок обработки данных."
@@ -170,12 +161,11 @@ class ControlUnit:
     _tick = None
     "Текущее модельное время процессора (в тактах). Инициализируется нулём."
 
-    def __init__(self, program, data_path):
-        self.program = program
-        self.program_counter = 0
+    def __init__(self, microprogram, data_path):
+        self.microprogram = microprogram
+        self.mPC = 0
         self.data_path = data_path
         self._tick = 0
-        self.step = 0
 
     def tick(self):
         """Продвинуть модельное время процессора вперёд на один такт."""
@@ -185,120 +175,32 @@ class ControlUnit:
         """Текущее модельное время процессора (в тактах)."""
         return self._tick
 
-    def signal_latch_program_counter(self, sel_next):
-        """Защёлкнуть новое значение счётчика команд.
-
-        Если `sel_next` равен `True`, то счётчик будет увеличен на единицу,
-        иначе -- будет установлен в значение аргумента текущей инструкции.
-        """
-        if sel_next:
-            self.program_counter += 1
-        else:
-            instr = self.program[self.program_counter]
-            assert "arg" in instr, "internal error"
-            self.program_counter = instr["arg"]
-
-    def process_next_tick(self):  # noqa: C901 # код имеет хорошо структурирован, по этому не проблема.
-        """Основной цикл процессора. Декодирует и выполняет инструкцию.
-
-        Обработка инструкции:
-
-        1. Проверить `Opcode`.
-
-        2. Вызвать методы, имитирующие необходимые управляющие сигналы.
-
-        3. Продвинуть модельное время вперёд на один такт (`tick`).
-
-        4. (если необходимо) повторить шаги 2-3.
-
-        5. Перейти к следующей инструкции.
-
-        Обработка функций управления потоком исполнения вынесена в
-        `decode_and_execute_control_flow_instruction`.
-        """
-        instr = self.program[self.program_counter]
-        opcode = instr["opcode"]
-
-        if opcode is Opcode.HALT:
-            raise StopIteration()
-
-        if opcode is Opcode.JMP:
-            addr = instr["arg"]
-            self.program_counter = addr
-            self.step = 0
-            self.tick()
-            return
-
-        if opcode is Opcode.JZ:
-            if self.step == 0:
-                addr = instr["arg"]
-                self.data_path.signal_latch_acc()
-                self.step = 1
-                self.tick()
-                return
-            if self.step == 1:
-                if self.data_path.zero():
-                    self.signal_latch_program_counter(sel_next=False)
-                else:
-                    self.signal_latch_program_counter(sel_next=True)
-                self.step = 0
-                self.tick()
-                return
-
-        if opcode in {Opcode.RIGHT, Opcode.LEFT}:
-            self.data_path.signal_latch_data_addr(opcode.value)
-            self.signal_latch_program_counter(sel_next=True)
-            self.step = 0
-            self.tick()
-            return
-
-        if opcode in {Opcode.INC, Opcode.DEC, Opcode.INPUT}:
-            if self.step == 0:
-                self.data_path.signal_latch_acc()
-                self.step = 1
-                self.tick()
-                return
-            if self.step == 1:
-                self.data_path.signal_wr(opcode.value)
-                self.signal_latch_program_counter(sel_next=True)
-                self.step = 0
-                self.tick()
-                return
-
-        if opcode is Opcode.PRINT:
-            if self.step == 0:
-                self.data_path.signal_latch_acc()
-                self.step = 1
-                self.tick()
-                return
-            if self.step == 1:
-                self.data_path.signal_output()
-                self.signal_latch_program_counter(sel_next=True)
-                self.step = 0
-                self.tick()
-                return
+    def instruction_decoder(self):
+        # в control unit при инициализации я загружу таблицу линковки
+        # и эта функция будет просто сопоставлять опкод и адрес в памяти микрокоманд
+        # если такого адреса нет - возвращать 0 (специально)
+        return 0
 
     def __repr__(self):
         """Вернуть строковое представление состояния процессора."""
         state_repr = "TICK: {:3} PC: {:3}/{} ADDR: {:3} MEM_OUT: {} ACC: {}".format(
             self._tick,
-            self.program_counter,
-            self.step,
+            self.data_path.PC,
             self.data_path.data_address,
             self.data_path.data_memory[self.data_path.data_address],
-            self.data_path.acc,
+            self.data_path.AC,
         )
 
-        instr = self.program[self.program_counter]
-        opcode = instr["opcode"]
-        instr_repr = str(opcode)
+        # instr = self.program[self.data_path.PC]
+        # opcode = instr["opcode"]
+        # instr_repr = str(opcode)
 
-        if "arg" in instr:
-            instr_repr += " {}".format(instr["arg"])
+        # if "arg" in instr:
+        #     instr_repr += " {}".format(instr["arg"])
 
-        instr_hex = f"{opcode_to_binary[opcode] << 28 | (instr.get('arg', 0) & 0x0FFFFFFF):08X}"
+        # instr_hex = f"{opcode_to_binary[opcode] << 28 | (instr.get('arg', 0) & 0x0FFFFFFF):08X}"
 
-        return "{} \t{} [{}]".format(state_repr, instr_repr, instr_hex)
+        # return "{} \t{} [{}]".format(state_repr, instr_repr, instr_hex)
 
 
 def simulation(code, input_tokens, data_memory_size, limit):

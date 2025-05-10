@@ -227,6 +227,16 @@ def save_to_bin(microcode: dict, filename: str):
     print(f"Saved {len(steps)} microinstructions to {filename}")
 
 
+
+def microcode_from_byte(target):
+    # тут короче я хочу преобразовать бинарный файл в массив с элементом размером 3 байт
+    # [0]: [.......]
+    # [1]: [.......] и тд
+    # далее нужно сделать таблицу линковки. для load_imm - такой адрес, для load - такой и тд
+    # это отдельная функция сделает и передаст в simulation
+    return 0
+
+
 if __name__ == "__main__":
     assert len(sys.argv) == 2, "Wrong arguments: translator.py <input_file> <target_file>"
     _, target = sys.argv

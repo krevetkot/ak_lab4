@@ -20,6 +20,25 @@ class ALU:
         self.n = 1 if result < 0 else 0
         self.z = 1 if result == 0 else 0
 
+    def do_ALU(self, right, left, sel):
+        if sel == 1:
+            self.plus(right, left)
+        if sel == 2:
+            self.minus(right, left)
+        if sel == 3:
+            self.multiply(right, left)
+        if sel == 4:
+            self.divide(right, left)
+        if sel == 5:
+            self.modulo(right, left)
+        if sel == 6:
+            self.logical_and(right, left)
+        if sel == 7:
+            self.logical_or(right, left)
+        if sel == 8:
+            self.logical_not(right, left)
+            
+
     def plus(self, right, left):
         """Сложение с установкой флагов"""
         result = right + left
@@ -32,7 +51,6 @@ class ALU:
         self.c = (right + left) > max_uint32
         self.v = (right > 0 and left > 0 and result > max_int32) or \
                  (right < 0 and left < 0 and result < min_int32)
-        return result
 
     def minus(self, right, left):
         """Вычитание с установкой флагов"""
@@ -45,7 +63,6 @@ class ALU:
         # Переполнение для вычитания
         self.v = (right >= 0 and left < 0 and result < 0) or \
                  (right < 0 and left >= 0 and result > 0)
-        return result
 
     def multiply(self, right, left):
         """Умножение с установкой флагов"""
@@ -59,7 +76,6 @@ class ALU:
             self.v = 0
             
         self.c = 0  # Для умножения перенос обычно не используется
-        return result
 
     def divide(self, right, left):
         """Деление с установкой флагов"""
@@ -70,7 +86,6 @@ class ALU:
         self._update_nz(result)
         self.v = 0  # Деление не вызывает переполнения
         self.c = 0  # Нет переноса
-        return result
 
     def modulo(self, right, left):
         """Остаток от деления с установкой флагов"""
@@ -81,7 +96,6 @@ class ALU:
         self._update_nz(result)
         self.v = 0
         self.c = 0
-        return result
 
     def logical_and(self, right, left):
         """Логическое AND с установкой флагов"""
@@ -89,7 +103,6 @@ class ALU:
         self._update_nz(result)
         self.v = 0
         self.c = 0
-        return result
 
     def logical_or(self, right, left):
         """Логическое OR с установкой флагов"""
@@ -97,7 +110,6 @@ class ALU:
         self._update_nz(result)
         self.v = 0
         self.c = 0
-        return result
 
     def logical_not(self, right):
         """Логическое NOT с установкой флагов"""
@@ -105,4 +117,3 @@ class ALU:
         self._update_nz(result)
         self.v = 0
         self.c = 0
-        return result
