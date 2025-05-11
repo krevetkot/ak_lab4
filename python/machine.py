@@ -4,9 +4,9 @@
 
 Модель включает в себя три основных компонента:
 
-- `DataPath` -- работа с памятью данных и вводом-выводом.
+- `DataPath` -- работа с памятью и вводом-выводом.
 
-- `ControlUnit` -- работа с памятью команд и их интерпретация.
+- `ControlUnit` -- работа с памятью микрокоманд, интерпретация микрокоманд.
 
 - и набор вспомогательных функций: `simulation`, `main`.
 """
@@ -18,6 +18,7 @@ from isa import Opcode, opcode_to_binary
 from microcode_util import microcode_from_byte, linking_table, SIGNAL_ORDER, Signal
 
 
+# хочется конечно их на 0 и 4
 MEMORY_MAPPED_INPUT_ADDRESS = 128
 MEMORY_MAPPED_INPUT_ADDRESS = 132
 
@@ -143,7 +144,7 @@ class DataPath:
         elif sel == 1:
             self.data_memory[self.AR] = self.AC
 
-    "пока не знаю как примонтировать ячейку памяти на ввод/вывод"
+    # пока не знаю как примонтировать ячейку памяти на ввод/вывод
 
 
 class ControlUnit:
@@ -194,19 +195,18 @@ class ControlUnit:
     def parse_microinstr(self, instr):
         signals = {}
     
-        # Позиция текущего бита (начинаем с младших битов)
         pos = 0
         
         for name in SIGNAL_ORDER:
-            if name == "Signal.MUXSignal.ALU":
+            if name == Signal.MUXALU:
                 # 2 бита для Signal.MUXSignal.ALU
                 signals[name] = (instr >> pos) & 0b11
                 pos += 2
-            elif name == "Signal.ALU":
+            elif name == Signal.ALU:
                 # 4 бита для Signal.ALU
                 signals[name] = (instr >> pos) & 0b1111
                 pos += 4
-            elif name == "Signal.MUXMPC":
+            elif name == Signal.MUXMPC:
                 # 2 бита для Signal.MUXMPC
                 signals[name] = (instr >> pos) & 0b11
                 pos += 2
@@ -246,6 +246,14 @@ class ControlUnit:
             self.data_path.signal_latch_Signal.OE(signals[Signal.MUXSP])
         if signals[Signal.WR] == 1:
             self.data_path.signal_latch_Signal.WR(signals[Signal.MUXMEM])
+
+        if signals[Signal.MPC] == 1:
+            self.signal_latch_Signal.MPC(signals[Signal.MUXMPC])
+        else:
+            raise StopIteration()
+
+        self._tick()
+        
 
 
 
