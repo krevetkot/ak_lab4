@@ -14,12 +14,12 @@
 import logging
 import sys
 
-from isa import Opcode, from_bytes, opcode_to_binary
-from alu import ALU
+from isa import Opcode, opcode_to_binary
+from microcode_util import microcode_from_byte, linking_table, SIGNAL_ORDER, Signal
+
 
 MEMORY_MAPPED_INPUT_ADDRESS = 128
 MEMORY_MAPPED_INPUT_ADDRESS = 132
-
 
 
 class DataPath:
@@ -27,7 +27,7 @@ class DataPath:
 
     - `signal_latch_data_addr` -- защёлкивание адреса в памяти данных;
     - `signal_latch_acc` -- защёлкивание аккумулятора;
-    - `signal_wr` -- запись в память данных;
+    - `signal_Signal.WR` -- запись в память данных;
     - `signal_output` -- вывод в порт.
 
     Сигнал "исполняется" за один такт. Корректность использования сигналов --
@@ -45,7 +45,7 @@ class DataPath:
     data_address = None
     "чисто для симуляции хранится информация - откуда поступил адрес, иза AR или PC"
 
-    ALU = None
+    Signal.ALU = None
 
     CR = None
 
@@ -69,7 +69,7 @@ class DataPath:
     output_buffer = None
     "Буфер выходных данных."
 
-    def __init__(self, data_memory_size, stack_size, input_buffer):
+    def __init__(self, code, data_memory_size, stack_size, input_buffer):
         assert data_memory_size > 0, "Data_memory size should be non-zero"
         assert stack_size > 0, "Stack size should be non-zero"
         self.data_memory_size = data_memory_size
@@ -81,7 +81,7 @@ class DataPath:
         self.SP = data_memory_size
         self.input_buffer = input_buffer
         self.output_buffer = []
-        self.AlU = ALU()
+        self.Signal.ALU = Signal.ALU()
 
     def signal_latch_PC(self, sel):
         if sel == 1:
@@ -102,7 +102,7 @@ class DataPath:
     def signal_latch_BR(self):
         self.BR = (self.CR) & 0xFFFFFF
 
-    def signal_do_ALU(self, mux_sel, operation):
+    def signal_do_alu(self, mux_sel, operation):
         if mux_sel == 0:
             left = self.DR
         if mux_sel == 1:
@@ -111,10 +111,10 @@ class DataPath:
             left = self.BR
         if mux_sel == 3:
             left = self.CR
-        self.ALU.do_ALU(self.AC, left, operation)
+        self.Signal.ALU.do_Signal.ALU(self.AC, left, operation)
     
-    def signal_latch_acc(self):
-        self.AC = self.ALU.get_result()
+    def signal_latch_AC(self):
+        self.AC = self.Signal.ALU.get_result()
 
     def signal_latch_DR(self):
         self.DR = self.AC
@@ -153,7 +153,7 @@ class ControlUnit:
 
     microprogram = None
 
-    mPC = None
+    Signal.MPC = None
 
     data_path = None
     "Блок обработки данных."
@@ -163,7 +163,7 @@ class ControlUnit:
 
     def __init__(self, microprogram, data_path):
         self.microprogram = microprogram
-        self.mPC = 0
+        self.Signal.MPC = 0
         self.data_path = data_path
         self._tick = 0
 
@@ -171,15 +171,83 @@ class ControlUnit:
         """Продвинуть модельное время процессора вперёд на один такт."""
         self._tick += 1
 
+    def signal_latch_mpc(self, sel):
+        if sel == 0:
+            self.Signal.MPC = 0
+        if sel == 1:
+            self.Signal.MPC += 3
+        if sel == 2:
+            self.Signal.MPC = self.instruction_decoder()
+        
+
     def current_tick(self):
         """Текущее модельное время процессора (в тактах)."""
         return self._tick
 
     def instruction_decoder(self):
-        # в control unit при инициализации я загружу таблицу линковки
-        # и эта функция будет просто сопоставлять опкод и адрес в памяти микрокоманд
-        # если такого адреса нет - возвращать 0 (специально)
+        opcode = self.data_path.IR
+        if opcode in linking_table:
+            return linking_table[opcode]
         return 0
+
+
+    def parse_microinstr(self, instr):
+        signals = {}
+    
+        # Позиция текущего бита (начинаем с младших битов)
+        pos = 0
+        
+        for name in SIGNAL_ORDER:
+            if name == "Signal.MUXSignal.ALU":
+                # 2 бита для Signal.MUXSignal.ALU
+                signals[name] = (instr >> pos) & 0b11
+                pos += 2
+            elif name == "Signal.ALU":
+                # 4 бита для Signal.ALU
+                signals[name] = (instr >> pos) & 0b1111
+                pos += 4
+            elif name == "Signal.MUXMPC":
+                # 2 бита для Signal.MUXMPC
+                signals[name] = (instr >> pos) & 0b11
+                pos += 2
+            else:
+                # 1 бит для остальных сигналов
+                signals[name] = (instr >> pos) & 0b1
+                pos += 1
+        
+        return signals
+
+
+    
+    def process_next_tick(self):
+        if self.Signal.MPC+3 >= len(self.microprogram):
+            micro_instr = (self.microprogram[self.Signal.MPC] << 16)
+        else:
+            micro_instr = (self.microprogram[self.Signal.MPC] << 16) | (self.microprogram[self.Signal.MPC + 1] << 8) | (self.microprogram[self.Signal.MPC + 2])
+        signals = self.parse_microinstr(micro_instr)
+        if signals[Signal.Signal.LPC] == 1:
+            self.data_path.signal_latch_PC(signals[Signal.MUXPC])
+        if signals[Signal.LCR] == 1:
+            self.data_path.signal_latch_CR()
+        if signals[Signal.LIR] == 1:
+            self.data_path.signal_latch_IR()
+        if signals[Signal.LBR] == 1:
+            self.data_path.signal_latch_BR()
+        self.data_path.signal_do_Signal.ALU(signals[Signal.MUXSignal.ALU], signals[Signal.ALU])
+        if signals[Signal.LDR] == 1:
+            self.data_path.signal_latch_DR()
+        if signals[Signal.LAC] == 1:
+            self.data_path.signal_latch_AC()
+        if signals[Signal.LSP] == 1:
+            self.data_path.signal_latch_SP(signals[Signal.MUXSP])
+        if signals[Signal.LAR] == 1:
+            self.data_path.signal_latch_AR(signals[Signal.MUXAR])
+        if signals[Signal.OE] == 1:
+            self.data_path.signal_latch_Signal.OE(signals[Signal.MUXSP])
+        if signals[Signal.WR] == 1:
+            self.data_path.signal_latch_Signal.WR(signals[Signal.MUXMEM])
+
+
 
     def __repr__(self):
         """Вернуть строковое представление состояния процессора."""
@@ -203,20 +271,9 @@ class ControlUnit:
         # return "{} \t{} [{}]".format(state_repr, instr_repr, instr_hex)
 
 
-def simulation(code, input_tokens, data_memory_size, limit):
-    """Подготовка модели и запуск симуляции процессора.
-
-    Длительность моделирования ограничена:
-
-    - количеством выполненных тактов (`limit`);
-
-    - количеством данных ввода (`input_tokens`, если ввод используется), через
-      исключение `EOFError`;
-
-    - инструкцией `Halt`, через исключение `StopIteration`.
-    """
-    data_path = DataPath(data_memory_size, input_tokens)
-    control_unit = ControlUnit(code, data_path)
+def simulation(code, microcode, input_tokens, data_memory_size, limit):
+    data_path = DataPath(code, data_memory_size, 68, input_tokens)
+    control_unit = ControlUnit(microcode, data_path)
 
     logging.debug("%s", control_unit)
     try:
@@ -234,14 +291,17 @@ def simulation(code, input_tokens, data_memory_size, limit):
     return "".join(data_path.output_buffer), control_unit.current_tick()
 
 
-def main(code_file, input_file):
+def main(code_file, microcode_file, input_file):
     """Функция запуска модели процессора. Параметры -- имена файлов с машинным
     кодом и с входными данными для симуляции.
     """
+    # файл с бинарным кодом
     with open(code_file, "rb") as file:
         binary_code = file.read()
-    code = from_bytes(binary_code)
-    # у меня переменная длина инструкций, мне это не надо
+
+    # память микрокоманд
+    with open(microcode_file, "rb") as mfile:
+        micro_code = mfile.read()
 
     with open(input_file, encoding="utf-8") as file:
         input_text = file.read()
@@ -249,11 +309,17 @@ def main(code_file, input_file):
         for char in input_text:
             input_token.append(char)
 
+    # data_mem_size = len(binary_code) * 2
+    # if data_mem_size > 2**24 - 1:
+    #     data_mem_size = 2**24 - 1
+    # пока что так, но потом я хочу перенести ячейки ввода вывода в начало и сделать как выше
+
     output, ticks = simulation(
-        code,
+        binary_code,
+        micro_code,
         input_tokens=input_token,
-        data_memory_size=100,
-        limit=2000,
+        data_memory_size=200,
+        limit=2000
     )
 
     print("".join(output))
@@ -262,6 +328,7 @@ def main(code_file, input_file):
 
 if __name__ == "__main__":
     logging.getLogger().setLevel(logging.DEBUG)
-    assert len(sys.argv) == 3, "Wrong arguments: machine.py <code_file> <input_file>"
+    assert len(sys.argv) == 3, "Signal.WRong arguments: machine.py <code_file> <input_file>"
     _, code_file, input_file = sys.argv
-    main(code_file, input_file)
+    microcode_file = "C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\microcode.bin"
+    main(code_file, microcode_file, input_file)
