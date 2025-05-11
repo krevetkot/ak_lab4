@@ -636,7 +636,7 @@ def encode_microinstruction(step: dict) -> int:
             bitstr += f"{val:02b}"
         elif name == Signal.ALU:
             bitstr += f"{val:04b}"
-        if name == Signal.MUXMPC:
+        elif name == Signal.MUXMPC:
             bitstr += f"{val:02b}"
         else:
             bitstr += f"{val:01b}"
@@ -644,9 +644,11 @@ def encode_microinstruction(step: dict) -> int:
     return int(bitstr, 2)
 
 
+# попозже добавить автоматическое создание таблицы линковки
 def save_to_bin(microcode: dict, filename: str):
     os.makedirs(os.path.dirname(os.path.abspath(filename)) or ".", exist_ok=True)
-    steps = []
+    choose_op_instr = '11110000000000000000110'
+    steps = [int(choose_op_instr, 2)]
     for opcode in microcode:
         # Проверяем тип значения - список или словарь
         op_steps = microcode[opcode]
