@@ -215,7 +215,13 @@ microcode = {
             Signal.LSP: 0, Signal.MUXAR: 0, Signal.LAR: 0, Signal.MUXMEM: 0, Signal.OE: 0,
             Signal.WR: 0, Signal.MPC: 1, Signal.MUXMPC: 1
         }
-    ]
+    ],
+    Opcode.HALT: {
+        Signal.LPC: 0, Signal.MUXPC: 0, Signal.LCR: 0, Signal.LIR: 0, Signal.LBR: 0,
+        Signal.MUXALU: 0, Signal.ALU: 0, Signal.LDR: 0, Signal.LAC: 0, Signal.MUXSP: 0,
+        Signal.LSP: 0, Signal.MUXAR: 0, Signal.LAR: 0, Signal.MUXMEM: 0, Signal.OE: 0,
+        Signal.WR: 0, Signal.MPC: 0, Signal.MUXMPC: 0
+    }
 }
 
 linking_table = {
@@ -233,13 +239,8 @@ linking_table = {
     Opcode.AND: 63,
     Opcode.OR: 69,
     Opcode.NOT: 75,
+    Opcode.HALT: 81
 }
-
-# # Определение порядка управляющих сигналов
-# SIGNAL_ORDER = [
-#     "lpc", "muxpc", "lcr", "lir", "lbr", "muxalu", "alu", "ldr", "lac",
-#     "muxsp", "lsp", "muxar", "lar", "muxmem", "oe", "wr", "mpc", "muxmpc"
-# ]
 
 def encode_microinstruction(step: dict) -> int:
     """
