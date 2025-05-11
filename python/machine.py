@@ -93,9 +93,9 @@ class DataPath:
 
     def signal_latch_CR(self):
         self.CR = self.data_memory[self.data_address] << 24
-        self.CR |= self.data_memory[self.data_address+1] << 16
-        self.CR |= self.data_memory[self.data_address+2] << 8
-        self.CR |= self.data_memory[self.data_address+3]
+        self.CR |= self.data_memory[self.data_address + 1] << 16
+        self.CR |= self.data_memory[self.data_address + 2] << 8
+        self.CR |= self.data_memory[self.data_address + 3]
 
     def signal_latch_IR(self):
         self.IR = (self.CR >> 24) & 0xFF
@@ -113,7 +113,7 @@ class DataPath:
         if mux_sel == 3:
             left = self.CR
         self.Signal.ALU.do_Signal.ALU(self.AC, left, operation)
-    
+
     def signal_latch_AC(self):
         self.AC = self.Signal.ALU.get_result()
 
@@ -135,7 +135,9 @@ class DataPath:
 
     def signal_oe(self):
         self.data_address = self.AR
-        assert 0 <= self.data_address < self.data_memory_size, "out of memory: {}".format(self.data_address)
+        assert (
+            0 <= self.data_address < self.data_memory_size
+        ), "out of memory: {}".format(self.data_address)
 
     def signal_wr(self, sel):
         assert 0 <= self.AR < self.data_memory_size, "out of memory: {}".format(self.AR)
@@ -179,7 +181,6 @@ class ControlUnit:
             self.Signal.MPC += 3
         if sel == 2:
             self.Signal.MPC = self.instruction_decoder()
-        
 
     def current_tick(self):
         """Текущее модельное время процессора (в тактах)."""
@@ -191,12 +192,11 @@ class ControlUnit:
             return linking_table[opcode]
         return 0
 
-
     def parse_microinstr(self, instr):
         signals = {}
-    
+
         pos = 0
-        
+
         for name in SIGNAL_ORDER:
             if name == Signal.MUXALU:
                 # 2 бита для Signal.MUXSignal.ALU
@@ -214,16 +214,18 @@ class ControlUnit:
                 # 1 бит для остальных сигналов
                 signals[name] = (instr >> pos) & 0b1
                 pos += 1
-        
+
         return signals
 
-
-    
     def process_next_tick(self):
-        if self.Signal.MPC+3 >= len(self.microprogram):
-            micro_instr = (self.microprogram[self.Signal.MPC] << 16)
+        if self.Signal.MPC + 3 >= len(self.microprogram):
+            micro_instr = self.microprogram[self.Signal.MPC] << 16
         else:
-            micro_instr = (self.microprogram[self.Signal.MPC] << 16) | (self.microprogram[self.Signal.MPC + 1] << 8) | (self.microprogram[self.Signal.MPC + 2])
+            micro_instr = (
+                (self.microprogram[self.Signal.MPC] << 16)
+                | (self.microprogram[self.Signal.MPC + 1] << 8)
+                | (self.microprogram[self.Signal.MPC + 2])
+            )
         signals = self.parse_microinstr(micro_instr)
         if signals[Signal.Signal.LPC] == 1:
             self.data_path.signal_latch_PC(signals[Signal.MUXPC])
@@ -233,7 +235,9 @@ class ControlUnit:
             self.data_path.signal_latch_IR()
         if signals[Signal.LBR] == 1:
             self.data_path.signal_latch_BR()
-        self.data_path.signal_do_Signal.ALU(signals[Signal.MUXSignal.ALU], signals[Signal.ALU])
+        self.data_path.signal_do_Signal.ALU(
+            signals[Signal.MUXSignal.ALU], signals[Signal.ALU]
+        )
         if signals[Signal.LDR] == 1:
             self.data_path.signal_latch_DR()
         if signals[Signal.LAC] == 1:
@@ -253,9 +257,6 @@ class ControlUnit:
             raise StopIteration()
 
         self._tick()
-        
-
-
 
     def __repr__(self):
         """Вернуть строковое представление состояния процессора."""
@@ -327,7 +328,7 @@ def main(code_file, microcode_file, input_file):
         micro_code,
         input_tokens=input_token,
         data_memory_size=200,
-        limit=2000
+        limit=2000,
     )
 
     print("".join(output))
@@ -336,7 +337,9 @@ def main(code_file, microcode_file, input_file):
 
 if __name__ == "__main__":
     logging.getLogger().setLevel(logging.DEBUG)
-    assert len(sys.argv) == 3, "Signal.WRong arguments: machine.py <code_file> <input_file>"
+    assert (
+        len(sys.argv) == 3
+    ), "Signal.WRong arguments: machine.py <code_file> <input_file>"
     _, code_file, input_file = sys.argv
     microcode_file = "C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\microcode.bin"
     main(code_file, microcode_file, input_file)

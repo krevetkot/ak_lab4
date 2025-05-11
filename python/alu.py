@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+
 class ALU:
     def __init__(self):
         self.reset_flags()
@@ -7,12 +8,12 @@ class ALU:
 
     def get_result(self):
         return self.result
-    
+
     def reset_flags(self):
-        self.n = 0 
+        self.n = 0
         self.z = 1
-        self.v = 0 
-        self.c = 0 
+        self.v = 0
+        self.c = 0
 
     def _update_nz(self, result):
         """Обновление флагов N и Z"""
@@ -56,8 +57,9 @@ class ALU:
         min_int32 = -0x80000000
 
         self.c = (right + left) > max_uint32
-        self.v = (right > 0 and left > 0 and result > max_int32) or \
-                 (right < 0 and left < 0 and result < min_int32)
+        self.v = (right > 0 and left > 0 and result > max_int32) or (
+            right < 0 and left < 0 and result < min_int32
+        )
 
     def minus(self, right, left):
         """Вычитание с установкой флагов"""
@@ -66,10 +68,11 @@ class ALU:
 
         max_uint32 = 0xFFFFFFFF
         self.c = right < left  # Перенос при вычитании (если right < left)
-        
+
         # Переполнение для вычитания
-        self.v = (right >= 0 and left < 0 and result < 0) or \
-                 (right < 0 and left >= 0 and result > 0)
+        self.v = (right >= 0 and left < 0 and result < 0) or (
+            right < 0 and left >= 0 and result > 0
+        )
 
     def multiply(self, right, left):
         """Умножение с установкой флагов"""
@@ -81,14 +84,14 @@ class ALU:
             self.v = 1
         else:
             self.v = 0
-            
+
         self.c = 0  # Для умножения перенос обычно не используется
 
     def divide(self, right, left):
         """Деление с установкой флагов"""
         if left == 0:
             raise ZeroDivisionError("Division by zero")
-            
+
         result = left // right
         self._update_nz(result)
         self.v = 0  # Деление не вызывает переполнения
@@ -98,7 +101,7 @@ class ALU:
         """Остаток от деления с установкой флагов"""
         if left == 0:
             raise ZeroDivisionError("Modulo by zero")
-            
+
         result = left % right
         self._update_nz(result)
         self.v = 0
