@@ -96,7 +96,9 @@ class DataPath:
         self.ALU = ALU()
 
     def signal_latch_PC(self, sel):
-        if sel == 2:
+        if sel == 3:
+            self.PC = self.PC
+        elif sel == 2:
             self.PC += 1
         elif sel == 1:
             self.PC += 4
@@ -251,10 +253,19 @@ class ControlUnit:
             | (self.microprogram[self.mpc + 3])
         )
         signals = self.parse_microinstr(micro_instr)
-        if signals[Signal.LCR] == 1:
-            self.data_path.signal_latch_CR()
-        if signals[Signal.LPC] == 1:
-            self.data_path.signal_latch_PC(signals[Signal.MUXPC])
+        if signals[Signal.MPC] == 0:
+            raise StopIteration()
+        if self.mpc == 0:
+            if signals[Signal.LPC] == 1:
+                self.data_path.signal_latch_PC(signals[Signal.MUXPC])
+            if signals[Signal.LCR] == 1:
+                self.data_path.signal_latch_CR()
+        else:
+            if signals[Signal.LCR] == 1:
+                self.data_path.signal_latch_CR()
+            if signals[Signal.LPC] == 1:
+                self.data_path.signal_latch_PC(signals[Signal.MUXPC])
+
         if signals[Signal.LIR] == 1:
             self.data_path.signal_latch_IR()
         if signals[Signal.LBR] == 1:
@@ -267,9 +278,9 @@ class ControlUnit:
         if signals[Signal.LAR] == 1:
             self.data_path.signal_latch_AR(signals[Signal.MUXAR])
         if signals[Signal.LRSP] == 1:
-            self.data_path.signal_latch_SP(signals[Signal.MUXRSP])
+            self.data_path.signal_latch_RSP(signals[Signal.MUXRSP])
         if signals[Signal.LDSP] == 1:
-            self.data_path.signal_latch_SP(signals[Signal.MUXDSP])
+            self.data_path.signal_latch_DSP(signals[Signal.MUXDSP])
         if signals[Signal.OE] == 1:
             self.data_path.signal_oe()
         if signals[Signal.WR] == 1:
@@ -372,7 +383,7 @@ def main(code_file, microcode_file, input_file):
         input_tokens=input_token,
         data_memory_size=200,
         code_size=code_size,
-        limit=2000,
+        limit=100,
     )
 
     print("".join(output))

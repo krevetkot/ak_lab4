@@ -199,15 +199,6 @@ microcode = {
             Signal.WR: 1, Signal.MPC: 1, Signal.MUXMPC: 1
         },
     ],
-    Opcode.HALT: [
-        {
-            Signal.LPC: 0, Signal.MUXPC: 0, Signal.LCR: 0, Signal.LIR: 0,
-            Signal.LBR: 0, Signal.MUXALU: 0, Signal.ALU: 0, Signal.LDR: 0,
-            Signal.LAC: 0, Signal.MUXAR: 0, Signal.LAR: 0, Signal.MUXRSP: 0,
-            Signal.LRSP: 0, Signal.MUXDSP: 0, Signal.LDSP: 0, Signal.OE: 0,
-            Signal.WR: 0, Signal.MPC: 0, Signal.MUXMPC: 0
-        },
-    ],
     Opcode.POP_AC: [
         {
             Signal.LPC: 1, Signal.MUXPC: 2, Signal.LCR: 0, Signal.LIR: 0,
@@ -238,6 +229,15 @@ microcode = {
             Signal.LAC: 0, Signal.MUXAR: 0, Signal.LAR: 0, Signal.MUXRSP: 0,
             Signal.LRSP: 0, Signal.MUXDSP: 0, Signal.LDSP: 0, Signal.OE: 0,
             Signal.WR: 0, Signal.MPC: 1, Signal.MUXMPC: 0
+        },
+    ],
+        Opcode.HALT: [
+        {
+            Signal.LPC: 0, Signal.MUXPC: 0, Signal.LCR: 0, Signal.LIR: 0,
+            Signal.LBR: 0, Signal.MUXALU: 0, Signal.ALU: 0, Signal.LDR: 0,
+            Signal.LAC: 0, Signal.MUXAR: 0, Signal.LAR: 0, Signal.MUXRSP: 0,
+            Signal.LRSP: 0, Signal.MUXDSP: 0, Signal.LDSP: 0, Signal.OE: 0,
+            Signal.WR: 0, Signal.MPC: 0, Signal.MUXMPC: 0
         },
     ],
 }
@@ -280,9 +280,9 @@ INSTRUCTION_ORDER = [
     Opcode.MOD,
     Opcode.AND,
     Opcode.OR,
-    Opcode.HALT,
     Opcode.POP_AC,
-    Opcode.POP_DR
+    Opcode.POP_DR,
+    Opcode.HALT,
 ]
 
 
@@ -301,9 +301,9 @@ linking_table = {
     Opcode.AND: 68,
     Opcode.OR: 72,
     Opcode.NOT: 76,
-    Opcode.HALT: 80,
-    Opcode.POP_AC: 84,
-    Opcode.POP_DR: 92
+    Opcode.POP_AC: 76,
+    Opcode.POP_DR: 84,
+    Opcode.HALT: 92,
 }
 
 
@@ -328,7 +328,7 @@ def encode_microinstruction(step: dict) -> int:
 # попозже добавить автоматическое создание таблицы линковки
 def save_to_bin(microcode: dict, filename: str):
     os.makedirs(os.path.dirname(os.path.abspath(filename)) or ".", exist_ok=True)
-    choose_op_instr = "00011000000000000000000110"
+    choose_op_instr = "11111000000000000000000110"
     steps = [int(choose_op_instr, 2)]
     for opcode in INSTRUCTION_ORDER:
         # Проверяем тип значения - список или словарь
@@ -341,7 +341,7 @@ def save_to_bin(microcode: dict, filename: str):
 
     with open(filename, "wb") as f:
         for code in steps:
-            # Сохраняем как 4 байта
+            # Сохраняем как 4 байта (24 бита)
             binary_bytes.extend(code.to_bytes(4, byteorder="big"))
         f.write(bytes(binary_bytes))
 
