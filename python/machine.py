@@ -63,7 +63,9 @@ class DataPath:
 
     AR = None
 
-    SP = None
+    RSP = None
+
+    DSP = None
 
     input_buffer = None
     "Буфер входных данных. Инициализируется входными данными конструктора."
@@ -85,7 +87,9 @@ class DataPath:
         self.IR = 0
         self.BR = 0
         self.AR = 0
-        self.SP = data_memory_size
+        self.RSP = data_memory_size
+        self.DSP = len(code) 
+        # data stack будет расти вверх, а return stack вниз
         self.input_buffer = input_buffer
         self.output_buffer = []
         self.ALU = ALU()
@@ -125,20 +129,26 @@ class DataPath:
         self.AC = self.ALU.get_result()
 
     def signal_latch_DR(self):
-        self.DR = self.AC
+        self.DR = self.ALU.get_result()
 
     def signal_latch_AR(self, sel):
         if sel == 0:
             self.AR = self.AC & 0xFFFFFF
         elif sel == 1:
-            self.AR = self.SP
+            self.AR = self.RSP
         self.data_address = self.AR
 
-    def signal_latch_SP(self, sel):
+    def signal_latch_RSP(self, sel):
         if sel == 0:
-            self.SP -= 4
+            self.RSP -= 4
         elif sel == 1:
-            self.SP += 4
+            self.RSP += 4
+
+    def signal_latch_DSP(self, sel):
+        if sel == 0:
+            self.DSP += 4
+        elif sel == 1:
+            self.DSP -= 4
 
     def signal_oe(self):
         self.data_address = self.AR
@@ -146,14 +156,12 @@ class DataPath:
             0 <= self.data_address < self.data_memory_size
         ), "out of memory: {}".format(self.data_address)
 
-    def signal_wr(self, sel):
+    def signal_wr(self):
         assert 0 <= self.AR < self.data_memory_size, "out of memory: {}".format(self.AR)
-        if sel == 0:
-            self.data_memory[self.AR] = self.DR
-        elif sel == 1:
-            self.data_memory[self.AR] = self.AC
+        self.data_memory[self.AR] = self.AC
 
     # пока не знаю как примонтировать ячейку памяти на ввод/вывод
+    # и еще нужно исправить то что память у нас однопортовая, добавить еще один mux между pc и ar
 
 
 class ControlUnit:
@@ -246,14 +254,16 @@ class ControlUnit:
             self.data_path.signal_latch_DR()
         if signals[Signal.LAC] == 1:
             self.data_path.signal_latch_AC()
-        if signals[Signal.LSP] == 1:
-            self.data_path.signal_latch_SP(signals[Signal.MUXSP])
+        if signals[Signal.LRSP] == 1:
+            self.data_path.signal_latch_SP(signals[Signal.MUXRSP])
+        if signals[Signal.LDSP] == 1:
+            self.data_path.signal_latch_SP(signals[Signal.MUXDSP])
         if signals[Signal.LAR] == 1:
             self.data_path.signal_latch_AR(signals[Signal.MUXAR])
         if signals[Signal.OE] == 1:
-            self.data_path.signal_latch_oe(signals[Signal.MUXSP])
+            self.data_path.signal_latch_oe(signals[Signal.MUXRSP])
         if signals[Signal.WR] == 1:
-            self.data_path.signal_latch_wr(signals[Signal.MUXMEM])
+            self.data_path.signal_latch_wr()
 
         if signals[Signal.MPC] == 1:
             self.signal_latch_mpc(signals[Signal.MUXMPC])
@@ -264,14 +274,16 @@ class ControlUnit:
 
     def __repr__(self):
         """Вернуть строковое представление состояния процессора."""
-        state_repr = "TICK: {:3} PC: {:3} ADDR: {:3} MEM_OUT: {} ACC: {} DR: {} CR: {}".format(
+        state_repr = "TICK: {:3} PC: {:3} ADDR: {:3} MEM_OUT: {} ACC: {} DR: {} CR: {} RSP: {} DSP : {}".format(
             self._tick,
             self.data_path.PC,
             self.data_path.data_address,
             self.data_path.data_memory[self.data_path.data_address],
             self.data_path.AC,
             self.data_path.DR,
-            self.data_path.CR 
+            self.data_path.CR,
+            self.data_path.RSP,
+            self.data_path.DSP
         )
 
         # это бинарный код

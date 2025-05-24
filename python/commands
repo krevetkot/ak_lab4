@@ -9,6 +9,8 @@
     SAVE - сохранить по адресу
     !
 
+    POP_DR + POP_AC + SAVE
+
     PLUS = "+"
     MINUS = "-"
     MULT = "*"

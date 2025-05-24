@@ -1,31 +1,33 @@
-0x0 -    5000048 - loadaddr (00000048)
+0x0 -    500004A - loadaddr (0000004A)
 0x4 -         32 - popac
 0x5 -         34 - popdr
 0x6 -          4 - add
 0x7 -         28 - return
-0x8 -    5000040 - loadaddr (00000040)
+0x8 -    5000042 - loadaddr (00000042)
 0xc -          2 - load
-0xd -   13000016 - while (00000016)
-0x11 -    5000044 - loadaddr (00000044)
-0x15 -         30 - save
-0x16 -   15000008 - repeat (00000008)
-0x1a -    3000001 - loadimm (00000001)
-0x1e -         32 - popac
-0x1f -         34 - popdr
-0x20 -         24 - greater
-0x21 -    900002D - if (0000002D)
-0x25 -    3000001 - loadimm (00000001)
-0x29 -         32 - popac
-0x2a -         34 - popdr
-0x2b -          4 - add
-0x2c -   11000037 - else (00000037)
-0x30 -    3000001 - loadimm (00000001)
-0x34 -         32 - popac
-0x35 -         34 - popdr
-0x36 -          6 - sub
-0x37 -    300002A - loadimm (0000002A)
-0x3b -    7000000 - call (00000000)
-0x3f -         26 - halt
-0x40 -         80 - input_addr
-0x44 -         84 - output_addr
-0x48 -          1 - one
+0xd -   13000018 - while (00000018)
+0x11 -    5000046 - loadaddr (00000046)
+0x15 -         34 - popdr
+0x16 -         32 - popac
+0x17 -         30 - save
+0x18 -   15000008 - repeat (00000008)
+0x1c -    3000001 - loadimm (00000001)
+0x20 -         32 - popac
+0x21 -         34 - popdr
+0x22 -         24 - greater
+0x23 -    900002F - if (0000002F)
+0x27 -    3000001 - loadimm (00000001)
+0x2b -         32 - popac
+0x2c -         34 - popdr
+0x2d -          4 - add
+0x2e -   11000039 - else (00000039)
+0x32 -    3000001 - loadimm (00000001)
+0x36 -         32 - popac
+0x37 -         34 - popdr
+0x38 -          6 - sub
+0x39 -    300002A - loadimm (0000002A)
+0x3d -    7000000 - call (00000000)
+0x41 -         26 - halt
+0x42 -         80 - input_addr
+0x46 -         84 - output_addr
+0x4a -          1 - one
