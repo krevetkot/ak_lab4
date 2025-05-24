@@ -14,7 +14,7 @@
 import logging
 import sys
 
-from isa import Opcode, opcode_to_binary
+from isa import Opcode, opcode_to_binary, binary_to_opcode, to_hex
 from microcode_util import microcode_from_byte, linking_table, SIGNAL_ORDER, Signal
 from alu import ALU
 
@@ -129,7 +129,7 @@ class DataPath:
 
     def signal_latch_AR(self, sel):
         if sel == 0:
-            self.AR = self.AC
+            self.AR = self.AC & 0xFFFFFF
         elif sel == 1:
             self.AR = self.SP
         self.data_address = self.AR
@@ -264,24 +264,35 @@ class ControlUnit:
 
     def __repr__(self):
         """Вернуть строковое представление состояния процессора."""
-        state_repr = "TICK: {:3} PC: {:3}/{} ADDR: {:3} MEM_OUT: {} ACC: {}".format(
+        state_repr = "TICK: {:3} PC: {:3} ADDR: {:3} MEM_OUT: {} ACC: {} DR: {} CR: {}".format(
             self._tick,
             self.data_path.PC,
             self.data_path.data_address,
             self.data_path.data_memory[self.data_path.data_address],
             self.data_path.AC,
+            self.data_path.DR,
+            self.data_path.CR 
         )
 
-        instr = self.data_path.program
-        # opcode = instr["opcode"]
-        # instr_repr = str(opcode)
+        # это бинарный код
+        index = self.data_path.PC
+        instr = self.data_path.code[index]
+        opcode = binary_to_opcode[instr]
+        instr_repr = str(opcode)
+        if (instr & 0x1) == 1:
+            arg = ((self.data_path.code[index + 1] << 16)
+                | (self.data_path.code[index + 2] << 8)
+                | self.data_path.code[index + 3]
+            )
+            command = {"address": index, "opcode": opcode, "arg": arg}
+            instr_repr += " {}".format(arg)
+        else:
+            command = {"address": index, "opcode": opcode}
+        
+        instr_hex = to_hex([command])
+ 
 
-        # if "arg" in instr:
-        #     instr_repr += " {}".format(instr["arg"])
-
-        # instr_hex = f"{opcode_to_binary[opcode] << 28 | (instr.get('arg', 0) & 0x0FFFFFFF):08X}"
-
-        # return "{} \t{} [{}]".format(state_repr, instr_repr, instr_hex)
+        return "{} \t{} [{}]".format(state_repr, instr_repr, instr_hex)
 
 
 def simulation(binary_code, microcode, input_tokens, data_memory_size, limit):

@@ -38,6 +38,23 @@ def instructions():
     }
 
 
+def math_instructions(): # на этапе трансляции они будут развернуты в POP_AC + POP_DR + INSTR
+    return {
+        "+",
+        "-",
+        "*",
+        "/",
+        "%",
+        "AND",
+        "OR",
+        "NOT",
+        "=",
+        ">",
+        "<",
+    }
+
+
+
 def instr_without_arg():  # без аргумента
     return {
         "@",
@@ -269,6 +286,31 @@ def translate_stage_1(text):
                 assert (
                     arg in variables_map or arg in functions_map
                 ), "Label is not defined!"
+
+        elif term.word in math_instructions():
+            code.append(
+                {
+                    "address": address,
+                    "opcode": Opcode.POP_AC,
+                    "term": term,
+                },
+            )  
+            address += 1
+            code.append(
+                {
+                    "address": address,
+                    "opcode": Opcode.POP_DR,
+                    "term": term,
+                },
+            )  
+            address += 1
+            code.append(
+                {
+                    "address": address,
+                    "opcode": word_to_opcode(term.word),
+                    "term": term,
+                },
+            )  
 
         else:
             code.append(

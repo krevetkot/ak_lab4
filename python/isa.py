@@ -1,6 +1,7 @@
 """Представление исходного и машинного кода."""
 
 from collections import namedtuple
+#from translator import variables_map
 from enum import Enum
 
 
@@ -25,6 +26,8 @@ class Opcode(str, Enum):
     GREATER = "greater"
     HALT = "halt"
     RETURN = "return"
+    POP_AC = "popac"
+    POP_DR = "popdr"
 
     # инструкции, которые не отображаются в память
     VARIABLE = "variable"
@@ -71,6 +74,8 @@ opcode_to_binary = {
     Opcode.HALT: 0x26,  # 00011010
     Opcode.RETURN: 0x28,  # 00011100
     Opcode.SAVE: 0x30,  # 00011110
+    Opcode.POP_AC: 0x32, # 0100000
+    Opcode.POP_DR: 0x34, # 0100010
     Opcode.LOAD_IMM: 0x3,  # 00000011
     Opcode.LOAD_ADDR: 0x5,  # 00000101
     Opcode.CALL: 0x7,  # 00000111
