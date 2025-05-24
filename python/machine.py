@@ -17,6 +17,7 @@ import sys
 from isa import Opcode, opcode_to_binary, binary_to_opcode, to_hex
 from microcode_util import microcode_from_byte, linking_table, SIGNAL_ORDER, Signal
 from alu import ALU
+from translator import variables_map
 
 
 # хочется конечно их на 0 и 4
@@ -88,25 +89,28 @@ class DataPath:
         self.BR = 0
         self.AR = 0
         self.RSP = data_memory_size
-        self.DSP = len(code) 
+        self.DSP = len(code)
         # data stack будет расти вверх, а return stack вниз
         self.input_buffer = input_buffer
         self.output_buffer = []
         self.ALU = ALU()
 
     def signal_latch_PC(self, sel):
-        if sel == 1:
+        if sel == 2:
+            self.PC += 1
+        elif sel == 1:
             self.PC += 4
         elif sel == 0:
             self.PC = self.BR
         self.data_address = self.PC
 
     def signal_latch_CR(self):
-        self.CR = self.data_memory[self.data_address] << 24
-        print(self.data_memory[self.data_address])
-        self.CR |= self.data_memory[self.data_address + 1] << 16
-        self.CR |= self.data_memory[self.data_address + 2] << 8
-        self.CR |= self.data_memory[self.data_address + 3]
+        self.CR = (
+            (self.data_memory[self.data_address] << 24)
+            | (self.data_memory[self.data_address + 1] << 16)
+            | (self.data_memory[self.data_address + 2] << 8)
+            | (self.data_memory[self.data_address + 3])
+        )
 
     def signal_latch_IR(self):
         self.IR = (self.CR >> 24) & 0xFF
@@ -206,7 +210,7 @@ class ControlUnit:
         return self._tick
 
     def instruction_decoder(self):
-        opcode = self.data_path.IR
+        opcode = binary_to_opcode[self.data_path.IR]
         if opcode in linking_table:
             return linking_table[opcode]
         return 0
@@ -214,33 +218,37 @@ class ControlUnit:
     def parse_microinstr(self, instr):
         signals = {}
 
-        pos = 22
+        pos = 26
 
         for name in SIGNAL_ORDER:
-            if name == Signal.MUXALU:
+            if (
+                (name == Signal.MUXALU)
+                or (name == Signal.MUXAR)
+                or (name == Signal.MUXPC)
+            ):
                 # 2 бита для Signal.MUXALU
-                signals[name] = (instr >> pos) & 0b11
                 pos -= 2
+                signals[name] = (instr >> pos) & 0b11
             elif name == Signal.ALU:
                 # 4 бита для Signal.ALU
-                signals[name] = (instr >> pos) & 0b1111
                 pos -= 4
+                signals[name] = (instr >> pos) & 0b1111
             elif name == Signal.MUXMPC:
-                # 2 бита для Signal.MUXMPC
-                signals[name] = (instr) & 0b11
                 pos -= 2
+                signals[name] = (instr) & 0b11
             else:
+                pos -= 1
                 # 1 бит для остальных сигналов
                 signals[name] = (instr >> pos) & 0b1
-                pos -= 1
 
         return signals
 
     def process_next_tick(self):
         micro_instr = (
-            (self.microprogram[self.mpc] << 16)
-            | (self.microprogram[self.mpc + 1] << 8)
-            | (self.microprogram[self.mpc + 2])
+            (self.microprogram[self.mpc] << 24)
+            | (self.microprogram[self.mpc + 1] << 16)
+            | (self.microprogram[self.mpc + 2] << 8)
+            | (self.microprogram[self.mpc + 3])
         )
         signals = self.parse_microinstr(micro_instr)
         if signals[Signal.LCR] == 1:
@@ -251,30 +259,28 @@ class ControlUnit:
             self.data_path.signal_latch_IR()
         if signals[Signal.LBR] == 1:
             self.data_path.signal_latch_BR()
-        self.data_path.signal_do_alu(
-            signals[Signal.MUXALU], signals[Signal.ALU]
-        )
+        self.data_path.signal_do_alu(signals[Signal.MUXALU], signals[Signal.ALU])
         if signals[Signal.LDR] == 1:
             self.data_path.signal_latch_DR()
         if signals[Signal.LAC] == 1:
             self.data_path.signal_latch_AC()
+        if signals[Signal.LAR] == 1:
+            self.data_path.signal_latch_AR(signals[Signal.MUXAR])
         if signals[Signal.LRSP] == 1:
             self.data_path.signal_latch_SP(signals[Signal.MUXRSP])
         if signals[Signal.LDSP] == 1:
             self.data_path.signal_latch_SP(signals[Signal.MUXDSP])
-        if signals[Signal.LAR] == 1:
-            self.data_path.signal_latch_AR(signals[Signal.MUXAR])
         if signals[Signal.OE] == 1:
-            self.data_path.signal_latch_oe(signals[Signal.MUXRSP])
+            self.data_path.signal_oe()
         if signals[Signal.WR] == 1:
-            self.data_path.signal_latch_wr()
+            self.data_path.signal_wr()
 
         if signals[Signal.MPC] == 1:
             self.signal_latch_mpc(signals[Signal.MUXMPC])
         else:
             raise StopIteration()
 
-        self._tick()
+        self.tick()
 
     def __repr__(self):
         """Вернуть строковое представление состояния процессора."""
@@ -287,26 +293,26 @@ class ControlUnit:
             self.data_path.DR,
             self.data_path.CR,
             self.data_path.RSP,
-            self.data_path.DSP
+            self.data_path.DSP,
         )
 
         # это бинарный код
         index = self.data_path.PC
-        instr = self.data_path.code[index]
+        instr = self.data_path.data_memory[index]
         opcode = binary_to_opcode[instr]
         instr_repr = str(opcode)
         if (instr & 0x1) == 1:
-            arg = ((self.data_path.code[index + 1] << 16)
-                | (self.data_path.code[index + 2] << 8)
-                | self.data_path.code[index + 3]
+            arg = (
+                (self.data_path.data_memory[index + 1] << 16)
+                | (self.data_path.data_memory[index + 2] << 8)
+                | self.data_path.data_memory[index + 3]
             )
             command = {"address": index, "opcode": opcode, "arg": arg}
             instr_repr += " {}".format(arg)
         else:
             command = {"address": index, "opcode": opcode}
-        
-        instr_hex = to_hex([command])
- 
+
+        instr_hex = to_hex([command], variables_map)
 
         return "{} \t{} [{}]".format(state_repr, instr_repr, instr_hex)
 
@@ -315,7 +321,7 @@ def simulation(binary_code, microcode, input_tokens, data_memory_size, limit):
     data_path = DataPath(binary_code, data_memory_size, 68, input_tokens)
     control_unit = ControlUnit(microcode, data_path)
 
-    logging.debug("%s", control_unit)
+    # logging.debug("%s", control_unit)
     try:
         while control_unit._tick < limit:
             control_unit.process_next_tick()
@@ -337,9 +343,11 @@ def main(code_file, microcode_file, input_file):
     """
     # файл с бинарным кодом
     with open(code_file, "rb") as file:
-        binary_code = file.read()
+        bin_code = file.read()
 
-    binary_code += bytes(68)
+    bin_code += bytes(68)
+
+    binary_code = bytearray(bin_code)
 
     # память микрокоманд
     with open(microcode_file, "rb") as mfile:

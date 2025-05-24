@@ -37,30 +37,6 @@ class Signal(str, Enum):
         """Возвращает строковое значение сигнала."""
         return str(self.value)
 
-
-# Обновленный порядок сигналов с использованием enum
-SIGNAL_ORDER = [
-    Signal.LPC,
-    Signal.MUXPC,
-    Signal.LCR,
-    Signal.LIR,
-    Signal.LBR,
-    Signal.MUXALU,
-    Signal.ALU,
-    Signal.LDR,
-    Signal.LAC,
-    Signal.MUXAR,
-    Signal.LAR,
-    Signal.MUXRSP,
-    Signal.LRSP,
-    Signal.MUXDSP,
-    Signal.LDSP,
-    Signal.OE,
-    Signal.WR,
-    # Signal.MPC, иначе не вмещается в три байта
-    Signal.MUXMPC,
-]
-
 microcode = {
     Opcode.LOAD_IMM: [
         {
@@ -73,18 +49,18 @@ microcode = {
     ],
     Opcode.LOAD_ADDR: [
         {
-            Signal.LPC: 1, Signal.MUXPC: 1, Signal.LCR: 0, Signal.LIR: 0,
+            Signal.LPC: 1, Signal.MUXPC: 1, Signal.LCR: 1, Signal.LIR: 0,
             Signal.LBR: 1, Signal.MUXALU: 2, Signal.ALU: 0, Signal.LDR: 0,
             Signal.LAC: 1, Signal.MUXAR: 0, Signal.LAR: 1, Signal.MUXRSP: 0,
-            Signal.LRSP: 0, Signal.MUXDSP: 0, Signal.LDSP: 0, Signal.OE: 0,
-            Signal.WR: 1, Signal.MPC: 1, Signal.MUXMPC: 1
+            Signal.LRSP: 0, Signal.MUXDSP: 0, Signal.LDSP: 0, Signal.OE: 1,
+            Signal.WR: 0, Signal.MPC: 1, Signal.MUXMPC: 1
         },
         {
             Signal.LPC: 0, Signal.MUXPC: 0, Signal.LCR: 1, Signal.LIR: 0,
             Signal.LBR: 0, Signal.MUXALU: 3, Signal.ALU: 0, Signal.LDR: 0,
             Signal.LAC: 1, Signal.MUXAR: 2, Signal.LAR: 1, Signal.MUXRSP: 0,
-            Signal.LRSP: 0, Signal.MUXDSP: 0, Signal.LDSP: 0, Signal.OE: 1,
-            Signal.WR: 0, Signal.MPC: 1, Signal.MUXMPC: 0
+            Signal.LRSP: 0, Signal.MUXDSP: 0, Signal.LDSP: 0, Signal.OE: 0,
+            Signal.WR: 1, Signal.MPC: 1, Signal.MUXMPC: 0
         },
     ],
     Opcode.CALL: [
@@ -105,7 +81,7 @@ microcode = {
     ],
     Opcode.RETURN: [
         {
-            Signal.LPC: 1, Signal.MUXPC: 1, Signal.LCR: 0, Signal.LIR: 0,
+            Signal.LPC: 1, Signal.MUXPC: 2, Signal.LCR: 0, Signal.LIR: 0,
             Signal.LBR: 0, Signal.MUXALU: 0, Signal.ALU: 0, Signal.LDR: 0,
             Signal.LAC: 0, Signal.MUXAR: 1, Signal.LAR: 1, Signal.MUXRSP: 1,
             Signal.LRSP: 1, Signal.MUXDSP: 0, Signal.LDSP: 0, Signal.OE: 1,
@@ -128,7 +104,7 @@ microcode = {
     ],
     Opcode.LOAD: [
         {
-            Signal.LPC: 1, Signal.MUXPC: 1, Signal.LCR: 0, Signal.LIR: 0,
+            Signal.LPC: 1, Signal.MUXPC: 2, Signal.LCR: 0, Signal.LIR: 0,
             Signal.LBR: 0, Signal.MUXALU: 0, Signal.ALU: 0, Signal.LDR: 0,
             Signal.LAC: 0, Signal.MUXAR: 0, Signal.LAR: 1, Signal.MUXRSP: 0,
             Signal.LRSP: 0, Signal.MUXDSP: 0, Signal.LDSP: 0, Signal.OE: 0,
@@ -144,7 +120,7 @@ microcode = {
     ],
     Opcode.SAVE: [
         {
-            Signal.LPC: 1, Signal.MUXPC: 1, Signal.LCR: 0, Signal.LIR: 0,
+            Signal.LPC: 1, Signal.MUXPC: 2, Signal.LCR: 0, Signal.LIR: 0,
             Signal.LBR: 0, Signal.MUXALU: 0, Signal.ALU: 0, Signal.LDR: 0,
             Signal.LAC: 0, Signal.MUXAR: 3, Signal.LAR: 1, Signal.MUXRSP: 0,
             Signal.LRSP: 0, Signal.MUXDSP: 0, Signal.LDSP: 0, Signal.OE: 0,
@@ -153,7 +129,7 @@ microcode = {
     ],
     Opcode.PLUS: [
         {
-            Signal.LPC: 1, Signal.MUXPC: 1, Signal.LCR: 0, Signal.LIR: 0,
+            Signal.LPC: 1, Signal.MUXPC: 2, Signal.LCR: 0, Signal.LIR: 0,
             Signal.LBR: 0, Signal.MUXALU: 0, Signal.ALU: 0, Signal.LDR: 0,
             Signal.LAC: 1, Signal.MUXAR: 0, Signal.LAR: 0, Signal.MUXRSP: 0,
             Signal.LRSP: 0, Signal.MUXDSP: 0, Signal.LDSP: 0, Signal.OE: 0,
@@ -162,7 +138,7 @@ microcode = {
     ],
     Opcode.MINUS: [
         {
-            Signal.LPC: 1, Signal.MUXPC: 1, Signal.LCR: 0, Signal.LIR: 0,
+            Signal.LPC: 1, Signal.MUXPC: 2, Signal.LCR: 0, Signal.LIR: 0,
             Signal.LBR: 0, Signal.MUXALU: 0, Signal.ALU: 1, Signal.LDR: 0,
             Signal.LAC: 0, Signal.MUXAR: 0, Signal.LAR: 0, Signal.MUXRSP: 0,
             Signal.LRSP: 0, Signal.MUXDSP: 0, Signal.LDSP: 0, Signal.OE: 0,
@@ -171,7 +147,7 @@ microcode = {
     ],
     Opcode.MULT: [
         {
-            Signal.LPC: 1, Signal.MUXPC: 1, Signal.LCR: 0, Signal.LIR: 0,
+            Signal.LPC: 1, Signal.MUXPC: 2, Signal.LCR: 0, Signal.LIR: 0,
             Signal.LBR: 0, Signal.MUXALU: 0, Signal.ALU: 2, Signal.LDR: 0,
             Signal.LAC: 0, Signal.MUXAR: 0, Signal.LAR: 0, Signal.MUXRSP: 0,
             Signal.LRSP: 0, Signal.MUXDSP: 0, Signal.LDSP: 0, Signal.OE: 0,
@@ -180,7 +156,7 @@ microcode = {
     ],
     Opcode.DIV: [
         {
-            Signal.LPC: 1, Signal.MUXPC: 1, Signal.LCR: 0, Signal.LIR: 0,
+            Signal.LPC: 1, Signal.MUXPC: 2, Signal.LCR: 0, Signal.LIR: 0,
             Signal.LBR: 0, Signal.MUXALU: 0, Signal.ALU: 3, Signal.LDR: 0,
             Signal.LAC: 0, Signal.MUXAR: 0, Signal.LAR: 0, Signal.MUXRSP: 0,
             Signal.LRSP: 0, Signal.MUXDSP: 0, Signal.LDSP: 0, Signal.OE: 0,
@@ -189,7 +165,7 @@ microcode = {
     ],
     Opcode.MOD: [
         {
-            Signal.LPC: 1, Signal.MUXPC: 1, Signal.LCR: 0, Signal.LIR: 0,
+            Signal.LPC: 1, Signal.MUXPC: 2, Signal.LCR: 0, Signal.LIR: 0,
             Signal.LBR: 0, Signal.MUXALU: 0, Signal.ALU: 4, Signal.LDR: 0,
             Signal.LAC: 0, Signal.MUXAR: 0, Signal.LAR: 0, Signal.MUXRSP: 0,
             Signal.LRSP: 0, Signal.MUXDSP: 0, Signal.LDSP: 0, Signal.OE: 0,
@@ -198,7 +174,7 @@ microcode = {
     ],
     Opcode.AND: [
         {
-            Signal.LPC: 1, Signal.MUXPC: 1, Signal.LCR: 0, Signal.LIR: 0,
+            Signal.LPC: 1, Signal.MUXPC: 2, Signal.LCR: 0, Signal.LIR: 0,
             Signal.LBR: 0, Signal.MUXALU: 0, Signal.ALU: 5, Signal.LDR: 0,
             Signal.LAC: 0, Signal.MUXAR: 0, Signal.LAR: 0, Signal.MUXRSP: 0,
             Signal.LRSP: 0, Signal.MUXDSP: 0, Signal.LDSP: 0, Signal.OE: 0,
@@ -207,7 +183,7 @@ microcode = {
     ],
     Opcode.OR: [
         {
-            Signal.LPC: 1, Signal.MUXPC: 1, Signal.LCR: 0, Signal.LIR: 0,
+            Signal.LPC: 1, Signal.MUXPC: 2, Signal.LCR: 0, Signal.LIR: 0,
             Signal.LBR: 0, Signal.MUXALU: 0, Signal.ALU: 6, Signal.LDR: 0,
             Signal.LAC: 0, Signal.MUXAR: 0, Signal.LAR: 0, Signal.MUXRSP: 0,
             Signal.LRSP: 0, Signal.MUXDSP: 0, Signal.LDSP: 0, Signal.OE: 0,
@@ -216,7 +192,7 @@ microcode = {
     ],
     Opcode.NOT: [
         {
-            Signal.LPC: 1, Signal.MUXPC: 1, Signal.LCR: 0, Signal.LIR: 0,
+            Signal.LPC: 1, Signal.MUXPC: 2, Signal.LCR: 0, Signal.LIR: 0,
             Signal.LBR: 0, Signal.MUXALU: 0, Signal.ALU: 7, Signal.LDR: 0,
             Signal.LAC: 0, Signal.MUXAR: 0, Signal.LAR: 0, Signal.MUXRSP: 0,
             Signal.LRSP: 0, Signal.MUXDSP: 0, Signal.LDSP: 0, Signal.OE: 0,
@@ -234,7 +210,7 @@ microcode = {
     ],
     Opcode.POP_AC: [
         {
-            Signal.LPC: 1, Signal.MUXPC: 1, Signal.LCR: 0, Signal.LIR: 0,
+            Signal.LPC: 1, Signal.MUXPC: 2, Signal.LCR: 0, Signal.LIR: 0,
             Signal.LBR: 0, Signal.MUXALU: 0, Signal.ALU: 0, Signal.LDR: 0,
             Signal.LAC: 0, Signal.MUXAR: 2, Signal.LAR: 1, Signal.MUXRSP: 0,
             Signal.LRSP: 0, Signal.MUXDSP: 1, Signal.LDSP: 1, Signal.OE: 1,
@@ -250,7 +226,7 @@ microcode = {
     ],
     Opcode.POP_DR: [
         {
-            Signal.LPC: 1, Signal.MUXPC: 1, Signal.LCR: 0, Signal.LIR: 0,
+            Signal.LPC: 1, Signal.MUXPC: 2, Signal.LCR: 0, Signal.LIR: 0,
             Signal.LBR: 0, Signal.MUXALU: 0, Signal.ALU: 0, Signal.LDR: 0,
             Signal.LAC: 0, Signal.MUXAR: 2, Signal.LAR: 1, Signal.MUXRSP: 0,
             Signal.LRSP: 0, Signal.MUXDSP: 1, Signal.LDSP: 1, Signal.OE: 1,
@@ -266,42 +242,83 @@ microcode = {
     ],
 }
 
+
+
+SIGNAL_ORDER = [
+    Signal.LPC,
+    Signal.MUXPC,
+    Signal.LCR,
+    Signal.LIR,
+    Signal.LBR,
+    Signal.MUXALU,
+    Signal.ALU,
+    Signal.LDR,
+    Signal.LAC,
+    Signal.MUXAR,
+    Signal.LAR,
+    Signal.MUXRSP,
+    Signal.LRSP,
+    Signal.MUXDSP,
+    Signal.LDSP,
+    Signal.OE,
+    Signal.WR,
+    Signal.MPC,
+    Signal.MUXMPC,
+]
+
+INSTRUCTION_ORDER = [
+    Opcode.LOAD_IMM,
+    Opcode.LOAD_ADDR,
+    Opcode.CALL,
+    Opcode.RETURN,
+    Opcode.LOAD,
+    Opcode.SAVE,
+    Opcode.PLUS,
+    Opcode.MINUS,
+    Opcode.MULT,
+    Opcode.DIV,
+    Opcode.MOD,
+    Opcode.AND,
+    Opcode.OR,
+    Opcode.HALT,
+    Opcode.POP_AC,
+    Opcode.POP_DR
+]
+
+
 linking_table = {
-    Opcode.LOAD_IMM: 3,
-    Opcode.LOAD_ADDR: 6,
-    Opcode.CALL: 12,
-    Opcode.RETURN: 18,
-    Opcode.LOAD: 24,
-    Opcode.SAVE: 30,
-    Opcode.PLUS: 33,
-    Opcode.MINUS: 39,
-    Opcode.MULT: 45,
-    Opcode.DIV: 51,
-    Opcode.MOD: 57,
-    Opcode.AND: 63,
-    Opcode.OR: 69,
-    Opcode.NOT: 75,
-    Opcode.HALT: 81,
+    Opcode.LOAD_IMM: 4,
+    Opcode.LOAD_ADDR: 8,
+    Opcode.CALL: 16,
+    Opcode.RETURN: 24,
+    Opcode.LOAD: 36,
+    Opcode.SAVE: 44,
+    Opcode.PLUS: 48,
+    Opcode.MINUS: 52,
+    Opcode.MULT: 56,
+    Opcode.DIV: 60,
+    Opcode.MOD: 64,
+    Opcode.AND: 68,
+    Opcode.OR: 72,
+    Opcode.NOT: 76,
+    Opcode.HALT: 80,
+    Opcode.POP_AC: 84,
+    Opcode.POP_DR: 92
 }
 
 
 def encode_microinstruction(step: dict) -> int:
     """
-    Кодирует один шаг микрокода в 24-битное целое число.
-    muxalu — 2 бита, alu — 4 бита, muxmpc - 2 бита, остальные сигналы 1 бит
-    Остальные сигналы — 1 бит.
+    Кодирует один шаг микрокода в 26-битное целое число.
+    muxalu — 2 бита, alu — 4 бита, muxmpc - 2 бита, muxar - 2 бита остальные сигналы 1 бит
     """
     bitstr = ""
     for name in SIGNAL_ORDER:
         val = step.get(name, 0)
-        if name == Signal.MUXALU:
+        if (name == Signal.MUXALU) or (name == Signal.MUXMPC) or (name == Signal.MUXAR) or (name == Signal.MUXPC):
             bitstr += f"{val:02b}"
         elif name == Signal.ALU:
             bitstr += f"{val:04b}"
-        elif name == Signal.MUXMPC:
-            bitstr += f"{val:02b}"
-        elif name == Signal.MUXAR:
-            bitstr += f"{val:02b}"
         else:
             bitstr += f"{val:01b}"
     print(bitstr)
@@ -311,25 +328,28 @@ def encode_microinstruction(step: dict) -> int:
 # попозже добавить автоматическое создание таблицы линковки
 def save_to_bin(microcode: dict, filename: str):
     os.makedirs(os.path.dirname(os.path.abspath(filename)) or ".", exist_ok=True)
-    choose_op_instr = "111100000000000000000010"
+    choose_op_instr = "00011000000000000000000110"
     steps = [int(choose_op_instr, 2)]
-    for opcode in microcode:
+    for opcode in INSTRUCTION_ORDER:
         # Проверяем тип значения - список или словарь
         op_steps = microcode[opcode]
         for step in op_steps:
             encoded = encode_microinstruction(step)
             steps.append(encoded)
 
+    binary_bytes = bytearray()
+
     with open(filename, "wb") as f:
         for code in steps:
-            # Сохраняем как 3 байта (24 бита)
-            f.write(code.to_bytes(3, byteorder="big"))
+            # Сохраняем как 4 байта
+            binary_bytes.extend(code.to_bytes(4, byteorder="big"))
+        f.write(bytes(binary_bytes))
 
     print(f"Saved {len(steps)} microinstructions to {filename}")
 
 
 def microcode_from_byte(target):
-    # одна инструкция 3 байта
+    # одна инструкция 4 байта
     with open(target, "rb") as f:
         byte_array = list(f.read())
     return byte_array

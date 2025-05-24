@@ -4,19 +4,30 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-
+    
         {
-            "name": "Python Debugger: Current File with Arguments",
+            "name": "Python Debugger: translator",
             "type": "debugpy",
             "request": "launch",
-            //"program": "C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\translator.py",
-            "program": "C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\microcode_util.py",
-            //"program": "C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\machine.py",
+            "program": "C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\translator.py",
             "console": "integratedTerminal",
-            //"args": "C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\examples\\hello.forth C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\examples\\target.bin"
+            "args": "C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\examples\\hello.forth C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\examples\\target.bin"
+        },
+        {
+            "name": "Python Debugger: microcode",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\microcode_util.py",
+            "console": "integratedTerminal",
             "args": "C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\microcode.bin"
-            //"args": "C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\examples\\target.bin C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\examples\\input_file.txt"
-            
+        },
+        {
+            "name": "Python Debugger: machine",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\machine.py",
+            "console": "integratedTerminal",
+            "args": "C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\examples\\target.bin C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\examples\\input_file.txt"
         }
     ]
 }
