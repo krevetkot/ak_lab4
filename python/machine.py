@@ -136,6 +136,10 @@ class DataPath:
             self.AR = self.AC & 0xFFFFFF
         elif sel == 1:
             self.AR = self.RSP
+        elif sel == 2:
+            self.AR = self.DSP
+        else:
+            self.AR = self.DR
         self.data_address = self.AR
 
     def signal_latch_RSP(self, sel):
@@ -214,7 +218,7 @@ class ControlUnit:
 
         for name in SIGNAL_ORDER:
             if name == Signal.MUXALU:
-                # 2 бита для Signal.MUXSignal.ALU
+                # 2 бита для Signal.MUXALU
                 signals[name] = (instr >> pos) & 0b11
                 pos -= 2
             elif name == Signal.ALU:
