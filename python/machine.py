@@ -74,7 +74,7 @@ class DataPath:
     output_buffer = None
     "Буфер выходных данных."
 
-    def __init__(self, code, data_memory_size, stack_size, input_buffer):
+    def __init__(self, code, data_memory_size, code_size, stack_size, input_buffer):
         assert data_memory_size > 0, "Data_memory size should be non-zero"
         assert stack_size > 0, "Stack size should be non-zero"
         self.data_memory_size = data_memory_size
@@ -89,7 +89,7 @@ class DataPath:
         self.BR = 0
         self.AR = 0
         self.RSP = data_memory_size
-        self.DSP = len(code)
+        self.DSP = code_size
         # data stack будет расти вверх, а return stack вниз
         self.input_buffer = input_buffer
         self.output_buffer = []
@@ -201,7 +201,7 @@ class ControlUnit:
         if sel == 0:
             self.mpc = 0
         if sel == 1:
-            self.mpc += 3
+            self.mpc += 4
         if sel == 2:
             self.mpc = self.instruction_decoder()
 
@@ -317,8 +317,8 @@ class ControlUnit:
         return "{} \t{} [{}]".format(state_repr, instr_repr, instr_hex)
 
 
-def simulation(binary_code, microcode, input_tokens, data_memory_size, limit):
-    data_path = DataPath(binary_code, data_memory_size, 68, input_tokens)
+def simulation(binary_code, microcode, input_tokens, data_memory_size, code_size, limit):
+    data_path = DataPath(binary_code, data_memory_size, code_size, 68, input_tokens)
     control_unit = ControlUnit(microcode, data_path)
 
     # logging.debug("%s", control_unit)
@@ -345,7 +345,9 @@ def main(code_file, microcode_file, input_file):
     with open(code_file, "rb") as file:
         bin_code = file.read()
 
-    bin_code += bytes(68)
+    code_size = len(bin_code)
+
+    bin_code += bytes(200 - code_size)
 
     binary_code = bytearray(bin_code)
 
@@ -369,6 +371,7 @@ def main(code_file, microcode_file, input_file):
         microcode,
         input_tokens=input_token,
         data_memory_size=200,
+        code_size=code_size,
         limit=2000,
     )
 
