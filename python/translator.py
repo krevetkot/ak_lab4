@@ -310,8 +310,34 @@ def translate_stage_1(text):
                     "opcode": word_to_opcode(term.word),
                     "term": term,
                 },
-            )  
+            ) 
 
+        elif  word_to_opcode(term.word) == Opcode.SAVE:
+            code.append(
+                {
+                    "address": address,
+                    "opcode": Opcode.POP_DR,
+                    "term": term,
+                },
+            )  
+            address += 1
+            code.append(
+                {
+                    "address": address,
+                    "opcode": Opcode.POP_AC,
+                    "term": term,
+                },
+            )  
+            address += 1
+            code.append(
+                {
+                    "address": address,
+                    "opcode": word_to_opcode(term.word),
+                    "term": term,
+                },
+            ) 
+        
+             
         else:
             code.append(
                 {"address": address, "opcode": word_to_opcode(term.word), "term": term}
