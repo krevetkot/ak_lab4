@@ -84,11 +84,11 @@ class DataPath:
         self.CR = 0
         self.AC = 0
         self.DR = 0
-        self.PC = 0
+        self.PC = 12
         self.IR = 0
         self.BR = 0
         self.AR = 0
-        self.RSP = data_memory_size
+        self.RSP = data_memory_size - 4
         self.DSP = code_size
         # data stack будет расти вверх, а return stack вниз
         self.input_buffer = input_buffer
@@ -150,9 +150,9 @@ class DataPath:
 
     def signal_latch_RSP(self, sel):
         if sel == 0:
-            self.RSP -= 4
-        elif sel == 1:
             self.RSP += 4
+        elif sel == 1:
+            self.RSP -= 4
 
     def signal_latch_DSP(self, sel):
         if sel == 0:
@@ -168,7 +168,10 @@ class DataPath:
 
     def signal_wr(self):
         assert 0 <= self.AR < self.data_memory_size, "out of memory: {}".format(self.AR)
-        self.data_memory[self.AR] = self.AC
+        self.data_memory[self.AR] = (self.AC >> 24) & 0xFF
+        self.data_memory[self.AR + 1] = (self.AC >> 16) & 0xFF
+        self.data_memory[self.AR + 2] = (self.AC >> 8) & 0xFF
+        self.data_memory[self.AR + 3] = (self.AC) & 0xFF
 
     # пока не знаю как примонтировать ячейку памяти на ввод/вывод
     # и еще нужно исправить то что память у нас однопортовая, добавить еще один mux между pc и ar
