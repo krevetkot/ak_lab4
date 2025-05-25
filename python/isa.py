@@ -28,6 +28,7 @@ class Opcode(str, Enum):
     RETURN = "return"
     POP_AC = "popac"
     POP_DR = "popdr"
+    PUSH = "push"
 
     # инструкции, которые не отображаются в память
     VARIABLE = "variable"
@@ -76,6 +77,8 @@ opcode_to_binary = {
     Opcode.SAVE: 0x30,  # 00011110
     Opcode.POP_AC: 0x32, # 0100000
     Opcode.POP_DR: 0x34, # 0100010
+    Opcode.PUSH: 0x36, # 0100100
+    
     Opcode.LOAD_IMM: 0x3,  # 00000011
     Opcode.LOAD_ADDR: 0x5,  # 00000101
     Opcode.CALL: 0x7,  # 00000111
