@@ -1,10 +1,15 @@
-0x8 -    5000016 - loadaddr (00000016)
-0xc -         32 - popac
-0xd -          2 - load
-0xe -    500001A - loadaddr (0000001A)
-0x12 -         34 - popdr
-0x13 -         32 - popac
-0x14 -         30 - save
-0x15 -         26 - halt
-0x16 -          0 - input_address
-0x1a -          4 - output_address
+0x8 -    3000006 - loadimm (00000006)
+0xc -    3000005 - loadimm (00000005)
+0x10 -    3000005 - loadimm (00000005)
+0x14 -         32 - popac
+0x15 -         34 - popdr
+0x16 -          8 - mul
+0x17 -         32 - popac
+0x18 -         34 - popdr
+0x19 -          6 - sub
+0x1a -    5000022 - loadaddr (00000022)
+0x1e -         34 - popdr
+0x1f -         32 - popac
+0x20 -         30 - save
+0x21 -         26 - halt
+0x22 -          4 - output_address

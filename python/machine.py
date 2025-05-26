@@ -90,7 +90,7 @@ class DataPath:
         self.BR = 0
         self.AR = 0
         self.RSP = data_memory_size - 4
-        self.DSP = code_size + 8
+        self.DSP = code_size
         # data stack будет расти вверх, а return stack вниз
         self.input_buffer = input_buffer
         self.output_buffer = []
@@ -141,12 +141,13 @@ class DataPath:
     def signal_do_alu(self, mux_sel, operation):
         if mux_sel == 0:
             left = self.DR
-        if mux_sel == 1:
+        elif mux_sel == 1:
             left = self.PC
-        if mux_sel == 2:
+        elif mux_sel == 2:
             left = self.BR
-        if mux_sel == 3:
+        elif mux_sel == 3:
             left = self.CR
+        left = struct.unpack('i', struct.pack('I', left))[0]
         self.ALU.do_ALU(self.AC, left, operation)
 
     def signal_latch_AC(self):
@@ -277,7 +278,7 @@ class ControlUnit:
             | (self.microprogram[self.mpc + 3])
         )
         signals = self.parse_microinstr(micro_instr)
-        if self.mpc == 40:
+        if self.mpc == 84:
             print('its load')
         if signals[Signal.MPC] == 0:
             raise StopIteration()
@@ -296,7 +297,7 @@ class ControlUnit:
             self.data_path.signal_latch_IR()
         if signals[Signal.LBR] == 1:
             self.data_path.signal_latch_BR()
-        self.data_path.signal_do_alu(signals[Signal.MUXALU], signals[Signal.ALU])
+        self.data_path.signal_do_alu(signals[Signal.MUXALU], signals[Signal.ALU]) # что подаем на левый вход и какая операция
         if signals[Signal.LDR] == 1:
             self.data_path.signal_latch_DR()
         if signals[Signal.LAC] == 1:

@@ -24,21 +24,21 @@ class ALU:
     def do_ALU(self, right, left, sel):
         if sel == 0:
             self.plus_zero(left)
-        if sel == 1:
+        elif sel == 1:
             self.plus(right, left)
-        if sel == 2:
+        elif sel == 2:
             self.minus(right, left)
-        if sel == 3:
+        elif sel == 3:
             self.multiply(right, left)
-        if sel == 4:
+        elif sel == 4:
             self.divide(right, left)
-        if sel == 5:
+        elif sel == 5:
             self.modulo(right, left)
-        if sel == 6:
+        elif sel == 6:
             self.logical_and(right, left)
-        if sel == 7:
+        elif sel == 7:
             self.logical_or(right, left)
-        if sel == 8:
+        elif sel == 8:
             self.logical_not(right, left)
 
     def plus_zero(self, left):
@@ -63,7 +63,7 @@ class ALU:
 
     def minus(self, right, left):
         """Вычитание с установкой флагов"""
-        result = right - left
+        result = left - right
         self._update_nz(result)
 
         max_uint32 = 0xFFFFFFFF
@@ -76,7 +76,7 @@ class ALU:
 
     def multiply(self, right, left):
         """Умножение с установкой флагов"""
-        result = right * left
+        result = left * right
         self._update_nz(result)
 
         # Проверка переполнения для умножения

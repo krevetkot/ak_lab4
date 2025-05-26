@@ -146,8 +146,8 @@ microcode = {
     Opcode.MINUS: [
         {
             Signal.LPC: 1, Signal.MUXPC: 2, Signal.LCR: 0, Signal.LIR: 0,
-            Signal.LBR: 0, Signal.MUXALU: 1, Signal.ALU: 1, Signal.LDR: 0,
-            Signal.LAC: 0, Signal.MUXAR: 2, Signal.LAR: 1, Signal.MUXRSP: 0,
+            Signal.LBR: 0, Signal.MUXALU: 0, Signal.ALU: 2, Signal.LDR: 0,
+            Signal.LAC: 1, Signal.MUXAR: 2, Signal.LAR: 1, Signal.MUXRSP: 0,
             Signal.LRSP: 0, Signal.MUXDSP: 0, Signal.LDSP: 1, Signal.OE: 0,
             Signal.WR: 1, Signal.MPC: 1, Signal.MUXMPC: 0
         },
@@ -155,8 +155,8 @@ microcode = {
     Opcode.MULT: [
         {
             Signal.LPC: 1, Signal.MUXPC: 2, Signal.LCR: 0, Signal.LIR: 0,
-            Signal.LBR: 0, Signal.MUXALU: 2, Signal.ALU: 1, Signal.LDR: 0,
-            Signal.LAC: 0, Signal.MUXAR: 2, Signal.LAR: 1, Signal.MUXRSP: 0,
+            Signal.LBR: 0, Signal.MUXALU: 0, Signal.ALU: 3, Signal.LDR: 0,
+            Signal.LAC: 1, Signal.MUXAR: 2, Signal.LAR: 1, Signal.MUXRSP: 0,
             Signal.LRSP: 0, Signal.MUXDSP: 0, Signal.LDSP: 1, Signal.OE: 0,
             Signal.WR: 1, Signal.MPC: 1, Signal.MUXMPC: 0
         },
@@ -164,8 +164,8 @@ microcode = {
     Opcode.DIV: [
         {
             Signal.LPC: 1, Signal.MUXPC: 2, Signal.LCR: 0, Signal.LIR: 0,
-            Signal.LBR: 0, Signal.MUXALU: 3, Signal.ALU: 1, Signal.LDR: 0,
-            Signal.LAC: 0, Signal.MUXAR: 2, Signal.LAR: 1, Signal.MUXRSP: 0,
+            Signal.LBR: 0, Signal.MUXALU: 0, Signal.ALU: 4, Signal.LDR: 0,
+            Signal.LAC: 1, Signal.MUXAR: 2, Signal.LAR: 1, Signal.MUXRSP: 0,
             Signal.LRSP: 0, Signal.MUXDSP: 0, Signal.LDSP: 1, Signal.OE: 0,
             Signal.WR: 1, Signal.MPC: 1, Signal.MUXMPC: 0
         },
@@ -173,8 +173,8 @@ microcode = {
     Opcode.MOD: [
         {
             Signal.LPC: 1, Signal.MUXPC: 2, Signal.LCR: 0, Signal.LIR: 0,
-            Signal.LBR: 0, Signal.MUXALU: 4, Signal.ALU: 1, Signal.LDR: 0,
-            Signal.LAC: 0, Signal.MUXAR: 2, Signal.LAR: 1, Signal.MUXRSP: 0,
+            Signal.LBR: 0, Signal.MUXALU: 0, Signal.ALU: 5, Signal.LDR: 0,
+            Signal.LAC: 1, Signal.MUXAR: 2, Signal.LAR: 1, Signal.MUXRSP: 0,
             Signal.LRSP: 0, Signal.MUXDSP: 0, Signal.LDSP: 1, Signal.OE: 0,
             Signal.WR: 1, Signal.MPC: 1, Signal.MUXMPC: 0
         },
@@ -182,8 +182,8 @@ microcode = {
     Opcode.AND: [
         {
             Signal.LPC: 1, Signal.MUXPC: 2, Signal.LCR: 0, Signal.LIR: 0,
-            Signal.LBR: 0, Signal.MUXALU: 5, Signal.ALU: 1, Signal.LDR: 0,
-            Signal.LAC: 0, Signal.MUXAR: 2, Signal.LAR: 1, Signal.MUXRSP: 0,
+            Signal.LBR: 0, Signal.MUXALU: 0, Signal.ALU: 6, Signal.LDR: 0,
+            Signal.LAC: 1, Signal.MUXAR: 2, Signal.LAR: 1, Signal.MUXRSP: 0,
             Signal.LRSP: 0, Signal.MUXDSP: 0, Signal.LDSP: 1, Signal.OE: 0,
             Signal.WR: 1, Signal.MPC: 1, Signal.MUXMPC: 0
         },
@@ -191,8 +191,8 @@ microcode = {
     Opcode.OR: [
         {
             Signal.LPC: 1, Signal.MUXPC: 2, Signal.LCR: 0, Signal.LIR: 0,
-            Signal.LBR: 0, Signal.MUXALU: 6, Signal.ALU: 1, Signal.LDR: 0,
-            Signal.LAC: 0, Signal.MUXAR: 2, Signal.LAR: 1, Signal.MUXRSP: 0,
+            Signal.LBR: 0, Signal.MUXALU: 0, Signal.ALU: 7, Signal.LDR: 0,
+            Signal.LAC: 1, Signal.MUXAR: 2, Signal.LAR: 1, Signal.MUXRSP: 0,
             Signal.LRSP: 0, Signal.MUXDSP: 0, Signal.LDSP: 1, Signal.OE: 0,
             Signal.WR: 1, Signal.MPC: 1, Signal.MUXMPC: 0
         },
@@ -200,8 +200,8 @@ microcode = {
     Opcode.NOT: [
         {
             Signal.LPC: 1, Signal.MUXPC: 2, Signal.LCR: 0, Signal.LIR: 0,
-            Signal.LBR: 0, Signal.MUXALU: 7, Signal.ALU: 1, Signal.LDR: 0,
-            Signal.LAC: 0, Signal.MUXAR: 2, Signal.LAR: 1, Signal.MUXRSP: 0,
+            Signal.LBR: 0, Signal.MUXALU: 0, Signal.ALU: 8, Signal.LDR: 0,
+            Signal.LAC: 1, Signal.MUXAR: 2, Signal.LAR: 1, Signal.MUXRSP: 0,
             Signal.LRSP: 0, Signal.MUXDSP: 0, Signal.LDSP: 1, Signal.OE: 0,
             Signal.WR: 1, Signal.MPC: 1, Signal.MUXMPC: 0
         },
