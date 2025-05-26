@@ -175,7 +175,7 @@ def translate_stage_1(text):
     # или память это просто битовый файл?
 
     i = 0
-    address = 0
+    address = 8
     hex_number_pattern = r"^0[xX][0-9A-Fa-f]+$"
     dec_number_pattern = r"^[0-9]+$"
     last_begin = 0
