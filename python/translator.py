@@ -233,7 +233,7 @@ def translate_stage_1(text):
                 {"address": address, "opcode": Opcode.IF, "arg": -1, "term": term}
             )
         elif term.word == "ELSE":
-            addresses_in_conditions[brackets_stack.pop()["address"]] = address + 1
+            addresses_in_conditions[brackets_stack.pop()["address"]] = address + 4
             brackets_stack.append({"address": address, "opcode": Opcode.ELSE})
             code.append(
                 {"address": address, "opcode": Opcode.ELSE, "arg": -1, "term": term}

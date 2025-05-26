@@ -189,7 +189,7 @@ class DataPath:
         elif sel == 1:
             self.DSP -= 4
         assert (
-            self.DSP > self.code_size
+            self.DSP >= self.code_size
         ), "out of memory: {}".format(self.RSP)
         assert (
             self.DSP < self.RSP
@@ -211,7 +211,6 @@ class DataPath:
             self.data_memory[self.AR + 2] = (self.AC >> 8) & 0xFF
             self.data_memory[self.AR + 3] = (self.AC) & 0xFF
 
-    # пока не знаю как примонтировать ячейку памяти на ввод/вывод
     # и еще нужно исправить то что память у нас однопортовая, добавить еще один mux между pc и ar
 
 
@@ -379,8 +378,8 @@ def simulation(binary_code, microcode, input_tokens, data_memory_size, code_size
     # logging.debug("%s", control_unit)
     try:
         while control_unit._tick < limit:
-            control_unit.process_next_tick()
             logging.debug("%s", control_unit)
+            control_unit.process_next_tick()
     except EOFError:
         logging.warning("Input buffer is empty!")
     except StopIteration:

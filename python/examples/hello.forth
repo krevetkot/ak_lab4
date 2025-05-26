@@ -1,11 +1,7 @@
-# 0x0 VARIABLE input_address
-0x4 VARIABLE output_address
+2 1 > IF
+1 +
+ELSE
+1 -
+THEN
 
-# input_address @
-# output_address !
- 
-# HALT
-
-6 5 5 * -
-output_address !
 HALT
