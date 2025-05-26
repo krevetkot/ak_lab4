@@ -4,5 +4,7 @@
 : FUNC one two + ;
 
 FUNC
+
+0x80 !
  
 HALT

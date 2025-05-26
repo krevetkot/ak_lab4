@@ -107,6 +107,7 @@ class DataPath:
         self.data_address = self.PC
 
     def signal_latch_CR(self):
+        # if self.data_address == 
         self.CR = (
             (self.data_memory[self.data_address] << 24)
             | (self.data_memory[self.data_address + 1] << 16)
@@ -256,6 +257,8 @@ class ControlUnit:
             | (self.microprogram[self.mpc + 3])
         )
         signals = self.parse_microinstr(micro_instr)
+        if self.mpc == 48:
+            print('its loadimm')
         if signals[Signal.MPC] == 0:
             raise StopIteration()
         if self.mpc == 0:
@@ -298,7 +301,7 @@ class ControlUnit:
 
     def __repr__(self):
         """Вернуть строковое представление состояния процессора."""
-        state_repr = "TICK: {:3} PC: {:3} ADDR: {:3} MEM_OUT: {} ACC: {} DR: {} CR: {} RSP: {} DSP : {}".format(
+        state_repr = "TICK: {:3} PC: {:3} ADDR: {:3} MEM_OUT: {} ACC: {} DR: {} CR: {} BR: {} RSP: {} DSP : {}".format(
             self._tick,
             self.data_path.PC,
             self.data_path.data_address,
@@ -306,6 +309,7 @@ class ControlUnit:
             self.data_path.AC,
             self.data_path.DR,
             self.data_path.CR,
+            self.data_path.BR,
             self.data_path.RSP,
             self.data_path.DSP,
         )

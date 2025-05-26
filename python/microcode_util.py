@@ -43,8 +43,8 @@ microcode = {
             Signal.LPC: 1, Signal.MUXPC: 1, Signal.LCR: 0, Signal.LIR: 0,
             Signal.LBR: 1, Signal.MUXALU: 2, Signal.ALU: 0, Signal.LDR: 0,
             Signal.LAC: 1, Signal.MUXAR: 2, Signal.LAR: 1, Signal.MUXRSP: 0,
-            Signal.LRSP: 0, Signal.MUXDSP: 0, Signal.LDSP: 0, Signal.OE: 1,
-            Signal.WR: 0, Signal.MPC: 1, Signal.MUXMPC: 0
+            Signal.LRSP: 0, Signal.MUXDSP: 0, Signal.LDSP: 1, Signal.OE: 0,
+            Signal.WR: 1, Signal.MPC: 1, Signal.MUXMPC: 0
         },
     ],
     Opcode.LOAD_ADDR: [
@@ -83,7 +83,7 @@ microcode = {
         {
             Signal.LPC: 1, Signal.MUXPC: 2, Signal.LCR: 0, Signal.LIR: 0,
             Signal.LBR: 0, Signal.MUXALU: 0, Signal.ALU: 0, Signal.LDR: 0,
-            Signal.LAC: 0, Signal.MUXAR: 0, Signal.LAR: 0, Signal.MUXRSP: 1,
+            Signal.LAC: 0, Signal.MUXAR: 0, Signal.LAR: 0, Signal.MUXRSP: 0,
             Signal.LRSP: 1, Signal.MUXDSP: 0, Signal.LDSP: 0, Signal.OE: 0,
             Signal.WR: 0, Signal.MPC: 1, Signal.MUXMPC: 1
         },
@@ -99,14 +99,14 @@ microcode = {
             Signal.LBR: 1, Signal.MUXALU: 0, Signal.ALU: 0, Signal.LDR: 0,
             Signal.LAC: 0, Signal.MUXAR: 0, Signal.LAR: 0, Signal.MUXRSP: 0,
             Signal.LRSP: 0, Signal.MUXDSP: 0, Signal.LDSP: 0, Signal.OE: 0,
-            Signal.WR: 1, Signal.MPC: 1, Signal.MUXMPC: 1
+            Signal.WR: 0, Signal.MPC: 1, Signal.MUXMPC: 1
         },
         {
             Signal.LPC: 1, Signal.MUXPC: 0, Signal.LCR: 0, Signal.LIR: 0,
             Signal.LBR: 0, Signal.MUXALU: 0, Signal.ALU: 0, Signal.LDR: 0,
             Signal.LAC: 0, Signal.MUXAR: 0, Signal.LAR: 0, Signal.MUXRSP: 0,
             Signal.LRSP: 0, Signal.MUXDSP: 0, Signal.LDSP: 0, Signal.OE: 0,
-            Signal.WR: 1, Signal.MPC: 0, Signal.MUXMPC: 0
+            Signal.WR: 0, Signal.MPC: 1, Signal.MUXMPC: 0
         },
     ],
     Opcode.LOAD: [
@@ -131,7 +131,7 @@ microcode = {
             Signal.LBR: 0, Signal.MUXALU: 0, Signal.ALU: 0, Signal.LDR: 0,
             Signal.LAC: 0, Signal.MUXAR: 3, Signal.LAR: 1, Signal.MUXRSP: 0,
             Signal.LRSP: 0, Signal.MUXDSP: 0, Signal.LDSP: 0, Signal.OE: 0,
-            Signal.WR: 1, Signal.MPC: 1, Signal.MUXMPC: 1
+            Signal.WR: 1, Signal.MPC: 1, Signal.MUXMPC: 0
         },
     ],
     Opcode.PLUS: [

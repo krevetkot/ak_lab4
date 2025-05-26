@@ -1,10 +1,14 @@
-0x0 -    5000011 - loadaddr (00000011)
-0x4 -    5000015 - loadaddr (00000015)
+0x0 -    5000018 - loadaddr (00000018)
+0x4 -    500001C - loadaddr (0000001C)
 0x8 -         32 - popac
 0x9 -         34 - popdr
 0xa -          4 - add
 0xb -         28 - return
 0xc -    7000000 - call (00000000)
-0x10 -         26 - halt
-0x11 -          1 - one
-0x15 -          2 - two
+0x10 -    3000080 - loadimm (00000080)
+0x14 -         34 - popdr
+0x15 -         32 - popac
+0x16 -         30 - save
+0x17 -         26 - halt
+0x18 -          1 - one
+0x1c -          2 - two
