@@ -43,6 +43,8 @@ class DataPath:
 
     stack_size = None
 
+    code_size = None
+
     data_memory = None
     "Память данных. Инициализируется нулевыми значениями."
 
@@ -78,6 +80,7 @@ class DataPath:
     def __init__(self, code, data_memory_size, code_size, stack_size, input_buffer: list):
         assert data_memory_size > 0, "Data_memory size should be non-zero"
         assert stack_size > 0, "Stack size should be non-zero"
+        self.code_size = code_size
         self.data_memory_size = data_memory_size
         self.stack_size = stack_size
         self.data_memory = code
@@ -172,12 +175,25 @@ class DataPath:
             self.RSP += 4
         elif sel == 1:
             self.RSP -= 4
+        assert (
+            self.RSP < self.data_memory_size
+        ), "out of memory: {}".format(self.RSP)
+        assert (
+            self.DSP < self.RSP
+        ), "stack overflow: {}".format(self.RSP)
+
 
     def signal_latch_DSP(self, sel):
         if sel == 0:
             self.DSP += 4
         elif sel == 1:
             self.DSP -= 4
+        assert (
+            self.DSP > self.code_size
+        ), "out of memory: {}".format(self.RSP)
+        assert (
+            self.DSP < self.RSP
+        ), "stack overflow: {}".format(self.RSP)
 
     def signal_oe(self):
         self.data_address = self.AR
