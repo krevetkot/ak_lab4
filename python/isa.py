@@ -78,7 +78,7 @@ opcode_to_binary = {
     Opcode.POP_AC: 0x32, # 0100000
     Opcode.POP_DR: 0x34, # 0100010
     Opcode.PUSH: 0x36, # 0100100
-    
+
     Opcode.LOAD_IMM: 0x3,  # 00000011
     Opcode.LOAD_ADDR: 0x5,  # 00000101
     Opcode.CALL: 0x7,  # 00000111
@@ -103,6 +103,7 @@ def to_bytes(code):
     └─────────┴─────────────────────────────────────────────────────────────┘
     """
     binary_bytes = bytearray()
+    binary_bytes += bytes(8)
     for instr in code:
         if "opcode" in instr:
             opcode_bin = opcode_to_binary[instr["opcode"]]
@@ -128,7 +129,7 @@ def to_hex(code, variables_map):
     result = []
     after_halt = False
 
-    i = 0
+    i = 8
     while i < len(binary_code):
         has_argument = (binary_code[i]) & 0x1 == 1
 

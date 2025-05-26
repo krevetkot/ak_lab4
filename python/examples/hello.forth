@@ -1,10 +1,7 @@
-0x1 VARIABLE one
-0x2 VARIABLE two
+0x0 VARIABLE input_address
+0x4 VARIABLE output_address
 
-: FUNC one two + ;
-
-FUNC
-
-0x80 !
+input_address @
+output_address !
  
 HALT

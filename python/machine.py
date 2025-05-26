@@ -13,6 +13,7 @@
 
 import logging
 import sys
+import struct
 
 from isa import Opcode, opcode_to_binary, binary_to_opcode, to_hex
 from microcode_util import microcode_from_byte, linking_table, SIGNAL_ORDER, Signal
@@ -20,9 +21,9 @@ from alu import ALU
 from translator import variables_map
 
 
-# хочется конечно их на 0 и 4
-MEMORY_MAPPED_INPUT_ADDRESS = 128
-MEMORY_MAPPED_INPUT_ADDRESS = 132
+# ура ура
+MEMORY_MAPPED_INPUT_ADDRESS = 0
+MEMORY_MAPPED_OUTPUT_ADDRESS = 4
 
 
 class DataPath:
@@ -74,7 +75,7 @@ class DataPath:
     output_buffer = None
     "Буфер выходных данных."
 
-    def __init__(self, code, data_memory_size, code_size, stack_size, input_buffer):
+    def __init__(self, code, data_memory_size, code_size, stack_size, input_buffer: list):
         assert data_memory_size > 0, "Data_memory size should be non-zero"
         assert stack_size > 0, "Stack size should be non-zero"
         self.data_memory_size = data_memory_size
@@ -84,12 +85,12 @@ class DataPath:
         self.CR = 0
         self.AC = 0
         self.DR = 0
-        self.PC = 12
+        self.PC = 8
         self.IR = 0
         self.BR = 0
         self.AR = 0
         self.RSP = data_memory_size - 4
-        self.DSP = code_size
+        self.DSP = code_size + 8
         # data stack будет расти вверх, а return stack вниз
         self.input_buffer = input_buffer
         self.output_buffer = []
@@ -107,13 +108,29 @@ class DataPath:
         self.data_address = self.PC
 
     def signal_latch_CR(self):
-        # if self.data_address == 
-        self.CR = (
+        if self.data_address == MEMORY_MAPPED_INPUT_ADDRESS:
+            element = self.input_buffer[0]
+            if isinstance(element, str) or isinstance(element, chr):
+                num = ord(element)       
+            elif isinstance(element, int):
+                num = element
+            
+            word = struct.pack('>I', num)  # Упаковываем в 4 байта (big-endian)
+            self.input_buffer.pop(0)
+            self.CR = (
+                (word[0] << 24)
+                | (word[1] << 16)
+                | (word[2] << 8)
+                | (word[3])
+            )   
+            
+        else:
+            self.CR = (
             (self.data_memory[self.data_address] << 24)
             | (self.data_memory[self.data_address + 1] << 16)
             | (self.data_memory[self.data_address + 2] << 8)
             | (self.data_memory[self.data_address + 3])
-        )
+            )
 
     def signal_latch_IR(self):
         self.IR = (self.CR >> 24) & 0xFF
@@ -169,10 +186,13 @@ class DataPath:
 
     def signal_wr(self):
         assert 0 <= self.AR < self.data_memory_size, "out of memory: {}".format(self.AR)
-        self.data_memory[self.AR] = (self.AC >> 24) & 0xFF
-        self.data_memory[self.AR + 1] = (self.AC >> 16) & 0xFF
-        self.data_memory[self.AR + 2] = (self.AC >> 8) & 0xFF
-        self.data_memory[self.AR + 3] = (self.AC) & 0xFF
+        if self.AR == MEMORY_MAPPED_OUTPUT_ADDRESS:
+            self.output_buffer.append(self.AC)
+        else:
+            self.data_memory[self.AR] = (self.AC >> 24) & 0xFF
+            self.data_memory[self.AR + 1] = (self.AC >> 16) & 0xFF
+            self.data_memory[self.AR + 2] = (self.AC >> 8) & 0xFF
+            self.data_memory[self.AR + 3] = (self.AC) & 0xFF
 
     # пока не знаю как примонтировать ячейку памяти на ввод/вывод
     # и еще нужно исправить то что память у нас однопортовая, добавить еще один mux между pc и ar
@@ -257,8 +277,8 @@ class ControlUnit:
             | (self.microprogram[self.mpc + 3])
         )
         signals = self.parse_microinstr(micro_instr)
-        if self.mpc == 48:
-            print('its loadimm')
+        if self.mpc == 40:
+            print('its load')
         if signals[Signal.MPC] == 0:
             raise StopIteration()
         if self.mpc == 0:
@@ -351,21 +371,22 @@ def simulation(binary_code, microcode, input_tokens, data_memory_size, code_size
 
     if control_unit._tick >= limit:
         logging.warning("Limit exceeded!")
-    logging.info("output_buffer: %s", repr("".join(data_path.output_buffer)))
-    return "".join(data_path.output_buffer), control_unit.current_tick()
+    logging.info("output_buffer: %s", repr("".join(str(x) for x in data_path.output_buffer)))
+    return "".join(str(x) for x in data_path.output_buffer), control_unit.current_tick()
 
 
 def main(code_file, microcode_file, input_file):
     """Функция запуска модели процессора. Параметры -- имена файлов с машинным
     кодом и с входными данными для симуляции.
     """
+    CONST_data_memory_size = 200
     # файл с бинарным кодом
     with open(code_file, "rb") as file:
         bin_code = file.read()
 
     code_size = len(bin_code)
 
-    bin_code += bytes(200 - code_size)
+    bin_code += bytes(CONST_data_memory_size - code_size)
 
     binary_code = bytearray(bin_code)
 
@@ -379,16 +400,11 @@ def main(code_file, microcode_file, input_file):
         for char in input_text:
             input_token.append(char)
 
-    # data_mem_size = len(binary_code) * 2
-    # if data_mem_size > 2**24 - 1:
-    #     data_mem_size = 2**24 - 1
-    # пока что так, но потом я хочу перенести ячейки ввода вывода в начало и сделать как выше
-
     output, ticks = simulation(
         binary_code,
         microcode,
         input_tokens=input_token,
-        data_memory_size=200,
+        data_memory_size=CONST_data_memory_size,
         code_size=code_size,
         limit=100,
     )
