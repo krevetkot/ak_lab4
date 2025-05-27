@@ -1,20 +1,30 @@
-0x8 -    3000002 - loadimm (00000002)
-0xc -    3000001 - loadimm (00000001)
+0x8 -    3000046 - loadimm (00000046)
+0xc -    3000000 - loadimm (00000000)
 0x10 -         32 - popac
 0x11 -         34 - popdr
-0x12 -         22 - less
-0x13 -    9000026 - if (00000026)
-0x17 -    3000005 - loadimm (00000005)
-0x1b -    5000036 - loadaddr (00000036)
-0x1f -         34 - popdr
+0x12 -         24 - greater
+0x13 -         32 - popac
+0x14 -   1100003D - while (0000003D)
+0x18 -    3000001 - loadimm (00000001)
+0x1c -    3000042 - loadimm (00000042)
 0x20 -         32 - popac
-0x21 -         30 - save
-0x22 -   11000031 - else (00000031)
-0x26 -    3000006 - loadimm (00000006)
-0x2a -    5000036 - loadaddr (00000036)
-0x2e -         34 - popdr
+0x21 -          2 - load
+0x22 -         34 - popdr
+0x23 -         32 - popac
+0x24 -         30 - save
+0x25 -    3000046 - loadimm (00000046)
+0x29 -         32 - popac
+0x2a -          2 - load
+0x2b -    3000001 - loadimm (00000001)
 0x2f -         32 - popac
-0x30 -         30 - save
-0x31 -         26 - halt
-0x32 -          0 - input_address
-0x36 -          4 - output_address
+0x30 -         34 - popdr
+0x31 -          6 - sub
+0x32 -    3000046 - loadimm (00000046)
+0x36 -         34 - popdr
+0x37 -         32 - popac
+0x38 -         30 - save
+0x39 -   13000008 - repeat (00000008)
+0x3d -         26 - halt
+0x3e -          0 - input_address
+0x42 -          4 - output_address
+0x46 -          5 - counter

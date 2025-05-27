@@ -1,10 +1,11 @@
 0x0 VARIABLE input_address
 0x4 VARIABLE output_address
+0x5 VARIABLE counter
 
-2 1 < IF
-5 output_address !
-ELSE
-6 output_address !
-THEN
+BEGIN
+counter 0 > WHILE
+1 output_address @ !
+counter @ 1 - counter !
+REPEAT
 
 HALT

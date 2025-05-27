@@ -74,7 +74,7 @@ def instr_without_arg():  # без аргумента
     }
 
 
-def second_type_instructions():  # с аргументом + LOAD_IMM + LOAD_ADDR + CALL
+def second_type_instructions():  # с аргументом + LOAD_IMM + CALL
     return {"!", "IF", "ELSE", "WHILE", "REPEAT"}
 
 
@@ -225,6 +225,8 @@ def translate_stage_1(text):  # noqa: C901
 
         # обработка if - else - then, чтобы вставить им потом в аругменты адреса переходов
         elif term.word == "IF":
+            code.append({"address": address, "opcode": Opcode.POP_AC, "term": term})
+            address += 1
             brackets_stack.append({"address": address, "opcode": Opcode.IF})
             code.append({"address": address, "opcode": Opcode.IF, "arg": -1, "term": term})
         elif term.word == "ELSE":
@@ -239,10 +241,12 @@ def translate_stage_1(text):  # noqa: C901
             last_begin = address
             address -= 4
         elif term.word == "WHILE":
+            code.append({"address": address, "opcode": Opcode.POP_AC, "term": term})
+            address += 1
             brackets_stack.append({"address": address, "opcode": Opcode.WHILE})
             code.append({"address": address, "opcode": Opcode.WHILE, "arg": -1, "term": term})
         elif term.word == "REPEAT":
-            addresses_in_conditions[brackets_stack.pop()["address"]] = address
+            addresses_in_conditions[brackets_stack.pop()["address"]] = address + 4
             code.append(
                 {
                     "address": address,
@@ -259,7 +263,7 @@ def translate_stage_1(text):  # noqa: C901
                 code.append(
                     {
                         "address": address,
-                        "opcode": Opcode.LOAD_ADDR,
+                        "opcode": Opcode.LOAD_IMM,
                         "arg": arg,
                         "term": term,
                     }

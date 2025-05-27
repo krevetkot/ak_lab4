@@ -12,6 +12,7 @@ class Opcode(str, Enum):
 
     # инструкции без аргумента
     LOAD = "load"
+    SAVE = "save"
     PLUS = "add"
     MINUS = "sub"
     MULT = "mul"
@@ -37,8 +38,6 @@ class Opcode(str, Enum):
 
     # инструкции с аргументом
     LOAD_IMM = "loadimm"
-    LOAD_ADDR = "loadaddr"
-    SAVE = "save"
     IF = "if"
     ELSE = "else"
     WHILE = "while"
@@ -78,12 +77,11 @@ opcode_to_binary = {
     Opcode.POP_DR: 0x34,  # 0100010
     Opcode.PUSH: 0x36,  # 0100100
     Opcode.LOAD_IMM: 0x3,  # 00000011
-    Opcode.LOAD_ADDR: 0x5,  # 00000101
-    Opcode.CALL: 0x7,  # 00000111
-    Opcode.IF: 0x9,  # 00001001
-    Opcode.ELSE: 0x11,  # 00001011
-    Opcode.WHILE: 0x13,  # 00001101
-    Opcode.REPEAT: 0x15,  # 00001111
+    Opcode.CALL: 0x5,  # 00000101
+    Opcode.IF: 0x7,  # 00000111
+    Opcode.ELSE: 0x9,  # 00001001
+    Opcode.WHILE: 0x11,  # 00001011
+    Opcode.REPEAT: 0x13,  # 00001101
 }
 
 binary_to_opcode = {binary: opcode for opcode, binary in opcode_to_binary.items()}

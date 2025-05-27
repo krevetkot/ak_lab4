@@ -144,7 +144,8 @@ class DataPath:
             left = self.BR
         elif mux_sel == 3:
             left = self.CR
-        left = struct.unpack("i", struct.pack("I", left))[0]
+        if left>0:
+            left = struct.unpack("i", struct.pack("I", left))[0]
         self.ALU.do_ALU(self.AC, left, operation)
 
     def signal_latch_AC(self): # noqa: N802
@@ -272,7 +273,7 @@ class ControlUnit:
             | (self.microprogram[self.mpc + 3])
         )
         signals = self.parse_microinstr(micro_instr)
-        if self.mpc == 132:
+        if self.mpc == 48:
             print("its load")
 
         PC_selecter = signals[Signal.MUXPC]  # noqa: N806
@@ -408,7 +409,7 @@ def main(code_file, microcode_file, input_file):
         input_tokens=input_token,
         data_memory_size=const_data_memory_size,
         code_size=code_size,
-        limit=100,
+        limit=1000,
     )
 
     print("".join(output))
