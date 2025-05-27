@@ -41,8 +41,6 @@ class DataPath:
     data_memory_size = None
     "Размер памяти данных."
 
-    stack_size = None
-
     code_size = None
 
     data_memory = None
@@ -76,17 +74,15 @@ class DataPath:
     output_buffer = None
     "Буфер выходных данных."
 
-    def __init__(self, code, data_memory_size, code_size, stack_size, input_buffer: list):
+    def __init__(self, code, data_memory_size, code_size, first_exec_instr, input_buffer: list):
         assert data_memory_size > 0, "Data_memory size should be non-zero"
-        assert stack_size > 0, "Stack size should be non-zero"
         self.code_size = code_size
         self.data_memory_size = data_memory_size
-        self.stack_size = stack_size
         self.data_memory = code
         self.CR = 0
         self.AC = 0
         self.DR = 0
-        self.PC = 8
+        self.PC = first_exec_instr
         self.DA = self.PC
         self.IR = 0
         self.BR = 0
@@ -366,7 +362,9 @@ class ControlUnit:
 
 
 def simulation(binary_code, microcode, input_tokens, data_memory_size, code_size, limit):
-    data_path = DataPath(binary_code, data_memory_size, code_size, 68, input_tokens)
+    first_exec_instr = (binary_code[4] << 24) | (binary_code[5] << 16) | (binary_code[6] << 8) | (binary_code[7])
+
+    data_path = DataPath(binary_code, data_memory_size, code_size, first_exec_instr, input_tokens)
     control_unit = ControlUnit(microcode, data_path)
 
     try:
@@ -408,7 +406,7 @@ def main(code_file, microcode_file, input_file):
         input_token = []
         for char in input_text:
             input_token.append(char)
-        input_token.append(0) # чтобы сделать cstr
+        input_token.append(0)  # чтобы сделать cstr
 
     output, ticks = simulation(
         binary_code,

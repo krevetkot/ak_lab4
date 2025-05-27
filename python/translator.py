@@ -384,6 +384,15 @@ def translate_stage_2(code):
     return code
 
 
+def get_first_executable_instr(code):
+    address = 8
+    for instr in code:
+        if "opcode" in instr:
+            if instr["opcode"] == Opcode.RETURN:
+                address = instr["address"] + 1
+    return address
+
+
 def main(source, target):
     """Функция запуска транслятора. Параметры -- исходный и целевой файлы."""
     with open(source, encoding="utf-8") as f:
@@ -393,7 +402,8 @@ def main(source, target):
     code = translate_stage_2(code)
     for el in code:
         print(el)
-    binary_code = to_bytes(code)
+    first_ex_instr = get_first_executable_instr(code)
+    binary_code = to_bytes(code, first_ex_instr)
     hex_code = to_hex(code, variables_map)
 
     # Убедимся, что каталог назначения существует

@@ -87,7 +87,7 @@ opcode_to_binary = {
 binary_to_opcode = {binary: opcode for opcode, binary in opcode_to_binary.items()}
 
 
-def to_bytes(code):
+def to_bytes(code, first_ex_instr):
     """Преобразует машинный код в бинарное представление.
 
     Бинарное представление инструкций:
@@ -99,7 +99,8 @@ def to_bytes(code):
     └─────────┴─────────────────────────────────────────────────────────────┘
     """
     binary_bytes = bytearray()
-    binary_bytes += bytes(8)
+    binary_bytes += bytes(4)
+    binary_bytes += first_ex_instr.to_bytes(4, byteorder="big")
     for instr in code:
         if "opcode" in instr:
             opcode_bin = opcode_to_binary[instr["opcode"]]
@@ -110,7 +111,6 @@ def to_bytes(code):
         if "arg" in instr:
             arg = instr.get("arg", 0)
             binary_bytes.extend(((arg >> 16) & 0xFF, (arg >> 8) & 0xFF, arg & 0xFF))
-
     return bytes(binary_bytes)
 
 
@@ -121,7 +121,7 @@ def to_hex(code, variables_map):
     Формат вывода:
     <address> - <HEXCODE> - <mnemonic>
     """
-    binary_code = to_bytes(code)
+    binary_code = to_bytes(code, 8)
     result = []
     after_halt = False
 
