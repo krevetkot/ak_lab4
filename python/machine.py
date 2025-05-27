@@ -107,15 +107,14 @@ class DataPath:
             self.PC += 4
         elif sel == 0:
             self.PC = self.BR
-        # self.DA = self.PC
 
-    def signal_latch_CR(self): # noqa: N802
+    def signal_latch_CR(self):  # noqa: N802
         if self.DA == MEMORY_MAPPED_INPUT_ADDRESS:
             element = self.input_buffer[0]
-            if isinstance(element, str) or isinstance(element, chr):
-                num = ord(element)
-            elif isinstance(element, int):
+            if isinstance(element, int):
                 num = element
+            elif isinstance(element, str) or isinstance(element, chr):
+                num = ord(element)
 
             word = struct.pack(">I", num)  # Упаковываем в 4 байта (big-endian)
             self.input_buffer.pop(0)
@@ -129,10 +128,10 @@ class DataPath:
                 | (self.data_memory[self.DA + 3])
             )
 
-    def signal_latch_IR(self): # noqa: N802
+    def signal_latch_IR(self):  # noqa: N802
         self.IR = (self.CR >> 24) & 0xFF
 
-    def signal_latch_BR(self): # noqa: N802
+    def signal_latch_BR(self):  # noqa: N802
         self.BR = (self.CR) & 0xFFFFFF
 
     def signal_do_alu(self, mux_sel, operation):
@@ -144,17 +143,17 @@ class DataPath:
             left = self.BR
         elif mux_sel == 3:
             left = self.CR
-        if left>0:
+        if left > 0:
             left = struct.unpack("i", struct.pack("I", left))[0]
         self.ALU.do_ALU(self.AC, left, operation)
 
-    def signal_latch_AC(self): # noqa: N802
+    def signal_latch_AC(self):  # noqa: N802
         self.AC = self.ALU.get_result()
 
-    def signal_latch_DR(self): # noqa: N802
+    def signal_latch_DR(self):  # noqa: N802
         self.DR = self.ALU.get_result()
 
-    def signal_latch_AR(self, sel): # noqa: N802
+    def signal_latch_AR(self, sel):  # noqa: N802
         if sel == 0:
             self.AR = self.AC & 0xFFFFFF
         elif sel == 1:
@@ -163,15 +162,15 @@ class DataPath:
             self.AR = self.DSP
         else:
             self.AR = self.DR
-        # self.DA = self.AR
 
-    def signal_latch_DA(self, sel): # noqa: N802
+    def signal_latch_DA(self, sel):  # noqa: N802
         if sel == 0:
             self.DA = self.PC
         elif sel == 1:
             self.DA = self.AR
+        assert 0 <= self.DA < self.data_memory_size, "out of memory: {}".format(self.DA)
 
-    def signal_latch_RSP(self, sel): # noqa: N802
+    def signal_latch_RSP(self, sel):  # noqa: N802
         if sel == 0:
             self.RSP += 4
         elif sel == 1:
@@ -179,7 +178,7 @@ class DataPath:
         assert self.RSP < self.data_memory_size, "out of memory: {}".format(self.RSP)
         assert self.DSP < self.RSP, "stack overflow: {}".format(self.RSP)
 
-    def signal_latch_DSP(self, sel): # noqa: N802
+    def signal_latch_DSP(self, sel):  # noqa: N802
         if sel == 0:
             self.DSP += 4
         elif sel == 1:
@@ -279,7 +278,7 @@ class ControlUnit:
             | (self.microprogram[self.mpc + 3])
         )
         signals = self.parse_microinstr(micro_instr)
-        if self.mpc == 128:
+        if self.mpc == 96:
             print("its load")
 
         # по сути oe и lcr всегда равны
@@ -327,11 +326,6 @@ class ControlUnit:
             self.signal_latch_mpc(signals[Signal.MUXMPC])
         else:
             raise StopIteration()
-
-        print(self.data_path.data_memory[70])
-        print(self.data_path.data_memory[71])
-        print(self.data_path.data_memory[72])
-        print(self.data_path.data_memory[73])
 
         self.tick()
 
@@ -414,6 +408,7 @@ def main(code_file, microcode_file, input_file):
         input_token = []
         for char in input_text:
             input_token.append(char)
+        input_token.append(0) # чтобы сделать cstr
 
     output, ticks = simulation(
         binary_code,
