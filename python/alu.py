@@ -21,7 +21,7 @@ class ALU:
         self.n = 1 if result < 0 else 0
         self.z = 1 if result == 0 else 0
 
-    def do_ALU(self, right, left, sel):
+    def do_ALU(self, right, left, sel):  # noqa: C901, N802
         if sel == 0:
             self.plus_zero(left)
         elif sel == 1:
@@ -49,9 +49,6 @@ class ALU:
 
     def plus_zero(self, left):
         self.result = left
-        # self._update_nz(result)
-        # self.c = 0
-        # self.v = 0
 
     def plus(self, right, left):
         """Сложение с установкой флагов"""
@@ -63,22 +60,16 @@ class ALU:
         min_int32 = -0x80000000
 
         self.c = (right + left) > max_uint32
-        self.v = (right > 0 and left > 0 and result > max_int32) or (
-            right < 0 and left < 0 and result < min_int32
-        )
+        self.v = (right > 0 and left > 0 and result > max_int32) or (right < 0 and left < 0 and result < min_int32)
 
     def minus(self, right, left):
         """Вычитание с установкой флагов"""
         result = left - right
         self._update_nz(result)
-
-        max_uint32 = 0xFFFFFFFF
         self.c = right < left  # Перенос при вычитании (если right < left)
 
         # Переполнение для вычитания
-        self.v = (right >= 0 and left < 0 and result < 0) or (
-            right < 0 and left >= 0 and result > 0
-        )
+        self.v = (right >= 0 and left < 0 and result < 0) or (right < 0 and left >= 0 and result > 0)
 
     def multiply(self, right, left):
         """Умножение с установкой флагов"""
@@ -96,7 +87,7 @@ class ALU:
     def divide(self, right, left):
         """Деление с установкой флагов"""
         if left == 0:
-            raise ZeroDivisionError("Division by zero")
+            raise ZeroDivisionError("Division by zero")  # noqa: TRY003
 
         result = left // right
         self._update_nz(result)
@@ -106,7 +97,7 @@ class ALU:
     def modulo(self, right, left):
         """Остаток от деления с установкой флагов"""
         if left == 0:
-            raise ZeroDivisionError("Modulo by zero")
+            raise ZeroDivisionError("Modulo by zero")  # noqa: TRY003
 
         result = left % right
         self._update_nz(result)
@@ -136,7 +127,7 @@ class ALU:
 
     def equal(self, right, left):
         """Проверка на равенство с установкой флагов"""
-        if (right == left):
+        if right == left:
             result = 1
         else:
             result = 0
@@ -146,7 +137,7 @@ class ALU:
 
     def less(self, right, left):
         """Меньше с установкой флагов"""
-        if (left < right):
+        if left < right:
             result = 1
         else:
             result = 0
@@ -156,7 +147,7 @@ class ALU:
 
     def greater(self, right, left):
         """Больше с установкой флагов"""
-        if (left > right):
+        if left > right:
             result = 1
         else:
             result = 0

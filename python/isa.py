@@ -1,7 +1,6 @@
 """Представление исходного и машинного кода."""
 
 from collections import namedtuple
-#from translator import variables_map
 from enum import Enum
 
 
@@ -75,10 +74,9 @@ opcode_to_binary = {
     Opcode.HALT: 0x26,  # 00011010
     Opcode.RETURN: 0x28,  # 00011100
     Opcode.SAVE: 0x30,  # 00011110
-    Opcode.POP_AC: 0x32, # 0100000
-    Opcode.POP_DR: 0x34, # 0100010
-    Opcode.PUSH: 0x36, # 0100100
-
+    Opcode.POP_AC: 0x32,  # 0100000
+    Opcode.POP_DR: 0x34,  # 0100010
+    Opcode.PUSH: 0x36,  # 0100100
     Opcode.LOAD_IMM: 0x3,  # 00000011
     Opcode.LOAD_ADDR: 0x5,  # 00000101
     Opcode.CALL: 0x7,  # 00000111
@@ -120,7 +118,7 @@ def to_bytes(code):
 
 def to_hex(code, variables_map):
     addr_to_var = {addr: name for name, addr in variables_map.items()}
-    """Преобразует машинный код в текстовый файл с шестнадцатеричным представлением.
+    """Преобразует машинный код в текстовый файл c шестнадцатеричным представлением.
 
     Формат вывода:
     <address> - <HEXCODE> - <mnemonic>
@@ -138,12 +136,7 @@ def to_hex(code, variables_map):
 
         address = i
         if after_halt:
-            word = (
-                (binary_code[i] << 24)
-                | (binary_code[i + 1] << 16)
-                | (binary_code[i + 2] << 8)
-                | binary_code[i + 3]
-            )
+            word = (binary_code[i] << 24) | (binary_code[i + 1] << 16) | (binary_code[i + 2] << 8) | binary_code[i + 3]
             mnemonic = addr_to_var[address]
             i += 4
         else:
@@ -152,16 +145,9 @@ def to_hex(code, variables_map):
                 after_halt = True
             if has_argument:
                 word = (
-                    (binary_code[i] << 24)
-                    | (binary_code[i + 1] << 16)
-                    | (binary_code[i + 2] << 8)
-                    | binary_code[i + 3]
+                    (binary_code[i] << 24) | (binary_code[i + 1] << 16) | (binary_code[i + 2] << 8) | binary_code[i + 3]
                 )
-                arg = (
-                    (binary_code[i + 1] << 16)
-                    | (binary_code[i + 2] << 8)
-                    | binary_code[i + 3]
-                )
+                arg = (binary_code[i + 1] << 16) | (binary_code[i + 2] << 8) | binary_code[i + 3]
                 i += 4
             else:
                 word = binary_code[i]

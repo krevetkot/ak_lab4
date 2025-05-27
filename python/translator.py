@@ -38,7 +38,7 @@ def instructions():
     }
 
 
-def math_instructions(): # на этапе трансляции они будут развернуты в POP_AC + POP_DR + INSTR
+def math_instructions():  # на этапе трансляции они будут развернуты в POP_AC + POP_DR + INSTR
     return {
         "+",
         "-",
@@ -52,7 +52,6 @@ def math_instructions(): # на этапе трансляции они буду�
         ">",
         "<",
     }
-
 
 
 def instr_without_arg():  # без аргумента
@@ -106,7 +105,7 @@ def word_to_opcode(symbol):
     }.get(symbol)
 
 
-def text_to_terms(text):
+def text_to_terms(text):  # noqa: C901
     """Трансляция текста в последовательность операторов языка (токенов).
 
     Включает в себя:
@@ -128,26 +127,26 @@ def text_to_terms(text):
 
     # pos - адрес, потом переименую
 
-    ifFlag = 0
-    whileFlag = 0
+    if_flag = 0
+    while_flag = 0
     for term in terms:
         if term.word == "IF":
-            ifFlag += 2
+            if_flag += 2
         if term.word == "ELSE":
-            ifFlag -= 1
+            if_flag -= 1
         if term.word == "THEN":
-            ifFlag -= 1
-        assert ifFlag >= 0, "Unbalanced IF-ELSE-THEN!"
+            if_flag -= 1
+        assert if_flag >= 0, "Unbalanced IF-ELSE-THEN!"
 
         if term.word == "BEGIN":
-            whileFlag += 2
+            while_flag += 2
         if term.word == "WHILE":
-            whileFlag -= 1
+            while_flag -= 1
         if term.word == "REPEAT":
-            whileFlag -= 1
-        assert whileFlag >= 0, "Unbalanced BEGIN-WHILE-REPEAT!"
-    assert ifFlag == 0, "Unbalanced IF-ELSE-THEN!"
-    assert whileFlag == 0, "Unbalanced BEGIN-WHILE-REPEAT!"
+            while_flag -= 1
+        assert while_flag >= 0, "Unbalanced BEGIN-WHILE-REPEAT!"
+    assert if_flag == 0, "Unbalanced IF-ELSE-THEN!"
+    assert while_flag == 0, "Unbalanced BEGIN-WHILE-REPEAT!"
 
     return terms
 
@@ -159,7 +158,7 @@ variables_queue = {}  # переменные будут сохранены в к
 addresses_in_conditions = {}  # код, куда нужно вставить аргумент - аргумент
 
 
-def translate_stage_1(text):
+def translate_stage_1(text):  # noqa: C901
     """Первый этап трансляции.
     Убираются все токены, которые не отображаются напрямую в команды,
     переменные заносятся в память (после кода),
@@ -185,7 +184,7 @@ def translate_stage_1(text):
         # если это 16 cc число - load_imm
         if re.fullmatch(hex_number_pattern, term.word):
             arg = int(term.word, 16)
-            assert arg <= 67108863 and arg >= -67108864, "Argument is not in range!"
+            assert -67108864 <= arg <= 67108863, "Argument is not in range!"
             code.append(
                 {
                     "address": address,
@@ -197,7 +196,7 @@ def translate_stage_1(text):
         # или 10 сс
         elif re.fullmatch(dec_number_pattern, term.word):
             arg = int(term.word)
-            assert arg <= 67108863 and arg >= -67108864, "Argument is not in range!"
+            assert -67108864 <= arg <= 67108863, "Argument is not in range!"
             code.append(
                 {
                     "address": address,
@@ -210,9 +209,7 @@ def translate_stage_1(text):
         # если встретили определение слова
         elif term.word == "VARIABLE":
             # после обработки всех термов, мы добавим его в конец
-            value = code[-1][
-                "arg"
-            ]  # берем отсюда, так как тут число уже прошло конвертацию
+            value = code[-1]["arg"]  # берем отсюда, так как тут число уже прошло конвертацию
             label = terms[i + 1].word
             variables_queue[label] = value
             i += 1  # перепрыгиваем через лейбл, тк  мы его обработали
@@ -229,15 +226,11 @@ def translate_stage_1(text):
         # обработка if - else - then, чтобы вставить им потом в аругменты адреса переходов
         elif term.word == "IF":
             brackets_stack.append({"address": address, "opcode": Opcode.IF})
-            code.append(
-                {"address": address, "opcode": Opcode.IF, "arg": -1, "term": term}
-            )
+            code.append({"address": address, "opcode": Opcode.IF, "arg": -1, "term": term})
         elif term.word == "ELSE":
             addresses_in_conditions[brackets_stack.pop()["address"]] = address + 4
             brackets_stack.append({"address": address, "opcode": Opcode.ELSE})
-            code.append(
-                {"address": address, "opcode": Opcode.ELSE, "arg": -1, "term": term}
-            )
+            code.append({"address": address, "opcode": Opcode.ELSE, "arg": -1, "term": term})
         elif term.word == "THEN":
             addresses_in_conditions[brackets_stack.pop()["address"]] = address
             address -= 4
@@ -247,9 +240,7 @@ def translate_stage_1(text):
             address -= 4
         elif term.word == "WHILE":
             brackets_stack.append({"address": address, "opcode": Opcode.WHILE})
-            code.append(
-                {"address": address, "opcode": Opcode.WHILE, "arg": -1, "term": term}
-            )
+            code.append({"address": address, "opcode": Opcode.WHILE, "arg": -1, "term": term})
         elif term.word == "REPEAT":
             addresses_in_conditions[brackets_stack.pop()["address"]] = address
             code.append(
@@ -283,9 +274,7 @@ def translate_stage_1(text):
                     }
                 )
             else:
-                assert (
-                    arg in variables_map or arg in functions_map
-                ), "Label is not defined!"
+                assert arg in variables_map or arg in functions_map, "Label is not defined!"
 
         elif term.word in math_instructions():
             code.append(
@@ -294,7 +283,7 @@ def translate_stage_1(text):
                     "opcode": Opcode.POP_AC,
                     "term": term,
                 },
-            )  
+            )
             address += 1
             code.append(
                 {
@@ -302,7 +291,7 @@ def translate_stage_1(text):
                     "opcode": Opcode.POP_DR,
                     "term": term,
                 },
-            )  
+            )
             address += 1
             code.append(
                 {
@@ -310,7 +299,7 @@ def translate_stage_1(text):
                     "opcode": word_to_opcode(term.word),
                     "term": term,
                 },
-            ) 
+            )
 
         elif word_to_opcode(term.word) == Opcode.SAVE:
             code.append(
@@ -319,7 +308,7 @@ def translate_stage_1(text):
                     "opcode": Opcode.POP_DR,
                     "term": term,
                 },
-            )  
+            )
             address += 1
             code.append(
                 {
@@ -327,7 +316,7 @@ def translate_stage_1(text):
                     "opcode": Opcode.POP_AC,
                     "term": term,
                 },
-            )  
+            )
             address += 1
             code.append(
                 {
@@ -344,7 +333,7 @@ def translate_stage_1(text):
                     "opcode": Opcode.POP_AC,
                     "term": term,
                 },
-            )  
+            )
             address += 1
             code.append(
                 {
@@ -352,13 +341,10 @@ def translate_stage_1(text):
                     "opcode": word_to_opcode(term.word),
                     "term": term,
                 },
-            ) 
-        
-             
-        else:
-            code.append(
-                {"address": address, "opcode": word_to_opcode(term.word), "term": term}
             )
+
+        else:
+            code.append({"address": address, "opcode": word_to_opcode(term.word), "term": term})
 
         if term.word in instr_without_arg():
             address -= 3
@@ -417,8 +403,6 @@ def main(source, target):
 
 
 if __name__ == "__main__":
-    assert (
-        len(sys.argv) == 3
-    ), "Wrong arguments: translator.py <input_file> <target_file>"
+    assert len(sys.argv) == 3, "Wrong arguments: translator.py <input_file> <target_file>"
     _, source, target = sys.argv
     main(source, target)
