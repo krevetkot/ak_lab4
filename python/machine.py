@@ -273,7 +273,7 @@ class ControlUnit:
             | (self.microprogram[self.mpc + 3])
         )
         signals = self.parse_microinstr(micro_instr)
-        if self.mpc == 48:
+        if self.mpc == 128:
             print("its load")
 
         PC_selecter = signals[Signal.MUXPC]  # noqa: N806
@@ -320,6 +320,11 @@ class ControlUnit:
             self.signal_latch_mpc(signals[Signal.MUXMPC])
         else:
             raise StopIteration()
+
+        print(self.data_path.data_memory[70])
+        print(self.data_path.data_memory[71])
+        print(self.data_path.data_memory[72])
+        print(self.data_path.data_memory[73])
 
         self.tick()
 
