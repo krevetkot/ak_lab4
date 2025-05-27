@@ -28,6 +28,7 @@ class Signal(str, Enum):
     LDSP = "ldsp"  # Загрузка DSP (указателя стека)
     MUXAR = "muxar"  # Выбор источника для AR
     MUXMEM = "muxmem" # выбор источника для шины адреса
+    LDA = "lda"
     LAR = "lar"  # Загрузка AR (регистра адреса)
     OE = "oe"  # Разрешение чтения из памяти
     WR = "wr"  # Разрешение записи в память
@@ -921,7 +922,6 @@ SIGNAL_ORDER = [
     Signal.LAC,
     Signal.MUXAR,
     Signal.LAR,
-    Signal.MUXMEM,
     Signal.MUXRSP,
     Signal.LRSP,
     Signal.MUXDSP,
@@ -960,29 +960,29 @@ INSTRUCTION_ORDER = [
 
 
 linking_table = {
-    Opcode.LOAD_IMM: 4,
-    Opcode.LOAD: 8,
-    Opcode.CALL: 20,
-    Opcode.RETURN: 28,
-    Opcode.SAVE: 44,
-    Opcode.PLUS: 48,
-    Opcode.MINUS: 52,
-    Opcode.MULT: 56,
-    Opcode.DIV: 60,
-    Opcode.MOD: 64,
-    Opcode.AND: 68,
-    Opcode.OR: 72,
-    Opcode.NOT: 76,
-    Opcode.EQUAL: 80,
-    Opcode.LESS: 84,
-    Opcode.GREATER: 88,
-    Opcode.POP_AC: 92,
-    Opcode.POP_DR: 104,
-    Opcode.IF: 116,
-    Opcode.ELSE: 124,
-    Opcode.WHILE: 132,
-    Opcode.REPEAT: 140,
-    Opcode.HALT: 148,
+    Opcode.LOAD_IMM: 4+4,
+    Opcode.LOAD: 8+4,
+    Opcode.CALL: 20+4,
+    Opcode.RETURN: 28+4,
+    Opcode.SAVE: 44+4,
+    Opcode.PLUS: 48+4,
+    Opcode.MINUS: 52+4,
+    Opcode.MULT: 56+4,
+    Opcode.DIV: 60+4,
+    Opcode.MOD: 64+4,
+    Opcode.AND: 68+4,
+    Opcode.OR: 72+4,
+    Opcode.NOT: 76+4,
+    Opcode.EQUAL: 80+4,
+    Opcode.LESS: 84+4,
+    Opcode.GREATER: 88+4,
+    Opcode.POP_AC: 92+4,
+    Opcode.POP_DR: 104+4,
+    Opcode.IF: 116+4,
+    Opcode.ELSE: 124+4,
+    Opcode.WHILE: 132+4,
+    Opcode.REPEAT: 140+4,
+    Opcode.HALT: 148+4,
 }
 
 
@@ -1008,9 +1008,12 @@ def encode_microinstruction(step: dict) -> int:
 def save_to_bin(microcode: dict, filename: str):
     global linking_table
     os.makedirs(os.path.dirname(os.path.abspath(filename)) or ".", exist_ok=True)
-    choose_op_instr = "0111110000000000000000000110"
-    steps = [int(choose_op_instr, 2)]
-    address = 4
+    choose_op_instr_1 = "011100000000000000000000101"
+    choose_op_instr_2 = "000011000000000000000000110"
+    print(choose_op_instr_1)
+    print(choose_op_instr_2)
+    steps = [int(choose_op_instr_1, 2), int(choose_op_instr_2, 2)]
+    address = 8
     for opcode in INSTRUCTION_ORDER:
         # Проверяем тип значения - список или словарь
         print(opcode, address)
