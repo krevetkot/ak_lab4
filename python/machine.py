@@ -260,7 +260,7 @@ class ControlUnit:
     def parse_microinstr(self, instr):
         signals = {}
 
-        pos = 26
+        pos = 27
 
         for name in SIGNAL_ORDER:
             if (
@@ -293,20 +293,26 @@ class ControlUnit:
             | (self.microprogram[self.mpc + 3])
         )
         signals = self.parse_microinstr(micro_instr)
-        if self.mpc == 84:
+        if self.mpc == 132:
             print('its load')
+        
+        PC_selecter = signals[Signal.MUXPC]
+        if signals[Signal.SIGNIF] == 1:
+            PC_selecter = 1 - self.data_path.ALU.z
+            # если z == 0, значит условие ВЫПОЛНИЛОСЬ, и нужно в мультиплексоре выбрать 1 (идти дальше)
+            # если z == 1, значит условие НЕ ВЫПОЛНИЛОСЬ, и нужно в мультиплексоре выбрать 0 (перепрыгнуть на else) 
         if signals[Signal.MPC] == 0:
             raise StopIteration()
         if self.mpc == 0:
             if signals[Signal.LPC] == 1:
-                self.data_path.signal_latch_PC(signals[Signal.MUXPC])
+                self.data_path.signal_latch_PC(PC_selecter)
             if signals[Signal.LCR] == 1:
                 self.data_path.signal_latch_CR()
         else:
             if signals[Signal.LCR] == 1:
                 self.data_path.signal_latch_CR()
             if signals[Signal.LPC] == 1:
-                self.data_path.signal_latch_PC(signals[Signal.MUXPC])
+                self.data_path.signal_latch_PC(PC_selecter)
 
         if signals[Signal.LIR] == 1:
             self.data_path.signal_latch_IR()

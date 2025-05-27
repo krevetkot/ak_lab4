@@ -2,15 +2,19 @@
 0xc -    3000001 - loadimm (00000001)
 0x10 -         32 - popac
 0x11 -         34 - popdr
-0x12 -         24 - greater
-0x13 -    9000022 - if (00000022)
-0x17 -    3000001 - loadimm (00000001)
-0x1b -         32 - popac
-0x1c -         34 - popdr
-0x1d -          4 - add
-0x1e -   11000029 - else (00000029)
-0x22 -    3000001 - loadimm (00000001)
-0x26 -         32 - popac
-0x27 -         34 - popdr
-0x28 -          6 - sub
-0x29 -         26 - halt
+0x12 -         22 - less
+0x13 -    9000026 - if (00000026)
+0x17 -    3000005 - loadimm (00000005)
+0x1b -    5000036 - loadaddr (00000036)
+0x1f -         34 - popdr
+0x20 -         32 - popac
+0x21 -         30 - save
+0x22 -   11000031 - else (00000031)
+0x26 -    3000006 - loadimm (00000006)
+0x2a -    5000036 - loadaddr (00000036)
+0x2e -         34 - popdr
+0x2f -         32 - popac
+0x30 -         30 - save
+0x31 -         26 - halt
+0x32 -          0 - input_address
+0x36 -          4 - output_address

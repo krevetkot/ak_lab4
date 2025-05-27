@@ -40,12 +40,18 @@ class ALU:
             self.logical_or(right, left)
         elif sel == 8:
             self.logical_not(right, left)
+        elif sel == 9:
+            self.equal(right, left)
+        elif sel == 10:
+            self.less(right, left)
+        elif sel == 11:
+            self.greater(right, left)
 
     def plus_zero(self, left):
-        result = left
-        self._update_nz(result)
-        self.c = 0
-        self.v = 0
+        self.result = left
+        # self._update_nz(result)
+        # self.c = 0
+        # self.v = 0
 
     def plus(self, right, left):
         """Сложение с установкой флагов"""
@@ -124,6 +130,36 @@ class ALU:
     def logical_not(self, right):
         """Логическое NOT с установкой флагов"""
         result = ~right
+        self._update_nz(result)
+        self.v = 0
+        self.c = 0
+
+    def equal(self, right, left):
+        """Проверка на равенство с установкой флагов"""
+        if (right == left):
+            result = 1
+        else:
+            result = 0
+        self._update_nz(result)
+        self.v = 0
+        self.c = 0
+
+    def less(self, right, left):
+        """Меньше с установкой флагов"""
+        if (left < right):
+            result = 1
+        else:
+            result = 0
+        self._update_nz(result)
+        self.v = 0
+        self.c = 0
+
+    def greater(self, right, left):
+        """Больше с установкой флагов"""
+        if (left > right):
+            result = 1
+        else:
+            result = 0
         self._update_nz(result)
         self.v = 0
         self.c = 0
