@@ -2,11 +2,10 @@
 0x4 VARIABLE output_address
 0x2 VARIABLE counter
 
-BEGIN
-counter @ 0 >
-WHILE
+2 1 > IF
 1 output_address @ !
-counter @ 1 - counter !
-REPEAT
+ELSE
+2 output_address @ !
+THEN
 
 HALT

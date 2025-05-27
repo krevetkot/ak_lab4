@@ -23,6 +23,7 @@ from translator import variables_map
 # ура ура
 MEMORY_MAPPED_INPUT_ADDRESS = 0
 MEMORY_MAPPED_OUTPUT_ADDRESS = 4
+MICROCOMAND_SIZE = 28
 
 
 class DataPath:
@@ -47,8 +48,7 @@ class DataPath:
     data_memory = None
     "Память данных. Инициализируется нулевыми значениями."
 
-    data_address = None
-    "чисто для симуляции хранится информация - откуда поступил адрес, иза AR или PC"
+    DA = None
 
     ALU = None
 
@@ -83,7 +83,7 @@ class DataPath:
         self.data_memory_size = data_memory_size
         self.stack_size = stack_size
         self.data_memory = code
-        self.data_address = 0
+        self.DA = 0
         self.CR = 0
         self.AC = 0
         self.DR = 0
@@ -91,6 +91,7 @@ class DataPath:
         self.IR = 0
         self.BR = 0
         self.AR = 0
+        self.DA = 0
         self.RSP = data_memory_size - 4
         self.DSP = code_size
         # data stack будет расти вверх, а return stack вниз
@@ -107,10 +108,10 @@ class DataPath:
             self.PC += 4
         elif sel == 0:
             self.PC = self.BR
-        self.data_address = self.PC
+        self.DA = self.PC
 
     def signal_latch_CR(self): # noqa: N802
-        if self.data_address == MEMORY_MAPPED_INPUT_ADDRESS:
+        if self.DA == MEMORY_MAPPED_INPUT_ADDRESS:
             element = self.input_buffer[0]
             if isinstance(element, str) or isinstance(element, chr):
                 num = ord(element)
@@ -123,10 +124,10 @@ class DataPath:
 
         else:
             self.CR = (
-                (self.data_memory[self.data_address] << 24)
-                | (self.data_memory[self.data_address + 1] << 16)
-                | (self.data_memory[self.data_address + 2] << 8)
-                | (self.data_memory[self.data_address + 3])
+                (self.data_memory[self.DA] << 24)
+                | (self.data_memory[self.DA + 1] << 16)
+                | (self.data_memory[self.DA + 2] << 8)
+                | (self.data_memory[self.DA + 3])
             )
 
     def signal_latch_IR(self): # noqa: N802
@@ -163,7 +164,7 @@ class DataPath:
             self.AR = self.DSP
         else:
             self.AR = self.DR
-        self.data_address = self.AR
+        self.DA = self.AR
 
     def signal_latch_RSP(self, sel): # noqa: N802
         if sel == 0:
@@ -182,8 +183,8 @@ class DataPath:
         assert self.DSP < self.RSP, "stack overflow: {}".format(self.RSP)
 
     def signal_oe(self):
-        self.data_address = self.AR
-        assert 0 <= self.data_address < self.data_memory_size, "out of memory: {}".format(self.data_address)
+        self.DA = self.AR
+        assert 0 <= self.DA < self.data_memory_size, "out of memory: {}".format(self.DA)
 
     def signal_wr(self):
         assert 0 <= self.AR < self.data_memory_size, "out of memory: {}".format(self.AR)
@@ -244,7 +245,7 @@ class ControlUnit:
     def parse_microinstr(self, instr):
         signals = {}
 
-        pos = 27
+        pos = MICROCOMAND_SIZE
 
         for name in SIGNAL_ORDER:
             if (name == Signal.MUXALU) or (name == Signal.MUXAR) or (name == Signal.MUXPC):
@@ -276,31 +277,33 @@ class ControlUnit:
         if self.mpc == 128:
             print("its load")
 
-        PC_selecter = signals[Signal.MUXPC]  # noqa: N806
+        PC_sel = signals[Signal.MUXPC]  # noqa: N806
         if signals[Signal.SIGNIF] == 1:
-            PC_selecter = 1 - self.data_path.ALU.z  # noqa: N806
+            PC_sel = 1 - self.data_path.ALU.z  # noqa: N806
             # если z == 0, значит условие ВЫПОЛНИЛОСЬ, и нужно в мультиплексоре выбрать 1 (идти дальше)
             # если z == 1, значит условие НЕ ВЫПОЛНИЛОСЬ, и нужно в мультиплексоре выбрать 0 (перепрыгнуть на else)
         if signals[Signal.MPC] == 0:
             raise StopIteration()
         if self.mpc == 0:
             if signals[Signal.LPC] == 1:
-                self.data_path.signal_latch_PC(PC_selecter)
+                self.data_path.signal_latch_PC(PC_sel)
             if signals[Signal.LCR] == 1:
                 self.data_path.signal_latch_CR()
         else:
             if signals[Signal.LCR] == 1:
                 self.data_path.signal_latch_CR()
             if signals[Signal.LPC] == 1:
-                self.data_path.signal_latch_PC(PC_selecter)
+                self.data_path.signal_latch_PC(PC_sel)
 
         if signals[Signal.LIR] == 1:
             self.data_path.signal_latch_IR()
         if signals[Signal.LBR] == 1:
             self.data_path.signal_latch_BR()
+
         self.data_path.signal_do_alu(
             signals[Signal.MUXALU], signals[Signal.ALU]
         )  # что подаем на левый вход и какая операция
+
         if signals[Signal.LDR] == 1:
             self.data_path.signal_latch_DR()
         if signals[Signal.LAC] == 1:
@@ -333,8 +336,8 @@ class ControlUnit:
         state_repr = "TICK: {:3} PC: {:3} ADDR: {:3} MEM_OUT: {} ACC: {} DR: {} CR: {} BR: {} RSP: {} DSP : {}".format(
             self._tick,
             self.data_path.PC,
-            self.data_path.data_address,
-            self.data_path.data_memory[self.data_path.data_address],
+            self.data_path.DA,
+            self.data_path.data_memory[self.data_path.DA],
             self.data_path.AC,
             self.data_path.DR,
             self.data_path.CR,
