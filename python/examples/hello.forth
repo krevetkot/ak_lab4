@@ -1,6 +1,6 @@
 0x0 VARIABLE input_address
 0x4 VARIABLE output_address
-S" What is your name?" VARIABLE hello_var
+S" Hi!" VARIABLE hello_var
 0 VARIABLE null_term
 
 : PRINT_STRING

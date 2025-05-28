@@ -28,14 +28,6 @@ MICROCOMAND_SIZE = 27
 
 class DataPath:
     """Тракт данных (пассивный), включая: ввод/вывод, память и арифметику.
-
-    - `signal_latch_data_addr` -- защёлкивание адреса в памяти данных;
-    - `signal_latch_acc` -- защёлкивание аккумулятора;
-    - `signal_Signal.WR` -- запись в память данных;
-    - `signal_output` -- вывод в порт.
-
-    Сигнал "исполняется" за один такт. Корректность использования сигналов --
-    задача `ControlUnit`.
     """
 
     data_memory_size = None
@@ -182,9 +174,6 @@ class DataPath:
         assert self.DSP >= self.code_size, "out of memory: {}".format(self.DSP)
         assert self.DSP < self.RSP, "stack overflow: {}".format(self.DSP)
 
-    # def signal_oe(self):
-    #     self.DA = self.AR
-    #     assert 0 <= self.DA < self.data_memory_size, "out of memory: {}".format(self.DA)
 
     def signal_wr(self):
         assert 0 <= self.AR < self.data_memory_size, "out of memory: {}".format(self.AR)
@@ -196,7 +185,6 @@ class DataPath:
             self.data_memory[self.AR + 2] = (self.AC >> 8) & 0xFF
             self.data_memory[self.AR + 3] = (self.AC) & 0xFF
 
-    # и еще нужно исправить то что память у нас однопортовая, добавить еще один mux между pc и ar
 
 
 class ControlUnit:
@@ -204,7 +192,7 @@ class ControlUnit:
     управляет состоянием модели процессора, включая обработку данных (DataPath).
     """
 
-    stack = [0, 0, 0, 0]
+    stack = [0, 0, 0, 0]  # noqa: RUF012
 
     microprogram = None
 
@@ -334,11 +322,10 @@ class ControlUnit:
 
     def __repr__(self):
         """Вернуть строковое представление состояния процессора."""
-        state_repr = "TICK: {:3} PC: {:3} ADDR: {:3} MEM_OUT: {} ACC: {} DR: {} CR: {} BR: {} RSP: {} DSP : {}".format(
+        state_repr = "TICK: {:3} PC: {:3} DA: {:3} AC: {} DR: {} CR: {} BR: {} RSP: {} DSP : {}".format(
             self._tick,
             self.data_path.PC,
             self.data_path.DA,
-            self.data_path.data_memory[self.data_path.DA],
             self.data_path.AC,
             self.data_path.DR,
             self.data_path.CR,
@@ -385,8 +372,8 @@ def simulation(binary_code, microcode, input_tokens, data_memory_size, code_size
 
     if control_unit._tick >= limit:
         logging.warning("Limit exceeded!")
-    logging.info("output_buffer: %s", repr("".join(str(x) for x in data_path.output_buffer)))
-    return "".join(str(x) for x in data_path.output_buffer), control_unit.current_tick()
+    logging.info("output_buffer: %s", data_path.output_buffer)
+    return data_path.output_buffer, control_unit.current_tick()
 
 
 def main(code_file, microcode_file, input_file):
@@ -424,7 +411,7 @@ def main(code_file, microcode_file, input_file):
         limit=1000,
     )
 
-    print("".join(output))
+    print(output)
     print("ticks:", ticks)
 
 
