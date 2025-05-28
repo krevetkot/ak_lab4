@@ -28,7 +28,7 @@ class Opcode(str, Enum):
     RETURN = "return"
     POP_AC = "popac"
     POP_DR = "popdr"
-    PUSH = "push"
+    DUP = "dup"
 
     # инструкции, которые не отображаются в память
     VARIABLE = "variable"
@@ -75,7 +75,7 @@ opcode_to_binary = {
     Opcode.SAVE: 0x30,  # 00011110
     Opcode.POP_AC: 0x32,  # 0100000
     Opcode.POP_DR: 0x34,  # 0100010
-    Opcode.PUSH: 0x36,  # 0100100
+    Opcode.DUP: 0x36,  # 0100100
     Opcode.LOAD_IMM: 0x3,  # 00000011
     Opcode.CALL: 0x5,  # 00000101
     Opcode.IF: 0x7,  # 00000111
@@ -87,7 +87,7 @@ opcode_to_binary = {
 binary_to_opcode = {binary: opcode for opcode, binary in opcode_to_binary.items()}
 
 
-def to_bytes(code, first_ex_instr):
+def to_bytes(code, first_ex_instr):  # noqa: C901
     """Преобразует машинный код в бинарное представление.
 
     Бинарное представление инструкций:

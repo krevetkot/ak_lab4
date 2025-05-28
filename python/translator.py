@@ -10,6 +10,7 @@ from isa import Opcode, Term, to_bytes, to_hex
 # комментарии разрешены только после #
 
 
+# вот здесь хочется какого-то автоматизма, да?
 def instructions():
     return {
         "@",
@@ -34,6 +35,7 @@ def instructions():
         "=",
         ">",
         "<",
+        "dup",
         "HALT",
     }
 
@@ -70,6 +72,7 @@ def instr_without_arg():  # без аргумента
         "=",
         ">",
         "<",
+        "dup",
         "HALT",
     }
 
@@ -103,6 +106,7 @@ def word_to_opcode(symbol):
         "=": Opcode.EQUAL,
         ">": Opcode.GREATER,
         "<": Opcode.LESS,
+        "dup": Opcode.DUP,
         "HALT": Opcode.HALT,
     }.get(symbol)
 
@@ -237,7 +241,7 @@ def translate_stage_1(text):  # noqa: C901
             address -= 8
 
         # если встретили определение функции
-        elif word_to_opcode(term.word) == Opcode.RETURN:
+        elif word_to_opcode(term.word) == Opcode.DEFINE_FUNC:
             label = terms[i + 1].word
             functions_map[label] = address
             i += 1

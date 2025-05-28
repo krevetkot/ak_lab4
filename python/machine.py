@@ -179,8 +179,8 @@ class DataPath:
             self.DSP += 4
         elif sel == 1:
             self.DSP -= 4
-        assert self.DSP >= self.code_size, "out of memory: {}".format(self.RSP)
-        assert self.DSP < self.RSP, "stack overflow: {}".format(self.RSP)
+        assert self.DSP >= self.code_size, "out of memory: {}".format(self.DSP)
+        assert self.DSP < self.RSP, "stack overflow: {}".format(self.DSP)
 
     # def signal_oe(self):
     #     self.DA = self.AR
@@ -274,7 +274,7 @@ class ControlUnit:
             | (self.microprogram[self.mpc + 3])
         )
         signals = self.parse_microinstr(micro_instr)
-        if self.mpc == 96:
+        if self.mpc == 156:
             print("its load")
 
         # по сути oe и lcr всегда равны
@@ -386,7 +386,7 @@ def main(code_file, microcode_file, input_file):
     """Функция запуска модели процессора. Параметры -- имена файлов с машинным
     кодом и с входными данными для симуляции.
     """
-    const_data_memory_size = 200
+    const_data_memory_size = 500
     # файл с бинарным кодом
     with open(code_file, "rb") as file:
         bin_code = file.read()

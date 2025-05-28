@@ -4,6 +4,18 @@
 S" What is your name?" VARIABLE hello_var
 0 VARIABLE null_term
 
-hello_var @ output_address @ !
+: PRINT_STRING
+    BEGIN
+    dup @ symbol ! 
+    symbol @ 0 >
+    WHILE
+    symbol @
+    output_address @ !
+    1 +
+    REPEAT
+;
+
+hello_var PRINT_STRING
+
 
 HALT
