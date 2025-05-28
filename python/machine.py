@@ -192,7 +192,7 @@ class ControlUnit:
     управляет состоянием модели процессора, включая обработку данных (DataPath).
     """
 
-    stack = [0, 0, 0, 0]  # noqa: RUF012
+    stack = [0, 0, 0, 0, 0]  # noqa: RUF012
 
     microprogram = None
 
@@ -264,7 +264,7 @@ class ControlUnit:
             | (self.microprogram[self.mpc + 3])
         )
         signals = self.parse_microinstr(micro_instr)
-        if self.mpc == 20:
+        if self.mpc == 24:
             print("its load")
 
         # по сути oe и lcr всегда равны
@@ -313,13 +313,13 @@ class ControlUnit:
             self.signal_latch_mpc(signals[Signal.MUXMPC])
         else:
             raise StopIteration()
-        
-        print(" ".join(str(x) for x in self.data_path.data_memory[163:197]))
 
-        self.stack[0] = self.data_path.data_memory[self.data_path.DSP-5]
-        self.stack[1] = self.data_path.data_memory[self.data_path.DSP-1]
-        self.stack[2] = self.data_path.data_memory[self.data_path.DSP+3]
-        self.stack[3] = self.data_path.data_memory[self.data_path.DSP+7]
+        print(" ".join(str(x) for x in self.data_path.data_memory[375:391]))
+        self.stack[0] = self.data_path.data_memory[self.data_path.DSP-9]
+        self.stack[1] = self.data_path.data_memory[self.data_path.DSP-5]
+        self.stack[2] = self.data_path.data_memory[self.data_path.DSP-1]
+        self.stack[3] = self.data_path.data_memory[self.data_path.DSP+3]
+        self.stack[4] = self.data_path.data_memory[self.data_path.DSP+7]
 
         self.tick()
 
@@ -384,7 +384,7 @@ def main(code_file, microcode_file, input_file):
     """Функция запуска модели процессора. Параметры -- имена файлов с машинным
     кодом и с входными данными для симуляции.
     """
-    const_data_memory_size = 500
+    const_data_memory_size = 1000
     # файл с бинарным кодом
     with open(code_file, "rb") as file:
         bin_code = file.read()
@@ -401,7 +401,7 @@ def main(code_file, microcode_file, input_file):
 
     with open(input_file, encoding="utf-8") as file:
         input_text = file.read()
-        input_token = [5, 4, 3, 2, 1]
+        input_token = [5, 4]
         # for char in input_text:
         #     input_token.append(char)
         input_token.append(0)  # чтобы сделать cstr

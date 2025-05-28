@@ -128,7 +128,7 @@ class ALU:
     def equal(self, right, left):
         """Проверка на равенство с установкой флагов"""
         if right == left:
-            result = 1
+            result = -1
         else:
             result = 0
         self._update_nz(result)
@@ -138,7 +138,7 @@ class ALU:
     def less(self, right, left):
         """Меньше с установкой флагов"""
         if left < right:
-            result = 1
+            result = -1
         else:
             result = 0
         self._update_nz(result)
@@ -148,7 +148,7 @@ class ALU:
     def greater(self, right, left):
         """Больше с установкой флагов"""
         if left > right:
-            result = 1
+            result = -1
         else:
             result = 0
         self._update_nz(result)

@@ -4,8 +4,8 @@
 0x4 VARIABLE output_address
 S" ______________________" VARIABLE buffer
 1 VARIABLE pointer1
-1 VARIABLE pointer2
-1 VARIABLE temp
+2 VARIABLE pointer2
+3 VARIABLE temp
 
 
 : SORT 
@@ -24,7 +24,7 @@ S" ______________________" VARIABLE buffer
             temp @ pointer1 @ !
             ELSE
             THEN
-            pointer2 @ 4 + pointer2
+            pointer2 @ 4 + pointer2 !
         REPEAT
     pointer1 @ 4 + pointer1 !
     REPEAT
@@ -39,6 +39,8 @@ WHILE
 pointer1 @ !
 pointer1 @ 4 + pointer1 !
 REPEAT
+
+0 pointer1 @ !
 
 SORT
 
