@@ -295,14 +295,15 @@ class ControlUnit:
             self.data_path.signal_latch_DR()
         if signals[Signal.LAC] == 1:
             self.data_path.signal_latch_AC()
+        if signals[Signal.LDSP] == 1:
+            self.data_path.signal_latch_DSP(signals[Signal.MUXDSP])
         if signals[Signal.LAR] == 1:
             self.data_path.signal_latch_AR(signals[Signal.MUXAR])
         if signal_LDA == 1:
             self.data_path.signal_latch_DA(signals[Signal.LAR])
         if signals[Signal.LRSP] == 1:
             self.data_path.signal_latch_RSP(signals[Signal.MUXRSP])
-        if signals[Signal.LDSP] == 1:
-            self.data_path.signal_latch_DSP(signals[Signal.MUXDSP])
+
         # if signals[Signal.OE] == 1:
         #     self.data_path.signal_oe()
         if signals[Signal.WR] == 1:
