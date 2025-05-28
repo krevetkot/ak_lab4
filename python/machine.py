@@ -408,10 +408,12 @@ def main(code_file, microcode_file, input_file):
         input_tokens=input_token,
         data_memory_size=const_data_memory_size,
         code_size=code_size,
-        limit=1000,
+        limit=10000,
     )
 
     print(output)
+    symbol_output = "".join(chr(code) for code in output)
+    print(symbol_output)
     print("ticks:", ticks)
 
 
