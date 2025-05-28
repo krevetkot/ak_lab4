@@ -400,7 +400,7 @@ def translate_stage_2(code):  # noqa: C901
             else:
                 size = 8
         elif isinstance(value, str):
-            size = len(value)
+            size = len(value)*4
         curr_address += size
 
     for instruction in code:

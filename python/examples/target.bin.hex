@@ -1,56 +1,29 @@
 0x8 -         36 - dup
 0x9 -         32 - popac
 0xa -          2 - load
-0xb -    3000050 - loadimm (00000050)
-0xf -         34 - popdr
+0xb -         36 - dup
+0xc -    3000000 - loadimm (00000000)
 0x10 -         32 - popac
-0x11 -         30 - save
-0x12 -    3000050 - loadimm (00000050)
-0x16 -         32 - popac
-0x17 -          2 - load
-0x18 -    3000000 - loadimm (00000000)
+0x11 -         34 - popdr
+0x12 -         24 - greater
+0x13 -         32 - popac
+0x14 -   1100002C - while (0000002C)
+0x18 -    300003A - loadimm (0000003A)
 0x1c -         32 - popac
-0x1d -         34 - popdr
-0x1e -         24 - greater
+0x1d -          2 - load
+0x1e -         34 - popdr
 0x1f -         32 - popac
-0x20 -   1100003E - while (0000003E)
-0x24 -    3000050 - loadimm (00000050)
-0x28 -         32 - popac
-0x29 -          2 - load
-0x2a -    300004C - loadimm (0000004C)
-0x2e -         32 - popac
-0x2f -          2 - load
-0x30 -         34 - popdr
-0x31 -         32 - popac
-0x32 -         30 - save
-0x33 -    3000001 - loadimm (00000001)
-0x37 -         32 - popac
-0x38 -         34 - popdr
-0x39 -          4 - add
-0x3a -   13000008 - repeat (00000008)
-0x3e -         28 - return
-0x3f -    3000054 - loadimm (00000054)
-0x43 -    5000008 - call (00000008)
-0x47 -         26 - halt
-0x48 -          0 - input_address
-0x4c -          4 - output_address
-0x50 -          0 - symbol
-0x54 -         57 - hello_var
-0x58 -         68 - hello_var
-0x5c -         61 - hello_var
-0x60 -         74 - hello_var
-0x64 -         20 - hello_var
-0x68 -         69 - hello_var
-0x6c -         73 - hello_var
-0x70 -         20 - hello_var
-0x74 -         79 - hello_var
-0x78 -         6F - hello_var
-0x7c -         75 - hello_var
-0x80 -         72 - hello_var
-0x84 -         20 - hello_var
-0x88 -         6E - hello_var
-0x8c -         61 - hello_var
-0x90 -         6D - hello_var
-0x94 -         65 - hello_var
-0x98 -         3F - hello_var
-0x9c -          0 - hello_var
+0x20 -         30 - save
+0x21 -    3000001 - loadimm (00000001)
+0x25 -         32 - popac
+0x26 -         34 - popdr
+0x27 -          4 - add
+0x28 -   13000008 - repeat (00000008)
+0x2c -         28 - return
+0x2d -    300003E - loadimm (0000003E)
+0x31 -    5000008 - call (00000008)
+0x35 -         26 - halt
+0x36 -          0 - input_address
+0x3a -          4 - output_address
+0x3e -         57 - hello_var
+0x42 -          0 - null_term

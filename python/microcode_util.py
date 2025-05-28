@@ -990,7 +990,7 @@ microcode = {
             Signal.MUXRSP: 0,
             Signal.LRSP: 0,
             Signal.MUXDSP: 0,
-            Signal.LDSP: 0,
+            Signal.LDSP: 1,
             Signal.OE: 0,
             Signal.WR: 1,
             Signal.MPC: 1,

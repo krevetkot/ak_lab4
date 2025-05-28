@@ -323,6 +323,16 @@ class ControlUnit:
         else:
             raise StopIteration()
 
+        print(self.data_path.data_memory[self.data_path.DSP-4])
+        print(self.data_path.data_memory[self.data_path.DSP-3])
+        print(self.data_path.data_memory[self.data_path.DSP-2])
+        print(self.data_path.data_memory[self.data_path.DSP-1])
+
+        print(self.data_path.data_memory[self.data_path.DSP])
+        print(self.data_path.data_memory[self.data_path.DSP+1])
+        print(self.data_path.data_memory[self.data_path.DSP+2])
+        print(self.data_path.data_memory[self.data_path.DSP+3])
+
         self.tick()
 
     def __repr__(self):
