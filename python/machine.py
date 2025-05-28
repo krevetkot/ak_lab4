@@ -360,6 +360,7 @@ class ControlUnit:
 
 def simulation(binary_code, microcode, input_tokens, data_memory_size, code_size, limit):
     first_exec_instr = (binary_code[4] << 24) | (binary_code[5] << 16) | (binary_code[6] << 8) | (binary_code[7])
+    print("------------------", first_exec_instr)
 
     data_path = DataPath(binary_code, data_memory_size, code_size, first_exec_instr, input_tokens)
     control_unit = ControlUnit(microcode, data_path)
@@ -400,9 +401,9 @@ def main(code_file, microcode_file, input_file):
 
     with open(input_file, encoding="utf-8") as file:
         input_text = file.read()
-        input_token = []
-        for char in input_text:
-            input_token.append(char)
+        input_token = [5, 4, 3, 2, 1]
+        # for char in input_text:
+        #     input_token.append(char)
         input_token.append(0)  # чтобы сделать cstr
 
     output, ticks = simulation(

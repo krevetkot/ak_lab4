@@ -102,7 +102,7 @@ def to_bytes(code, first_ex_instr):  # noqa: C901
     binary_bytes += bytes(4)
     binary_bytes += first_ex_instr.to_bytes(4, byteorder="big")
     for instr in code:
-        if "opcode" in instr:
+        if "opcode" in instr and instr["opcode"] != None:
             opcode_bin = opcode_to_binary[instr["opcode"]]
             binary_bytes.append(opcode_bin)
             if "arg" in instr:

@@ -39,7 +39,7 @@ class ALU:
         elif sel == 7:
             self.logical_or(right, left)
         elif sel == 8:
-            self.logical_not(right, left)
+            self.logical_not(right)
         elif sel == 9:
             self.equal(right, left)
         elif sel == 10:

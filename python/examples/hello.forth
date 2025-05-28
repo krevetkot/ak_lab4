@@ -1,0 +1,54 @@
+# Отсортировать массив чисел
+
+0x0 VARIABLE input_address
+0x4 VARIABLE output_address
+S" ______________________" VARIABLE buffer
+1 VARIABLE pointer1
+1 VARIABLE pointer2
+1 VARIABLE temp
+
+
+: SORT 
+    buffer pointer1 ! # инициализировали указатель
+
+    BEGIN
+    pointer1 @ @ 0 = dup NOT # пока не достигнем нуля
+    WHILE
+        pointer1 @ 4 + pointer2 !
+        BEGIN
+        pointer2 @ @ 0 = dup NOT # пока не достигнем нуля
+        WHILE
+            pointer1 @ @ pointer2 @ @ > IF
+            pointer2 @ @ temp !
+            pointer1 @ @ pointer2 @ !
+            temp @ pointer1 @ !
+            ELSE
+            THEN
+            pointer2 @ 4 + pointer2
+        REPEAT
+    pointer1 @ 4 + pointer1 !
+    REPEAT
+;
+
+buffer pointer1 !
+
+# получаем данные
+BEGIN
+input_address @ @ dup 0 = dup NOT
+WHILE
+pointer1 @ !
+pointer1 @ 4 + pointer1 !
+REPEAT
+
+SORT
+
+buffer pointer1 !
+
+BEGIN
+pointer1 @ @ dup 0 = dup NOT
+WHILE
+output_address @ !
+pointer1 @ 4 + pointer1 !
+REPEAT
+
+HALT

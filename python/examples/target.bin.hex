@@ -1,102 +1,220 @@
-0x8 -    30000BD - loadimm (000000BD)
-0xc -         32 - popac
-0xd -          2 - load
-0xe -    30000C1 - loadimm (000000C1)
-0x12 -         34 - popdr
-0x13 -         32 - popac
-0x14 -         30 - save
-0x15 -    3000000 - loadimm (00000000)
-0x19 -    30000C1 - loadimm (000000C1)
-0x1d -         32 - popac
-0x1e -          2 - load
-0x1f -    3000000 - loadimm (00000000)
+0x8 -    3000167 - loadimm (00000167)
+0xc -    30001BF - loadimm (000001BF)
+0x10 -         34 - popdr
+0x11 -         32 - popac
+0x12 -         30 - save
+0x13 -    30001BF - loadimm (000001BF)
+0x17 -         32 - popac
+0x18 -          2 - load
+0x19 -         32 - popac
+0x1a -          2 - load
+0x1b -    3000000 - loadimm (00000000)
+0x1f -         32 - popac
+0x20 -         34 - popdr
+0x21 -         20 - equal
+0x22 -         36 - dup
 0x23 -         32 - popac
 0x24 -         34 - popdr
-0x25 -         24 - greater
+0x25 -         18 - not
 0x26 -         32 - popac
-0x27 -   11000052 - while (00000052)
-0x2b -    30000C1 - loadimm (000000C1)
+0x27 -   110000CF - while (000000CF)
+0x2b -    30001BF - loadimm (000001BF)
 0x2f -         32 - popac
 0x30 -          2 - load
-0x31 -         36 - dup
-0x32 -    3000001 - loadimm (00000001)
-0x36 -         32 - popac
-0x37 -         34 - popdr
-0x38 -          6 - sub
-0x39 -         36 - dup
-0x3a -    3000001 - loadimm (00000001)
-0x3e -         32 - popac
-0x3f -         34 - popdr
-0x40 -          6 - sub
-0x41 -    30000C1 - loadimm (000000C1)
-0x45 -         34 - popdr
-0x46 -         32 - popac
-0x47 -         30 - save
-0x48 -         32 - popac
-0x49 -         34 - popdr
-0x4a -          4 - add
+0x31 -    3000004 - loadimm (00000004)
+0x35 -         32 - popac
+0x36 -         34 - popdr
+0x37 -          4 - add
+0x38 -    30001C3 - loadimm (000001C3)
+0x3c -         34 - popdr
+0x3d -         32 - popac
+0x3e -         30 - save
+0x3f -    30001C3 - loadimm (000001C3)
+0x43 -         32 - popac
+0x44 -          2 - load
+0x45 -         32 - popac
+0x46 -          2 - load
+0x47 -    3000000 - loadimm (00000000)
 0x4b -         32 - popac
 0x4c -         34 - popdr
-0x4d -          4 - add
-0x4e -   13000019 - repeat (00000019)
-0x52 -         36 - dup
-0x53 -         32 - popac
-0x54 -         34 - popdr
-0x55 -          8 - mul
-0x56 -         28 - return
-0x57 -    30000BD - loadimm (000000BD)
+0x4d -         20 - equal
+0x4e -         36 - dup
+0x4f -         32 - popac
+0x50 -         34 - popdr
+0x51 -         18 - not
+0x52 -         32 - popac
+0x53 -   110000B7 - while (000000B7)
+0x57 -    30001BF - loadimm (000001BF)
 0x5b -         32 - popac
 0x5c -          2 - load
-0x5d -    30000C1 - loadimm (000000C1)
-0x61 -         34 - popdr
-0x62 -         32 - popac
-0x63 -         30 - save
-0x64 -    3000000 - loadimm (00000000)
-0x68 -    30000C1 - loadimm (000000C1)
-0x6c -         32 - popac
-0x6d -          2 - load
-0x6e -    3000000 - loadimm (00000000)
-0x72 -         32 - popac
-0x73 -         34 - popdr
-0x74 -         24 - greater
+0x5d -         32 - popac
+0x5e -          2 - load
+0x5f -    30001C3 - loadimm (000001C3)
+0x63 -         32 - popac
+0x64 -          2 - load
+0x65 -         32 - popac
+0x66 -          2 - load
+0x67 -         32 - popac
+0x68 -         34 - popdr
+0x69 -         24 - greater
+0x6a -         32 - popac
+0x6b -    70000A2 - if (000000A2)
+0x6f -    30001C3 - loadimm (000001C3)
+0x73 -         32 - popac
+0x74 -          2 - load
 0x75 -         32 - popac
-0x76 -   1100009F - while (0000009F)
-0x7a -    30000C1 - loadimm (000000C1)
-0x7e -         32 - popac
-0x7f -          2 - load
-0x80 -         36 - dup
-0x81 -         32 - popac
-0x82 -         34 - popdr
-0x83 -          8 - mul
+0x76 -          2 - load
+0x77 -    30001C7 - loadimm (000001C7)
+0x7b -         34 - popdr
+0x7c -         32 - popac
+0x7d -         30 - save
+0x7e -    30001BF - loadimm (000001BF)
+0x82 -         32 - popac
+0x83 -          2 - load
 0x84 -         32 - popac
-0x85 -         34 - popdr
-0x86 -          4 - add
-0x87 -    30000C1 - loadimm (000000C1)
-0x8b -         32 - popac
-0x8c -          2 - load
-0x8d -    3000001 - loadimm (00000001)
-0x91 -         32 - popac
-0x92 -         34 - popdr
-0x93 -          6 - sub
-0x94 -    30000C1 - loadimm (000000C1)
-0x98 -         34 - popdr
+0x85 -          2 - load
+0x86 -    30001C3 - loadimm (000001C3)
+0x8a -         32 - popac
+0x8b -          2 - load
+0x8c -         34 - popdr
+0x8d -         32 - popac
+0x8e -         30 - save
+0x8f -    30001C7 - loadimm (000001C7)
+0x93 -         32 - popac
+0x94 -          2 - load
+0x95 -    30001BF - loadimm (000001BF)
 0x99 -         32 - popac
-0x9a -         30 - save
-0x9b -   13000068 - repeat (00000068)
-0x9f -         28 - return
-0xa0 -    5000008 - call (00000008)
-0xa4 -    5000057 - call (00000057)
-0xa8 -         32 - popac
-0xa9 -         34 - popdr
-0xaa -          6 - sub
-0xab -    30000B9 - loadimm (000000B9)
-0xaf -         32 - popac
-0xb0 -          2 - load
-0xb1 -         34 - popdr
-0xb2 -         32 - popac
-0xb3 -         30 - save
-0xb4 -         26 - halt
-0xb5 -          0 - input_address
-0xb9 -          4 - output_address
-0xbd -         64 - count_of_numbers
-0xc1 -          1 - counter
+0x9a -          2 - load
+0x9b -         34 - popdr
+0x9c -         32 - popac
+0x9d -         30 - save
+0x9e -    90000A2 - else (000000A2)
+0xa2 -    30001C3 - loadimm (000001C3)
+0xa6 -         32 - popac
+0xa7 -          2 - load
+0xa8 -    3000004 - loadimm (00000004)
+0xac -         32 - popac
+0xad -         34 - popdr
+0xae -          4 - add
+0xaf -    30001C3 - loadimm (000001C3)
+0xb3 -   1300003F - repeat (0000003F)
+0xb7 -    30001BF - loadimm (000001BF)
+0xbb -         32 - popac
+0xbc -          2 - load
+0xbd -    3000004 - loadimm (00000004)
+0xc1 -         32 - popac
+0xc2 -         34 - popdr
+0xc3 -          4 - add
+0xc4 -    30001BF - loadimm (000001BF)
+0xc8 -         34 - popdr
+0xc9 -         32 - popac
+0xca -         30 - save
+0xcb -   1300003F - repeat (0000003F)
+0xcf -         28 - return
+0xd0 -    3000167 - loadimm (00000167)
+0xd4 -    30001BF - loadimm (000001BF)
+0xd8 -         34 - popdr
+0xd9 -         32 - popac
+0xda -         30 - save
+0xdb -    300015F - loadimm (0000015F)
+0xdf -         32 - popac
+0xe0 -          2 - load
+0xe1 -         32 - popac
+0xe2 -          2 - load
+0xe3 -         36 - dup
+0xe4 -    3000000 - loadimm (00000000)
+0xe8 -         32 - popac
+0xe9 -         34 - popdr
+0xea -         20 - equal
+0xeb -         36 - dup
+0xec -         32 - popac
+0xed -         34 - popdr
+0xee -         18 - not
+0xef -         32 - popac
+0xf0 -   11000115 - while (00000115)
+0xf4 -    30001BF - loadimm (000001BF)
+0xf8 -         32 - popac
+0xf9 -          2 - load
+0xfa -         34 - popdr
+0xfb -         32 - popac
+0xfc -         30 - save
+0xfd -    30001BF - loadimm (000001BF)
+0x101 -         32 - popac
+0x102 -          2 - load
+0x103 -    3000004 - loadimm (00000004)
+0x107 -         32 - popac
+0x108 -         34 - popdr
+0x109 -          4 - add
+0x10a -    30001BF - loadimm (000001BF)
+0x10e -         34 - popdr
+0x10f -         32 - popac
+0x110 -         30 - save
+0x111 -   130000DB - repeat (000000DB)
+0x115 -    5000008 - call (00000008)
+0x119 -    3000167 - loadimm (00000167)
+0x11d -    30001BF - loadimm (000001BF)
+0x121 -         34 - popdr
+0x122 -         32 - popac
+0x123 -         30 - save
+0x124 -    30001BF - loadimm (000001BF)
+0x128 -         32 - popac
+0x129 -          2 - load
+0x12a -         32 - popac
+0x12b -          2 - load
+0x12c -         36 - dup
+0x12d -    3000000 - loadimm (00000000)
+0x131 -         32 - popac
+0x132 -         34 - popdr
+0x133 -         20 - equal
+0x134 -         36 - dup
+0x135 -         32 - popac
+0x136 -         34 - popdr
+0x137 -         18 - not
+0x138 -         32 - popac
+0x139 -   1100015E - while (0000015E)
+0x13d -    3000163 - loadimm (00000163)
+0x141 -         32 - popac
+0x142 -          2 - load
+0x143 -         34 - popdr
+0x144 -         32 - popac
+0x145 -         30 - save
+0x146 -    30001BF - loadimm (000001BF)
+0x14a -         32 - popac
+0x14b -          2 - load
+0x14c -    3000004 - loadimm (00000004)
+0x150 -         32 - popac
+0x151 -         34 - popdr
+0x152 -          4 - add
+0x153 -    30001BF - loadimm (000001BF)
+0x157 -         34 - popdr
+0x158 -         32 - popac
+0x159 -         30 - save
+0x15a -   13000124 - repeat (00000124)
+0x15e -         26 - halt
+0x15f -          0 - input_address
+0x163 -          4 - output_address
+0x167 -         5F - buffer
+0x16b -         5F - buffer
+0x16f -         5F - buffer
+0x173 -         5F - buffer
+0x177 -         5F - buffer
+0x17b -         5F - buffer
+0x17f -         5F - buffer
+0x183 -         5F - buffer
+0x187 -         5F - buffer
+0x18b -         5F - buffer
+0x18f -         5F - buffer
+0x193 -         5F - buffer
+0x197 -         5F - buffer
+0x19b -         5F - buffer
+0x19f -         5F - buffer
+0x1a3 -         5F - buffer
+0x1a7 -         5F - buffer
+0x1ab -         5F - buffer
+0x1af -         5F - buffer
+0x1b3 -         5F - buffer
+0x1b7 -         5F - buffer
+0x1bb -         5F - buffer
+0x1bf -          1 - pointer1
+0x1c3 -          1 - pointer2
+0x1c7 -          1 - temp
