@@ -411,7 +411,7 @@ def main(code_file, microcode_file, input_file):
         input_tokens=input_token,
         data_memory_size=const_data_memory_size,
         code_size=code_size,
-        limit=10000,
+        limit=20000,
     )
 
     print(output)

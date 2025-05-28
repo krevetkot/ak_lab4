@@ -1,12 +1,12 @@
-0x8 -    30000A2 - loadimm (000000A2)
+0x8 -    30000BD - loadimm (000000BD)
 0xc -         32 - popac
 0xd -          2 - load
-0xe -    30000A6 - loadimm (000000A6)
+0xe -    30000C1 - loadimm (000000C1)
 0x12 -         34 - popdr
 0x13 -         32 - popac
 0x14 -         30 - save
 0x15 -    3000000 - loadimm (00000000)
-0x19 -    30000A6 - loadimm (000000A6)
+0x19 -    30000C1 - loadimm (000000C1)
 0x1d -         32 - popac
 0x1e -          2 - load
 0x1f -    3000000 - loadimm (00000000)
@@ -15,7 +15,7 @@
 0x25 -         24 - greater
 0x26 -         32 - popac
 0x27 -   11000052 - while (00000052)
-0x2b -    30000A6 - loadimm (000000A6)
+0x2b -    30000C1 - loadimm (000000C1)
 0x2f -         32 - popac
 0x30 -          2 - load
 0x31 -         36 - dup
@@ -28,7 +28,7 @@
 0x3e -         32 - popac
 0x3f -         34 - popdr
 0x40 -          6 - sub
-0x41 -    30000A6 - loadimm (000000A6)
+0x41 -    30000C1 - loadimm (000000C1)
 0x45 -         34 - popdr
 0x46 -         32 - popac
 0x47 -         30 - save
@@ -44,15 +44,15 @@
 0x54 -         34 - popdr
 0x55 -          8 - mul
 0x56 -         28 - return
-0x57 -    30000A2 - loadimm (000000A2)
+0x57 -    30000BD - loadimm (000000BD)
 0x5b -         32 - popac
 0x5c -          2 - load
-0x5d -    30000A6 - loadimm (000000A6)
+0x5d -    30000C1 - loadimm (000000C1)
 0x61 -         34 - popdr
 0x62 -         32 - popac
 0x63 -         30 - save
 0x64 -    3000000 - loadimm (00000000)
-0x68 -    30000A6 - loadimm (000000A6)
+0x68 -    30000C1 - loadimm (000000C1)
 0x6c -         32 - popac
 0x6d -          2 - load
 0x6e -    3000000 - loadimm (00000000)
@@ -60,8 +60,8 @@
 0x73 -         34 - popdr
 0x74 -         24 - greater
 0x75 -         32 - popac
-0x76 -   1100008B - while (0000008B)
-0x7a -    30000A6 - loadimm (000000A6)
+0x76 -   1100009F - while (0000009F)
+0x7a -    30000C1 - loadimm (000000C1)
 0x7e -         32 - popac
 0x7f -          2 - load
 0x80 -         36 - dup
@@ -71,17 +71,32 @@
 0x84 -         32 - popac
 0x85 -         34 - popdr
 0x86 -          4 - add
-0x87 -   13000068 - repeat (00000068)
-0x8b -         28 - return
-0x8c -    5000008 - call (00000008)
-0x90 -    300009E - loadimm (0000009E)
-0x94 -         32 - popac
-0x95 -          2 - load
-0x96 -         34 - popdr
-0x97 -         32 - popac
-0x98 -         30 - save
-0x99 -         26 - halt
-0x9a -          0 - input_address
-0x9e -          4 - output_address
-0xa2 -          A - count_of_numbers
-0xa6 -          1 - counter
+0x87 -    30000C1 - loadimm (000000C1)
+0x8b -         32 - popac
+0x8c -          2 - load
+0x8d -    3000001 - loadimm (00000001)
+0x91 -         32 - popac
+0x92 -         34 - popdr
+0x93 -          6 - sub
+0x94 -    30000C1 - loadimm (000000C1)
+0x98 -         34 - popdr
+0x99 -         32 - popac
+0x9a -         30 - save
+0x9b -   13000068 - repeat (00000068)
+0x9f -         28 - return
+0xa0 -    5000008 - call (00000008)
+0xa4 -    5000057 - call (00000057)
+0xa8 -         32 - popac
+0xa9 -         34 - popdr
+0xaa -          6 - sub
+0xab -    30000B9 - loadimm (000000B9)
+0xaf -         32 - popac
+0xb0 -          2 - load
+0xb1 -         34 - popdr
+0xb2 -         32 - popac
+0xb3 -         30 - save
+0xb4 -         26 - halt
+0xb5 -          0 - input_address
+0xb9 -          4 - output_address
+0xbd -         64 - count_of_numbers
+0xc1 -          1 - counter

@@ -1,6 +1,8 @@
+# Найти разность между суммой квадратов и квадратом суммы первых ста натуральных чисел.
+
 0x0 VARIABLE input_address
 0x4 VARIABLE output_address
-10 VARIABLE count_of_numbers
+100 VARIABLE count_of_numbers
 1 VARIABLE counter
 
 : SQUARE_OF_SUM
@@ -12,9 +14,8 @@
     counter @
     dup 1 - dup 1 - counter ! + +
     REPEAT
-    # после этого на вершине стека сумма ста чисел
     dup *
-; # на вершине - квадрат суммы
+;
 
 : SUM_OF_SQUARES
     count_of_numbers @ counter !
@@ -24,10 +25,11 @@
     WHILE
     counter @
     dup * +
+    counter @ 1 - counter !
     REPEAT
-; # на вершине - сумма квадратов
+;
 
-SQUARE_OF_SUM # SUM_OF_SQUARES -
+SQUARE_OF_SUM SUM_OF_SQUARES -
 output_address @ !
 
 HALT
