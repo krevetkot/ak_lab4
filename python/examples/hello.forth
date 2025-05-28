@@ -1,35 +1,33 @@
 0x0 VARIABLE input_address
 0x4 VARIABLE output_address
-S" What is your name? " VARIABLE question
-0 VARIABLE null_term
-S" Hello, " VARIABLE hello
-S" ___________________________" VARIABLE buffer
-0 VARIABLE pointer
+2 VARIABLE count_of_numbers
+0 VARIABLE counter
 
-: PRINT_STRING
+: SQUARE_OF_SUM
+    count_of_numbers @ counter !
+    0
     BEGIN
-    dup @ dup 0 >
+    counter @ 0 >
     WHILE
-    output_address @ !
-    4 +
+    counter @
+    dup 1 - dup counter ! + +
     REPEAT
-;
+    # после этого на вершине стека сумма ста чисел
+    dup *
+; # на вершине - квадрат суммы
 
-: SAVE_STRING
-    buffer pointer !
-
+: SUM_OF_SQUARES
+    count_of_numbers @ counter !
+    0
     BEGIN
-    input_address @ @ dup 0 >
+    counter @ 0 >
     WHILE
-    pointer @ !
-    pointer @ 4 + pointer !
+    counter @
+    dup * +
     REPEAT
-    33 pointer @ !
-    0 pointer @ 4 + !
-;
+; # на вершине - сумма квадратов
 
-question PRINT_STRING
-SAVE_STRING
-hello PRINT_STRING
+SQUARE_OF_SUM SUM_OF_SQUARES -
+output_address @ !
 
 HALT
