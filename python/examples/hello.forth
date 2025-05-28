@@ -1,6 +1,6 @@
 0x0 VARIABLE input_address
 0x4 VARIABLE output_address
-S" W" VARIABLE hello_var
+S" What is your name?" VARIABLE hello_var
 0 VARIABLE null_term
 
 : PRINT_STRING
@@ -8,7 +8,7 @@ S" W" VARIABLE hello_var
     dup @ dup 0 >
     WHILE
     output_address @ !
-    1 +
+    4 +
     REPEAT
 ;
 

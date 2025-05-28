@@ -204,6 +204,8 @@ class ControlUnit:
     управляет состоянием модели процессора, включая обработку данных (DataPath).
     """
 
+    stack = [0, 0, 0, 0]
+
     microprogram = None
 
     mpc = None
@@ -274,7 +276,7 @@ class ControlUnit:
             | (self.microprogram[self.mpc + 3])
         )
         signals = self.parse_microinstr(micro_instr)
-        if self.mpc == 156:
+        if self.mpc == 20:
             print("its load")
 
         # по сути oe и lcr всегда равны
@@ -323,15 +325,10 @@ class ControlUnit:
         else:
             raise StopIteration()
 
-        print(self.data_path.data_memory[self.data_path.DSP-4])
-        print(self.data_path.data_memory[self.data_path.DSP-3])
-        print(self.data_path.data_memory[self.data_path.DSP-2])
-        print(self.data_path.data_memory[self.data_path.DSP-1])
-
-        print(self.data_path.data_memory[self.data_path.DSP])
-        print(self.data_path.data_memory[self.data_path.DSP+1])
-        print(self.data_path.data_memory[self.data_path.DSP+2])
-        print(self.data_path.data_memory[self.data_path.DSP+3])
+        self.stack[0] = self.data_path.data_memory[self.data_path.DSP-5]
+        self.stack[1] = self.data_path.data_memory[self.data_path.DSP-1]
+        self.stack[2] = self.data_path.data_memory[self.data_path.DSP+3]
+        self.stack[3] = self.data_path.data_memory[self.data_path.DSP+7]
 
         self.tick()
 
