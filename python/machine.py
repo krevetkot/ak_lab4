@@ -80,7 +80,7 @@ class DataPath:
         self.BR = 0
         self.AR = 0
         self.RSP = data_memory_size - 4
-        self.DSP = code_size
+        self.DSP = code_size - 4
         # data stack будет расти вверх, а return stack вниз
         self.input_buffer = input_buffer
         self.output_buffer = []
@@ -171,7 +171,7 @@ class DataPath:
             self.DSP += 4
         elif sel == 1:
             self.DSP -= 4
-        assert self.DSP >= self.code_size, "out of memory: {}".format(self.DSP)
+        assert self.DSP >= self.code_size - 4, "out of memory: {}".format(self.DSP)
         assert self.DSP < self.RSP, "stack overflow: {}".format(self.DSP)
 
 
@@ -313,6 +313,8 @@ class ControlUnit:
             self.signal_latch_mpc(signals[Signal.MUXMPC])
         else:
             raise StopIteration()
+        
+        print(" ".join(str(x) for x in self.data_path.data_memory[163:197]))
 
         self.stack[0] = self.data_path.data_memory[self.data_path.DSP-5]
         self.stack[1] = self.data_path.data_memory[self.data_path.DSP-1]
@@ -413,8 +415,8 @@ def main(code_file, microcode_file, input_file):
     )
 
     print(output)
-    symbol_output = "".join(chr(code) for code in output)
-    print(symbol_output)
+    #symbol_output = "".join(chr(code) for code in output)
+    #print(symbol_output)
     print("ticks:", ticks)
 
 
