@@ -85,7 +85,9 @@ def word_to_opcode(symbol):
         "!": Opcode.SAVE,
         "VARIABLE": Opcode.VARIABLE,
         "IF": Opcode.IF,
+        "ELSE": Opcode.ELSE,
         "THEN": Opcode.THEN,
+        "BEGIN": Opcode.BEGIN,
         "WHILE": Opcode.WHILE,
         "REPEAT": Opcode.REPEAT,
         ":": Opcode.DEFINE_FUNC,
@@ -206,8 +208,26 @@ def translate_stage_1(text):  # noqa: C901
                 }
             )
 
+        elif term.word == 'S"':
+            i += 1
+            string = ""
+            while not terms[i].word.endswith('"'):
+                string += terms[i].word
+                string += " "
+                i += 1
+            string += terms[i].word[:-1]
+            code.append(
+                {
+                    "address": address,
+                    "opcode": Opcode.LOAD_IMM,
+                    "arg": string,
+                    "term": term,
+                }
+            )
+
+
         # если встретили определение слова
-        elif term.word == "VARIABLE":
+        elif word_to_opcode(term.word) == Opcode.VARIABLE:
             # после обработки всех термов, мы добавим его в конец
             value = code[-1]["arg"]  # берем отсюда, так как тут число уже прошло конвертацию
             label = terms[i + 1].word
@@ -217,35 +237,35 @@ def translate_stage_1(text):  # noqa: C901
             address -= 8
 
         # если встретили определение функции
-        elif term.word == ":":
+        elif word_to_opcode(term.word) == Opcode.RETURN:
             label = terms[i + 1].word
             functions_map[label] = address
             i += 1
             address -= 4
 
         # обработка if - else - then, чтобы вставить им потом в аругменты адреса переходов
-        elif term.word == "IF":
+        elif word_to_opcode(term.word) == Opcode.IF:
             code.append({"address": address, "opcode": Opcode.POP_AC, "term": term})
             address += 1
             brackets_stack.append({"address": address, "opcode": Opcode.IF})
             code.append({"address": address, "opcode": Opcode.IF, "arg": -1, "term": term})
-        elif term.word == "ELSE":
+        elif word_to_opcode(term.word) == Opcode.ELSE:
             addresses_in_conditions[brackets_stack.pop()["address"]] = address + 4
             brackets_stack.append({"address": address, "opcode": Opcode.ELSE})
             code.append({"address": address, "opcode": Opcode.ELSE, "arg": -1, "term": term})
-        elif term.word == "THEN":
+        elif word_to_opcode(term.word) == Opcode.THEN:
             addresses_in_conditions[brackets_stack.pop()["address"]] = address
             address -= 4
 
-        elif term.word == "BEGIN":
+        elif word_to_opcode(term.word) == Opcode.BEGIN:
             last_begin = address
             address -= 4
-        elif term.word == "WHILE":
+        elif word_to_opcode(term.word) == Opcode.WHILE:
             code.append({"address": address, "opcode": Opcode.POP_AC, "term": term})
             address += 1
             brackets_stack.append({"address": address, "opcode": Opcode.WHILE})
             code.append({"address": address, "opcode": Opcode.WHILE, "arg": -1, "term": term})
-        elif term.word == "REPEAT":
+        elif word_to_opcode(term.word) == Opcode.REPEAT:
             addresses_in_conditions[brackets_stack.pop()["address"]] = address + 4
             code.append(
                 {
@@ -359,7 +379,7 @@ def translate_stage_1(text):  # noqa: C901
     return code
 
 
-def translate_stage_2(code):
+def translate_stage_2(code):  # noqa: C901
     """
     Вместо лейблов подставляются адреса,
     в if и while подставляются адреса переходов,
@@ -370,14 +390,21 @@ def translate_stage_2(code):
     for label, value in variables_queue.items():
         variables_map[label] = curr_address
         code.append({"address": curr_address, "arg": value})
-        curr_address += 4
+        if isinstance(value, int):
+            if -2**31 <= value <= 2**31-1:
+                size = 4
+            else:
+                size = 8
+        elif isinstance(value, str):
+            size = len(value)
+        curr_address += size
 
     for instruction in code:
         if "arg" in instruction:
             arg = instruction["arg"]
             if arg == -1:
                 instruction["arg"] = addresses_in_conditions[instruction["address"]]
-            elif isinstance(arg, str):
+            elif isinstance(arg, str) and "opcode" in instruction:
                 instruction["arg"] = variables_map[arg]
                 # если переменной с таким именем нет, транслятор выдаст ошибку еще на первом этапе
 

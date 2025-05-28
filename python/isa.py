@@ -105,16 +105,22 @@ def to_bytes(code, first_ex_instr):
         if "opcode" in instr:
             opcode_bin = opcode_to_binary[instr["opcode"]]
             binary_bytes.append(opcode_bin)
-        else:
-            binary_bytes.append(0)
-
-        if "arg" in instr:
+            if "arg" in instr:
+                arg = instr.get("arg", 0)
+                binary_bytes.extend(((arg >> 16) & 0xFF, (arg >> 8) & 0xFF, arg & 0xFF))
+        elif "arg" in instr:
             arg = instr.get("arg", 0)
-            binary_bytes.extend(((arg >> 16) & 0xFF, (arg >> 8) & 0xFF, arg & 0xFF))
+            if isinstance(arg, int):
+                binary_bytes.extend(((arg >> 24) & 0xFF, (arg >> 16) & 0xFF, (arg >> 8) & 0xFF, arg & 0xFF))
+            elif isinstance(arg, str):
+                for i in range(len(arg)):
+                    binary_bytes += bytes(3)
+                    binary_bytes.extend(arg[i].encode("ascii"))
+
     return bytes(binary_bytes)
 
 
-def to_hex(code, variables_map):
+def to_hex(code, variables_map):  # noqa: C901
     addr_to_var = {addr: name for name, addr in variables_map.items()}
     """Преобразует машинный код в текстовый файл c шестнадцатеричным представлением.
 
@@ -135,7 +141,8 @@ def to_hex(code, variables_map):
         address = i
         if after_halt:
             word = (binary_code[i] << 24) | (binary_code[i + 1] << 16) | (binary_code[i + 2] << 8) | binary_code[i + 3]
-            mnemonic = addr_to_var[address]
+            if address in addr_to_var:
+                mnemonic = addr_to_var[address]
             i += 4
         else:
             mnemonic = binary_to_opcode[binary_code[address]].value

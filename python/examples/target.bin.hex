@@ -1,32 +1,32 @@
-0x8 -    300003D - loadimm (0000003D)
+0x8 -    3000024 - loadimm (00000024)
 0xc -         32 - popac
 0xd -          2 - load
-0xe -         32 - popac
-0xf -          2 - load
-0x10 -    3000045 - loadimm (00000045)
+0xe -    300001C - loadimm (0000001C)
+0x12 -         32 - popac
+0x13 -          2 - load
 0x14 -         34 - popdr
 0x15 -         32 - popac
 0x16 -         30 - save
-0x17 -    3000045 - loadimm (00000045)
-0x1b -         32 - popac
-0x1c -          2 - load
-0x1d -    3000000 - loadimm (00000000)
-0x21 -         32 - popac
-0x22 -         34 - popdr
-0x23 -         24 - greater
-0x24 -         32 - popac
-0x25 -   1100003C - while (0000003C)
-0x29 -    3000045 - loadimm (00000045)
-0x2d -         32 - popac
-0x2e -          2 - load
-0x2f -    3000041 - loadimm (00000041)
-0x33 -         32 - popac
-0x34 -          2 - load
-0x35 -         34 - popdr
-0x36 -         32 - popac
-0x37 -         30 - save
-0x38 -   13000008 - repeat (00000008)
-0x3c -         26 - halt
-0x3d -          0 - input_address
-0x41 -          4 - output_address
-0x45 -          0 - element
+0x17 -         26 - halt
+0x18 -          0 - input_address
+0x1c -          4 - output_address
+0x20 -          0 - symbol
+0x24 -         57 - hello_var
+0x28 -         68 - hello_var
+0x2c -         61 - hello_var
+0x30 -         74 - hello_var
+0x34 -         20 - hello_var
+0x38 -         69 - hello_var
+0x3c -         73 - hello_var
+0x40 -         20 - hello_var
+0x44 -         79 - hello_var
+0x48 -         6F - hello_var
+0x4c -         75 - hello_var
+0x50 -         72 - hello_var
+0x54 -         20 - hello_var
+0x58 -         6E - hello_var
+0x5c -         61 - hello_var
+0x60 -         6D - hello_var
+0x64 -         65 - hello_var
+0x68 -         3F - hello_var
+0x6c -          0 - hello_var

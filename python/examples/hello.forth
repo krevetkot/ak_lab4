@@ -1,14 +1,9 @@
 0x0 VARIABLE input_address
 0x4 VARIABLE output_address
-0 VARIABLE element
+0 VARIABLE symbol
+S" What is your name?" VARIABLE hello_var
+0 VARIABLE null_term
 
-
-BEGIN
-input_address @ @ element ! 
-element @ 0 >
-WHILE
-element @
-output_address @ !
-REPEAT
+hello_var @ output_address @ !
 
 HALT
