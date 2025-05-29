@@ -4,15 +4,13 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-
-
         {
             "name": "Python Debugger: translator",
             "type": "debugpy",
             "request": "launch",
             "program": "C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\translator.py",
             "console": "integratedTerminal",
-            "args": "C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\examples\\euler.forth C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\examples\\target.bin"
+            "args": "C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\examples\\sort.forth C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\examples\\target.bin"
         },
         {
             "name": "Python Debugger: microcode",

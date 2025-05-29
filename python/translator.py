@@ -35,7 +35,7 @@ def instructions():
         "=",
         ">",
         "<",
-        "dup",
+        "DUP",
         "HALT",
     }
 
@@ -71,7 +71,7 @@ def instr_without_arg():  # без аргумента
         "=",
         ">",
         "<",
-        "dup",
+        "DUP",
         "HALT",
     }
 
@@ -105,7 +105,7 @@ def word_to_opcode(symbol):
         "=": Opcode.EQUAL,
         ">": Opcode.GREATER,
         "<": Opcode.LESS,
-        "dup": Opcode.DUP,
+        "DUP": Opcode.DUP,
         "HALT": Opcode.HALT,
     }.get(symbol)
 

@@ -6,7 +6,7 @@ in_source: |-
 
   : PRINT_STRING
       BEGIN
-      dup @ dup 0 >
+      DUP @ DUP 0 >
       WHILE
       output_address @ !
       4 +

@@ -35,7 +35,7 @@ in_source: |-
   buffer pointer1 !
 
   BEGIN
-  input_address @ @ dup 0 = NOT
+  input_address @ @ DUP 0 = NOT
   WHILE
   pointer1 @ !
   pointer1 @ 4 + pointer1 !
@@ -46,7 +46,7 @@ in_source: |-
 
   buffer pointer1 !
   BEGIN
-  pointer1 @ @ dup 0 = NOT
+  pointer1 @ @ DUP 0 = NOT
   WHILE
   output_address @ !
   pointer1 @ 4 + pointer1 !
