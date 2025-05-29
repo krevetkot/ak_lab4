@@ -410,8 +410,12 @@ def main(code_file, input_file, memory_size, symbolic_output_flag):
     with open(input_file, encoding="utf-8") as file:
         input_text = file.read()
         input_token = []
-        for char in input_text:
-            input_token.append(char)
+        if symbolic_output_flag:
+            for char in input_text:
+                input_token.append(char)
+        elif "," in input_text:
+            for el in input_text.split(","):
+                input_token.append(int(el))
         input_token.append(0)  # чтобы сделать cstr
 
     output, ticks = simulation(
@@ -433,11 +437,16 @@ def main(code_file, input_file, memory_size, symbolic_output_flag):
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG, format="%(levelname)s %(name)s %(message)s")
+    logging.basicConfig(level=logging.DEBUG, format="%(levelname)s   machine:simulation    %(message)s",
+                        filename="C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\machine.log",
+                        filemode="w")
     assert len(sys.argv) == 5, "Signal.WRong arguments: machine.py <code_file> <input_file> <memory_size> <symbolic_output_flag>"
     code_file = sys.argv[1]
     input_file = sys.argv[2]
     memory_size = int(sys.argv[3])
-    symbolic_output_flag = bool(sys.argv[4])
+    if sys.argv[4] == "True" or sys.argv[4] == "1":
+        symbolic_output_flag = True
+    else:
+        symbolic_output_flag = False
 
     main(code_file, input_file, memory_size, symbolic_output_flag)

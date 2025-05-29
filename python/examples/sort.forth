@@ -4,7 +4,7 @@
 0x4 VARIABLE output_address
 5 VARIABLE buffer
 4 VARIABLE buffer1
-S" ______________________" VARIABLE buffer2
+S" ______________________" VARIABLE buffer
 1 VARIABLE pointer1
 2 VARIABLE pointer2
 3 VARIABLE temp
