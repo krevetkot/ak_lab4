@@ -314,16 +314,16 @@ class ControlUnit:
         else:
             raise StopIteration()
 
-        print(" ".join(str(x) for x in self.data_path.data_memory[232:240]))
-        aboba = (self.data_path.data_memory[232] << 24) | (self.data_path.data_memory[233] << 16) | (self.data_path.data_memory[234] << 8) | (self.data_path.data_memory[235])
-        print(aboba)
-        aboba = (self.data_path.data_memory[236] << 24) | (self.data_path.data_memory[236+1] << 16) | (self.data_path.data_memory[236+2] << 8) | (self.data_path.data_memory[236+3])
-        print(aboba)
-        self.stack[0] = self.data_path.data_memory[self.data_path.DSP-9]
-        self.stack[1] = self.data_path.data_memory[self.data_path.DSP-5]
-        self.stack[2] = self.data_path.data_memory[self.data_path.DSP-1]
-        self.stack[3] = self.data_path.data_memory[self.data_path.DSP+3]
-        self.stack[4] = self.data_path.data_memory[self.data_path.DSP+7]
+        # print(" ".join(str(x) for x in self.data_path.data_memory[232:240]))
+        # aboba = (self.data_path.data_memory[232] << 24) | (self.data_path.data_memory[233] << 16) | (self.data_path.data_memory[234] << 8) | (self.data_path.data_memory[235])
+        # print(aboba)
+        # aboba = (self.data_path.data_memory[236] << 24) | (self.data_path.data_memory[236+1] << 16) | (self.data_path.data_memory[236+2] << 8) | (self.data_path.data_memory[236+3])
+        # print(aboba)
+        # self.stack[0] = self.data_path.data_memory[self.data_path.DSP-9]
+        # self.stack[1] = self.data_path.data_memory[self.data_path.DSP-5]
+        # self.stack[2] = self.data_path.data_memory[self.data_path.DSP-1]
+        # self.stack[3] = self.data_path.data_memory[self.data_path.DSP+3]
+        # self.stack[4] = self.data_path.data_memory[self.data_path.DSP+7]
 
         self.tick()
 
@@ -369,10 +369,14 @@ def simulation(binary_code, microcode, input_tokens, data_memory_size, code_size
     data_path = DataPath(binary_code, data_memory_size, code_size, first_exec_instr, input_tokens)
     control_unit = ControlUnit(microcode, data_path)
 
+    prev_pc = -1
+
     try:
         while control_unit._tick < limit:
-            logging.debug("%s", control_unit)
-            control_unit.process_next_tick()
+            if prev_pc != control_unit.data_path.PC:
+                logging.debug("%s", control_unit)
+                prev_pc = control_unit.data_path.PC
+            control_unit.process_next_tick() 
     except EOFError:
         logging.warning("Input buffer is empty!")
     except StopIteration:
@@ -384,10 +388,13 @@ def simulation(binary_code, microcode, input_tokens, data_memory_size, code_size
     return data_path.output_buffer, control_unit.current_tick()
 
 
-def main(code_file, microcode_file, input_file):
+def main(code_file, input_file, memory_size, symbolic_output_flag):
     """Функция запуска модели процессора. Параметры -- имена файлов с машинным
     кодом и с входными данными для симуляции.
     """
+
+    microcode_file = "C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\microcode.bin"
+
     const_data_memory_size = 1000
     # файл с бинарным кодом
     with open(code_file, "rb") as file:
@@ -405,29 +412,36 @@ def main(code_file, microcode_file, input_file):
 
     with open(input_file, encoding="utf-8") as file:
         input_text = file.read()
-        input_token = [5, 4, 3, 2, 1]
-        # for char in input_text:
-        #     input_token.append(char)
+        input_token = []
+        for char in input_text:
+            input_token.append(char)
         input_token.append(0)  # чтобы сделать cstr
 
     output, ticks = simulation(
         binary_code,
         microcode,
         input_tokens=input_token,
-        data_memory_size=const_data_memory_size,
+        data_memory_size=memory_size,
         code_size=code_size,
         limit=20000,
     )
 
-    print(output)
-    #symbol_output = "".join(chr(code) for code in output)
-    #print(symbol_output)
+    if symbolic_output_flag:
+        symbol_output = "".join(chr(code) for code in output)
+        print(symbol_output)
+    else:
+        print(output)
+
     print("ticks:", ticks)
 
 
 if __name__ == "__main__":
     logging.getLogger().setLevel(logging.DEBUG)
-    assert len(sys.argv) == 3, "Signal.WRong arguments: machine.py <code_file> <input_file>"
-    _, code_file, input_file = sys.argv
-    microcode_file = "C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\microcode.bin"
-    main(code_file, microcode_file, input_file)
+    assert len(sys.argv) == 5, "Signal.WRong arguments: machine.py <code_file> <input_file> <memory_size> <symbolic_output_flag>"
+    code_file = sys.argv[1]
+    input_file = sys.argv[2]
+    memory_size = int(sys.argv[3])
+    symbolic_output_flag = bool(sys.argv[4])
+    print(symbolic_output_flag)
+
+    main(code_file, input_file, memory_size, symbolic_output_flag)
