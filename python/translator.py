@@ -387,8 +387,6 @@ def main(source, target):
 
     code = translate_stage_1(source)
     code = translate_stage_2(code)
-    for el in code:
-        print(el)
     first_ex_instr = get_first_executable_instr(code)
     binary_code = to_bytes(code, first_ex_instr)
     hex_code = to_hex(code, variables_map)
@@ -401,6 +399,8 @@ def main(source, target):
         f.write(binary_code)
     with open(target + ".hex", "w") as f:
         f.write(hex_code)
+
+    print("source LoC:", len(source.split(" ")), "code instr:", len(code))
 
 
 if __name__ == "__main__":

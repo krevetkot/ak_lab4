@@ -1,41 +1,41 @@
-8 - 0x8 -         36 - dup
-9 - 0x9 -         32 - popac
-10 - 0xa -          2 - load
-11 - 0xb -         36 - dup
-12 - 0xc -    3000000 - loadimm (00000000)
-16 - 0x10 -         32 - popac
-17 - 0x11 -         34 - popdr
-18 - 0x12 -         24 - greater
-19 - 0x13 -         32 - popac
-20 - 0x14 -   1100002C - while (0000002C)
-24 - 0x18 -    300003A - loadimm (0000003A)
-28 - 0x1c -         32 - popac
-29 - 0x1d -          2 - load
-30 - 0x1e -         34 - popdr
-31 - 0x1f -         32 - popac
-32 - 0x20 -         30 - save
-33 - 0x21 -    3000004 - loadimm (00000004)
-37 - 0x25 -         32 - popac
-38 - 0x26 -         34 - popdr
-39 - 0x27 -          4 - add
-40 - 0x28 -   13000008 - repeat (00000008)
-44 - 0x2c -         28 - return
-45 - 0x2d -    300003E - loadimm (0000003E)
-49 - 0x31 -    5000008 - call (00000008)
-53 - 0x35 -         26 - halt
-54 - 0x36 -          0 - input_address
-58 - 0x3a -          4 - output_address
-62 - 0x3e -         48 - hello_world
-66 - 0x42 -         65 - hello_world
-70 - 0x46 -         6C - hello_world
-74 - 0x4a -         6C - hello_world
-78 - 0x4e -         6F - hello_world
-82 - 0x52 -         2C - hello_world
-86 - 0x56 -         20 - hello_world
-90 - 0x5a -         77 - hello_world
-94 - 0x5e -         6F - hello_world
-98 - 0x62 -         72 - hello_world
-102 - 0x66 -         6C - hello_world
-106 - 0x6a -         64 - hello_world
-110 - 0x6e -         21 - hello_world
-114 - 0x72 -          0 - null_term
+0x8 -         36 - dup
+0x9 -         32 - popac
+0xa -          2 - load
+0xb -         36 - dup
+0xc -    3000000 - loadimm (00000000)
+0x10 -         32 - popac
+0x11 -         34 - popdr
+0x12 -         24 - greater
+0x13 -         32 - popac
+0x14 -   1100002C - while (0000002C)
+0x18 -    300003A - loadimm (0000003A)
+0x1c -         32 - popac
+0x1d -          2 - load
+0x1e -         34 - popdr
+0x1f -         32 - popac
+0x20 -         30 - save
+0x21 -    3000004 - loadimm (00000004)
+0x25 -         32 - popac
+0x26 -         34 - popdr
+0x27 -          4 - add
+0x28 -   13000008 - repeat (00000008)
+0x2c -         28 - return
+0x2d -    300003E - loadimm (0000003E)
+0x31 -    5000008 - call (00000008)
+0x35 -         26 - halt
+0x36 -          0 - input_address
+0x3a -          4 - output_address
+0x3e -         48 - hello_world
+0x42 -         65 - hello_world
+0x46 -         6C - hello_world
+0x4a -         6C - hello_world
+0x4e -         6F - hello_world
+0x52 -         2C - hello_world
+0x56 -         20 - hello_world
+0x5a -         77 - hello_world
+0x5e -         6F - hello_world
+0x62 -         72 - hello_world
+0x66 -         6C - hello_world
+0x6a -         64 - hello_world
+0x6e -         21 - hello_world
+0x72 -          0 - null_term

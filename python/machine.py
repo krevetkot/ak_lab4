@@ -264,8 +264,6 @@ class ControlUnit:
             | (self.microprogram[self.mpc + 3])
         )
         signals = self.parse_microinstr(micro_instr)
-        if self.mpc == 24:
-            print("its load")
 
         # по сути oe и lcr всегда равны
         PC_sel = signals[Signal.MUXPC]  # noqa: N806
@@ -329,7 +327,7 @@ class ControlUnit:
 
     def __repr__(self):
         """Вернуть строковое представление состояния процессора."""
-        state_repr = "TICK: {:3} PC: {:3} DA: {:3} AC: {} DR: {} CR: {} BR: {} RSP: {} DSP : {}".format(
+        state_repr = "TICK: {:3} PC: {:3} DA: {:3} AC: {} DR: {} CR: {} BR: {} RSP: {} DSP: {}".format(
             self._tick,
             self.data_path.PC,
             self.data_path.DA,
@@ -359,12 +357,11 @@ class ControlUnit:
 
         instr_hex = to_hex([command], variables_map)
 
-        return "{} \t{} [{}]".format(state_repr, instr_repr, instr_hex)
+        return "{} {} [{}]".format(state_repr, instr_repr, instr_hex)
 
 
 def simulation(binary_code, microcode, input_tokens, data_memory_size, code_size, limit):
     first_exec_instr = (binary_code[4] << 24) | (binary_code[5] << 16) | (binary_code[6] << 8) | (binary_code[7])
-    print("------------------", first_exec_instr)
 
     data_path = DataPath(binary_code, data_memory_size, code_size, first_exec_instr, input_tokens)
     control_unit = ControlUnit(microcode, data_path)
@@ -436,12 +433,11 @@ def main(code_file, input_file, memory_size, symbolic_output_flag):
 
 
 if __name__ == "__main__":
-    logging.getLogger().setLevel(logging.DEBUG)
+    logging.basicConfig(level=logging.DEBUG, format="%(levelname)s %(name)s %(message)s")
     assert len(sys.argv) == 5, "Signal.WRong arguments: machine.py <code_file> <input_file> <memory_size> <symbolic_output_flag>"
     code_file = sys.argv[1]
     input_file = sys.argv[2]
     memory_size = int(sys.argv[3])
     symbolic_output_flag = bool(sys.argv[4])
-    print(symbolic_output_flag)
 
     main(code_file, input_file, memory_size, symbolic_output_flag)

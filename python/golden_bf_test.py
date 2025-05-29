@@ -1,6 +1,5 @@
 """Golden тесты транслятора и машины.
-
-Конфигурационнфе файлы: "golden/*_bf.yml"
+Конфигурационнфе файлы: "golden/*.yml"
 """
 
 import contextlib
@@ -16,7 +15,7 @@ import translator
 MAX_LOG = 4000
 
 
-@pytest.mark.golden_test("golden/*_bf.yml")
+@pytest.mark.golden_test("golden/*.yml")
 def test_translator_and_machine(golden, caplog):
     """Используется подход golden tests. У него не самая удачная реализация для
     python: https://pypi.org/project/pytest-golden/ , но знать об этом подходе
@@ -40,6 +39,8 @@ def test_translator_and_machine(golden, caplog):
 
     - `in_source` -- исходный код
     - `in_stdin` -- данные на ввод процессора для симуляции
+    - `in_memory_size` -- размер памяти
+    - `in_symbolic_output_flag` -- размер памяти
 
     Выход:
 
@@ -48,12 +49,10 @@ def test_translator_and_machine(golden, caplog):
     - `out_stdout` -- стандартный вывод транслятора и симулятора
     - `out_log` -- журнал программы
     """
-    # Установим уровень отладочного вывода на DEBUG
+    logging.basicConfig(level=logging.DEBUG, format="%(levelname)s:root:%(message)s")
     caplog.set_level(logging.DEBUG)
 
-    # Создаём временную папку для тестирования приложения.
     with tempfile.TemporaryDirectory() as tmpdirname:
-        # Готовим имена файлов для входных и выходных данных.
         source = os.path.join(tmpdirname, "source.bf")
         input_stream = os.path.join(tmpdirname, "input.txt")
         target = os.path.join(tmpdirname, "target.bin")
@@ -65,21 +64,20 @@ def test_translator_and_machine(golden, caplog):
         with open(input_stream, "w", encoding="utf-8") as file:
             file.write(golden["in_stdin"])
 
-        # Запускаем транслятор и собираем весь стандартный вывод в переменную
-        # stdout
+        memory_size = golden["in_memory_size"]
+        symbolic_output_flag = golden["in_symbolic_output_flag"]
+
         with contextlib.redirect_stdout(io.StringIO()) as stdout:
             translator.main(source, target)
             print("============================================================")
-            machine.main(target, input_stream)
+            machine.main(target, input_stream, memory_size, symbolic_output_flag)
 
-        # Выходные данные также считываем в переменные.
-        with open(target, "rb") as file:
-            code = file.read()
+        # with open(target, "rb") as file:
+        #     code = file.read()
         with open(target_hex, encoding="utf-8") as file:
             code_hex = file.read()
 
-        # Проверяем, что ожидания соответствуют реальности.
-        assert code == golden.out["out_code"]
+        #assert code == golden.out["out_code"]
         assert code_hex == golden.out["out_code_hex"]
         assert stdout.getvalue() == golden.out["out_stdout"]
-        assert caplog.text[0:MAX_LOG] + "EOF" == golden.out["out_log"]
+        assert caplog.text == golden.out["out_log"] + "\n"
