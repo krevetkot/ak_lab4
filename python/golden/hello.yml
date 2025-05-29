@@ -18,7 +18,8 @@ in_source: |-
 in_stdin: |-
 
 in_memory_size: 1000
-in_symbolic_output_flag: True
+in_sim_mode: sym
+in_eam: False
 out_stdout: |
   source LoC: 44 code instr: 29
   ============================================================

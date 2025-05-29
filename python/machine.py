@@ -61,12 +61,10 @@ class DataPath:
     DSP = None
 
     input_buffer = None
-    "Буфер входных данных. Инициализируется входными данными конструктора."
 
     output_buffer = None
-    "Буфер выходных данных."
 
-    def __init__(self, code, data_memory_size, code_size, first_exec_instr, input_buffer: list):
+    def __init__(self, code, data_memory_size, code_size, first_exec_instr, input_buffer: list, eam):
         assert data_memory_size > 0, "Data_memory size should be non-zero"
         self.code_size = code_size
         self.data_memory_size = data_memory_size
@@ -84,7 +82,7 @@ class DataPath:
         # data stack будет расти вверх, а return stack вниз
         self.input_buffer = input_buffer
         self.output_buffer = []
-        self.ALU = ALU()
+        self.ALU = ALU(eam)
 
     def signal_latch_PC(self, sel):  # noqa: N802
         if sel == 3:
@@ -360,10 +358,10 @@ class ControlUnit:
         return "{} {} [{}]".format(state_repr, instr_repr, instr_hex)
 
 
-def simulation(binary_code, microcode, input_tokens, data_memory_size, code_size, limit):
+def simulation(binary_code, microcode, input_tokens, data_memory_size, code_size, limit, eam):
     first_exec_instr = (binary_code[4] << 24) | (binary_code[5] << 16) | (binary_code[6] << 8) | (binary_code[7])
 
-    data_path = DataPath(binary_code, data_memory_size, code_size, first_exec_instr, input_tokens)
+    data_path = DataPath(binary_code, data_memory_size, code_size, first_exec_instr, input_tokens, eam)
     control_unit = ControlUnit(microcode, data_path)
 
     prev_pc = -1
@@ -385,7 +383,7 @@ def simulation(binary_code, microcode, input_tokens, data_memory_size, code_size
     return data_path.output_buffer, control_unit.current_tick()
 
 
-def main(code_file, input_file, memory_size, symbolic_output_flag):
+def main(code_file, input_file, memory_size, sim_mode, eam):
     """Функция запуска модели процессора. Параметры -- имена файлов с машинным
     кодом и с входными данными для симуляции.
     """
@@ -410,7 +408,7 @@ def main(code_file, input_file, memory_size, symbolic_output_flag):
     with open(input_file, encoding="utf-8") as file:
         input_text = file.read()
         input_token = []
-        if symbolic_output_flag:
+        if sim_mode == "sym":
             for char in input_text:
                 input_token.append(char)
         elif "," in input_text:
@@ -425,13 +423,20 @@ def main(code_file, input_file, memory_size, symbolic_output_flag):
         data_memory_size=memory_size,
         code_size=code_size,
         limit=20000,
+        eam=eam
     )
 
-    if symbolic_output_flag:
+    if sim_mode == "sym":
         symbol_output = "".join(chr(code) for code in output)
         print(symbol_output)
-    else:
+    elif sim_mode == "dec":
         print(output)
+    else:
+        hex_output = []
+        for el in output:
+            hex_el = f"0x{(el & 0xFFFFFFFF):08X}"
+            hex_output.append(hex_el)
+        print(hex_output)
 
     print("ticks:", ticks)
 
@@ -440,13 +445,16 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG, format="%(levelname)s   machine:simulation    %(message)s",
                         filename="C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\machine.log",
                         filemode="w")
-    assert len(sys.argv) == 5, "Signal.WRong arguments: machine.py <code_file> <input_file> <memory_size> <symbolic_output_flag>"
+    assert len(sys.argv) == 6, "Signal.WRong arguments: machine.py <code_file> <input_file> <memory_size> <mode> <eam>"
     code_file = sys.argv[1]
     input_file = sys.argv[2]
     memory_size = int(sys.argv[3])
-    if sys.argv[4] == "True" or sys.argv[4] == "1":
-        symbolic_output_flag = True
+    # mode: dec, sym, hex
+    sim_mode = sys.argv[4]
+    assert sim_mode in ["dec", "sym", "hex"], "Simulation mode can be only: dec, sym, hex"
+    if sys.argv[5] == "True" or sys.argv[5] == "1":
+        eam = True
     else:
-        symbolic_output_flag = False
+        eam = False
 
-    main(code_file, input_file, memory_size, symbolic_output_flag)
+    main(code_file, input_file, memory_size, sim_mode, eam)

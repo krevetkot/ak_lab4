@@ -2,9 +2,10 @@
 
 
 class ALU:
-    def __init__(self):
+    def __init__(self, eam):
         self.reset_flags()
         self.result = 0
+        self.eam = eam
 
     def get_result(self):
         return self.result
@@ -52,21 +53,27 @@ class ALU:
 
     def plus(self, right, left):
         """Сложение с установкой флагов"""
-        result = right + left
+        if self.eam:
+            result = right + left + self.c
+        else:
+            result = right + left
         self._update_nz(result)
 
         max_uint32 = 0xFFFFFFFF
         max_int32 = 0x7FFFFFFF
         min_int32 = -0x80000000
 
-        self.c = (right + left) > max_uint32
+        self.c = result > max_uint32
         self.v = (right > 0 and left > 0 and result > max_int32) or (right < 0 and left < 0 and result < min_int32)
 
     def minus(self, right, left):
         """Вычитание с установкой флагов"""
-        result = left - right
+        if self.eam:
+            result = left - right - self.C
+        else:
+            result = left - right
         self._update_nz(result)
-        self.c = right < left  # Перенос при вычитании (если right < left)
+        self.c = left < right  # Перенос при вычитании (если left < right)
 
         # Переполнение для вычитания
         self.v = (right >= 0 and left < 0 and result < 0) or (right < 0 and left >= 0 and result > 0)

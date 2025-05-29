@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\translator.py",
             "console": "integratedTerminal",
-            "args": "C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\examples\\sort.forth C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\examples\\target.bin"
+            "args": "C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\examples\\eam.forth C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\examples\\target.bin"
         },
         {
             "name": "Python Debugger: microcode",
@@ -26,7 +26,7 @@
             "request": "launch",
             "program": "C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\machine.py",
             "console": "integratedTerminal",
-            "args": "C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\examples\\target.bin C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\examples\\input_file.txt 1000 0"
+            "args": "C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\examples\\target.bin C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\examples\\input_file.txt 1000 hex True"
         }
     ]
 }

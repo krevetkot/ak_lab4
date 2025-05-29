@@ -57,7 +57,6 @@ class Term(namedtuple("Term", "line pos word")):
 
 # Словарь соответствия кодов операций их бинарному представлению
 opcode_to_binary = {
-    # с 1 или нет?
     Opcode.LOAD: 0x2,  # 00000010
     Opcode.PLUS: 0x4,  # 00000100
     Opcode.MINUS: 0x6,  # 00000110
@@ -82,6 +81,33 @@ opcode_to_binary = {
     Opcode.ELSE: 0x9,  # 00001001
     Opcode.WHILE: 0x11,  # 00001011
     Opcode.REPEAT: 0x13,  # 00001101
+}
+
+opcode_to_size = {
+    Opcode.LOAD: 1,  
+    Opcode.PLUS: 1, 
+    Opcode.MINUS: 1, 
+    Opcode.MULT: 1,  
+    Opcode.DIV: 1,  
+    Opcode.MOD: 1,  
+    Opcode.AND: 1,  
+    Opcode.OR: 1, 
+    Opcode.NOT: 1,
+    Opcode.EQUAL: 1,
+    Opcode.LESS: 1, 
+    Opcode.GREATER: 1, 
+    Opcode.HALT: 1, 
+    Opcode.RETURN: 1, 
+    Opcode.SAVE: 1,
+    Opcode.POP_AC: 1, 
+    Opcode.POP_DR: 1, 
+    Opcode.DUP: 1, 
+    Opcode.LOAD_IMM: 4,  
+    Opcode.CALL: 4, 
+    Opcode.IF: 4, 
+    Opcode.ELSE: 4,  
+    Opcode.WHILE: 4,  
+    Opcode.REPEAT: 4, 
 }
 
 binary_to_opcode = {binary: opcode for opcode, binary in opcode_to_binary.items()}
@@ -111,7 +137,11 @@ def to_bytes(code, first_ex_instr):  # noqa: C901
         elif "arg" in instr:
             arg = instr.get("arg", 0)
             if isinstance(arg, int):
-                binary_bytes.extend(((arg >> 24) & 0xFF, (arg >> 16) & 0xFF, (arg >> 8) & 0xFF, arg & 0xFF))
+                if not (-2**31 <= arg <= 2**31-1):
+                    binary_bytes.extend(((arg >> 56) & 0xFF, (arg >> 48) & 0xFF, (arg >> 40) & 0xFF, (arg >> 32) & 0xFF))
+                    binary_bytes.extend(((arg >> 24) & 0xFF, (arg >> 16) & 0xFF, (arg >> 8) & 0xFF, arg & 0xFF))
+                else:
+                    binary_bytes.extend(((arg >> 24) & 0xFF, (arg >> 16) & 0xFF, (arg >> 8) & 0xFF, arg & 0xFF))
             elif isinstance(arg, str):
                 for i in range(len(arg)):
                     binary_bytes += bytes(3)

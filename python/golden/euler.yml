@@ -36,7 +36,8 @@ in_source: |-
   HALT
 in_stdin: |-
 in_memory_size: 1000
-in_symbolic_output_flag: False
+in_sim_mode: dec
+in_eam: False
 out_stdout: |
   source LoC: 130 code instr: 102
   ============================================================

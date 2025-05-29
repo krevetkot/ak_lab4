@@ -26,7 +26,8 @@ def test_translator_and_machine(golden, caplog):
     - `in_source` -- исходный код
     - `in_stdin` -- данные на ввод процессора для симуляции
     - `in_memory_size` -- размер памяти
-    - `in_symbolic_output_flag` -- размер памяти
+    - `in_sim_mode` -- режим отображения результата: dec, sym, hex
+    - `in_eam` -- режим математики (если True, то расширенный)
 
     Выход:
 
@@ -51,12 +52,13 @@ def test_translator_and_machine(golden, caplog):
             file.write(golden["in_stdin"])
 
         memory_size = golden["in_memory_size"]
-        symbolic_output_flag = golden["in_symbolic_output_flag"]
+        in_sim_mode = golden["in_sim_mode"]
+        in_eam = golden["in_eam"]
 
         with contextlib.redirect_stdout(io.StringIO()) as stdout:
             translator.main(source, target)
             print("============================================================")
-            machine.main(target, input_stream, memory_size, symbolic_output_flag)
+            machine.main(target, input_stream, memory_size, in_sim_mode, in_eam)
 
         with open(target_hex, encoding="utf-8") as file:
             code_hex = file.read()

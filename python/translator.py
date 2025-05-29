@@ -5,12 +5,10 @@ import os
 import re
 import sys
 
-from isa import Opcode, Term, to_bytes, to_hex
+from isa import Opcode, Term, opcode_to_size, to_bytes, to_hex
 
 # комментарии разрешены только после #
 
-
-# вот здесь хочется какого-то автоматизма, да?
 def instructions():
     return {
         "@",
@@ -110,6 +108,7 @@ def word_to_opcode(symbol):
     }.get(symbol)
 
 
+
 def text_to_terms(text):  # noqa: C901
     """Трансляция текста в последовательность операторов языка (токенов).
 
@@ -174,9 +173,6 @@ def translate_stage_1(text):  # noqa: C901
     # Транслируем термы в машинный код.
     code = []
     brackets_stack = []
-    # надо бы сделать отдельный файлик который управляет памятью. инициализирует например
-    # стек у нас стопроц в общей памяти, просто с конца добавляется
-    # или память это просто битовый файл?
 
     i = 0
     address = 8
@@ -189,7 +185,7 @@ def translate_stage_1(text):  # noqa: C901
         # если это 16 cc число - load_imm
         if re.fullmatch(hex_number_pattern, term.word):
             arg = int(term.word, 16)
-            assert -67108864 <= arg <= 67108863, "Argument is not in range!"
+            assert -2**63 <= arg <= 2**63-1, "Argument is not in range!"
             code.append(
                 {
                     "address": address,
@@ -201,7 +197,7 @@ def translate_stage_1(text):  # noqa: C901
         # или 10 сс
         elif re.fullmatch(dec_number_pattern, term.word):
             arg = int(term.word)
-            assert -67108864 <= arg <= 67108863, "Argument is not in range!"
+            assert -2**63 <= arg <= 2**63-1, "Argument is not in range!"
             code.append(
                 {
                     "address": address,
@@ -249,7 +245,7 @@ def translate_stage_1(text):  # noqa: C901
         # обработка if - else - then, чтобы вставить им потом в аругменты адреса переходов
         elif word_to_opcode(term.word) == Opcode.IF:
             code.append({"address": address, "opcode": Opcode.POP_AC, "term": term})
-            address += 1
+            address += opcode_to_size[Opcode.POP_AC]
             brackets_stack.append({"address": address, "opcode": Opcode.IF})
             code.append({"address": address, "opcode": Opcode.IF, "arg": -1, "term": term})
         elif word_to_opcode(term.word) == Opcode.ELSE:
@@ -265,7 +261,7 @@ def translate_stage_1(text):  # noqa: C901
             address -= 4
         elif word_to_opcode(term.word) == Opcode.WHILE:
             code.append({"address": address, "opcode": Opcode.POP_AC, "term": term})
-            address += 1
+            address += opcode_to_size[Opcode.POP_AC]
             brackets_stack.append({"address": address, "opcode": Opcode.WHILE})
             code.append({"address": address, "opcode": Opcode.WHILE, "arg": -1, "term": term})
         elif word_to_opcode(term.word) == Opcode.REPEAT:
