@@ -314,7 +314,11 @@ class ControlUnit:
         else:
             raise StopIteration()
 
-        print(" ".join(str(x) for x in self.data_path.data_memory[375:391]))
+        print(" ".join(str(x) for x in self.data_path.data_memory[232:240]))
+        aboba = (self.data_path.data_memory[232] << 24) | (self.data_path.data_memory[233] << 16) | (self.data_path.data_memory[234] << 8) | (self.data_path.data_memory[235])
+        print(aboba)
+        aboba = (self.data_path.data_memory[236] << 24) | (self.data_path.data_memory[236+1] << 16) | (self.data_path.data_memory[236+2] << 8) | (self.data_path.data_memory[236+3])
+        print(aboba)
         self.stack[0] = self.data_path.data_memory[self.data_path.DSP-9]
         self.stack[1] = self.data_path.data_memory[self.data_path.DSP-5]
         self.stack[2] = self.data_path.data_memory[self.data_path.DSP-1]
@@ -401,7 +405,7 @@ def main(code_file, microcode_file, input_file):
 
     with open(input_file, encoding="utf-8") as file:
         input_text = file.read()
-        input_token = [5, 4]
+        input_token = [5, 4, 3, 2, 1]
         # for char in input_text:
         #     input_token.append(char)
         input_token.append(0)  # чтобы сделать cstr

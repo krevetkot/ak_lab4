@@ -161,9 +161,9 @@ def to_hex(code, variables_map):  # noqa: C901
         # Формируем строку в требуемом формате
         hex_word = f"{word:10X}"  # количество символов в строке
         if has_argument:
-            line = f"{hex(address)} - {hex_word} - {mnemonic} ({arg:08X})"
+            line = f"{address} - {hex(address)} - {hex_word} - {mnemonic} ({arg:08X})"
         else:
-            line = f"{hex(address)} - {hex_word} - {mnemonic}"
+            line = f"{address} - {hex(address)} - {hex_word} - {mnemonic}"
         result.append(line)
 
     return "\n".join(result)

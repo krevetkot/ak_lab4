@@ -49,7 +49,6 @@ def math_instructions():  # на этапе трансляции они буду
         "%",
         "AND",
         "OR",
-        "NOT",
         "=",
         ">",
         "<",
@@ -183,7 +182,7 @@ def translate_stage_1(text):  # noqa: C901
     address = 8
     hex_number_pattern = r"^0[xX][0-9A-Fa-f]+$"
     dec_number_pattern = r"^[0-9]+$"
-    last_begin = 0
+    last_begin = []
     while i < len(terms):
         term = terms[i]
 
@@ -262,7 +261,7 @@ def translate_stage_1(text):  # noqa: C901
             address -= 4
 
         elif word_to_opcode(term.word) == Opcode.BEGIN:
-            last_begin = address
+            last_begin.append(address)
             address -= 4
         elif word_to_opcode(term.word) == Opcode.WHILE:
             code.append({"address": address, "opcode": Opcode.POP_AC, "term": term})
@@ -275,7 +274,7 @@ def translate_stage_1(text):  # noqa: C901
                 {
                     "address": address,
                     "opcode": Opcode.REPEAT,
-                    "arg": last_begin,
+                    "arg": last_begin.pop(),
                     "term": term,
                 }
             )
@@ -304,72 +303,29 @@ def translate_stage_1(text):  # noqa: C901
             else:
                 assert arg in variables_map or arg in functions_map, "Label is not defined!"
 
+        elif word_to_opcode(term.word) == Opcode.NOT:
+            code.append({"address": address, "opcode": Opcode.POP_AC, "term": term})
+            address += 1
+            code.append({"address": address, "opcode": word_to_opcode(term.word), "term": term})
+
         elif term.word in math_instructions():
-            code.append(
-                {
-                    "address": address,
-                    "opcode": Opcode.POP_AC,
-                    "term": term,
-                },
-            )
+            code.append({"address": address, "opcode": Opcode.POP_AC, "term": term})
             address += 1
-            code.append(
-                {
-                    "address": address,
-                    "opcode": Opcode.POP_DR,
-                    "term": term,
-                },
-            )
+            code.append({"address": address, "opcode": Opcode.POP_DR, "term": term})
             address += 1
-            code.append(
-                {
-                    "address": address,
-                    "opcode": word_to_opcode(term.word),
-                    "term": term,
-                },
-            )
+            code.append({"address": address, "opcode": word_to_opcode(term.word), "term": term})
 
         elif word_to_opcode(term.word) == Opcode.SAVE:
-            code.append(
-                {
-                    "address": address,
-                    "opcode": Opcode.POP_DR,
-                    "term": term,
-                },
-            )
+            code.append({"address": address, "opcode": Opcode.POP_DR, "term": term})
             address += 1
-            code.append(
-                {
-                    "address": address,
-                    "opcode": Opcode.POP_AC,
-                    "term": term,
-                },
-            )
+            code.append({"address": address, "opcode": Opcode.POP_AC, "term": term})
             address += 1
-            code.append(
-                {
-                    "address": address,
-                    "opcode": word_to_opcode(term.word),
-                    "term": term,
-                },
-            )
+            code.append({"address": address, "opcode": word_to_opcode(term.word), "term": term})
 
         elif word_to_opcode(term.word) == Opcode.LOAD:
-            code.append(
-                {
-                    "address": address,
-                    "opcode": Opcode.POP_AC,
-                    "term": term,
-                },
-            )
+            code.append({"address": address, "opcode": Opcode.POP_AC, "term": term})
             address += 1
-            code.append(
-                {
-                    "address": address,
-                    "opcode": word_to_opcode(term.word),
-                    "term": term,
-                },
-            )
+            code.append({"address": address, "opcode": word_to_opcode(term.word), "term": term})
 
         else:
             code.append({"address": address, "opcode": word_to_opcode(term.word), "term": term})
