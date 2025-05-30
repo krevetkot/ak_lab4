@@ -1,7 +1,13 @@
-PHONY: lint-fix lint
+all: format lint test
 
-lint-fix:
-	markdownlint -c .markdownlint.yaml --fix .
+format:
+	poetry run ruff format .
 
 lint:
-	markdownlint -c .markdownlint.yaml .
+	poetry run ruff check --fix .
+
+test:
+	poetry run pytest -v
+
+test-update-golden:
+	poetry run pytest . -v --update-goldens

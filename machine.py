@@ -387,7 +387,7 @@ def main(code_file, input_file, memory_size, sim_mode, eam):  # noqa: C901
     кодом и с входными данными для симуляции.
     """
 
-    microcode_file = "C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\microcode.bin"
+    microcode_file = "C:\\Users\\User\\VSCode\\ak\\ak_lab4\\microcode.bin"
 
     const_data_memory_size = 1000
     # файл с бинарным кодом
@@ -442,7 +442,7 @@ def main(code_file, input_file, memory_size, sim_mode, eam):  # noqa: C901
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG, format="%(levelname)s   machine:simulation    %(message)s",
-                        filename="C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\machine.log",
+                        filename="C:\\Users\\User\\VSCode\\ak\\ak_lab4\\machine.log",
                         filemode="w")
     assert len(sys.argv) == 6, "Signal.WRong arguments: machine.py <code_file> <input_file> <memory_size> <mode> <eam>"
     code_file = sys.argv[1]

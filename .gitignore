@@ -1,1 +1,5 @@
-.DS_Store
+*.out
+.fleet
+.coverage
+__pycache__
+out/
