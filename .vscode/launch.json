@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\translator.py",
             "console": "integratedTerminal",
-            "args": "C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\examples\\eam.forth C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\examples\\target.bin"
+            "args": "C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\examples\\euler.forth C:\\Users\\User\\VSCode\\ak\\ak_lab4\\python\\examples\\target.bin"
         },
         {
             "name": "Python Debugger: microcode",

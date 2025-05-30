@@ -8,7 +8,7 @@ S" ___________________________" VARIABLE buffer
 
 : PRINT_STRING
     BEGIN
-    dup @ dup 0 >
+    DUP @ DUP 0 >
     WHILE
     output_address @ !
     4 +
@@ -19,7 +19,7 @@ S" ___________________________" VARIABLE buffer
     buffer pointer !
 
     BEGIN
-    input_address @ @ dup 0 >
+    input_address @ @ DUP 0 >
     WHILE
     pointer @ !
     pointer @ 4 + pointer !

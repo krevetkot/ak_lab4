@@ -23,6 +23,8 @@ in_stdin: |-
 in_memory_size: 1000
 in_sim_mode: hex
 in_eam: True
+out_code_bin: !!binary |
+  AAAAAAAAAAgDAABpAwAABDI0BDICAwAAcQMAAAQyNAQyAjI0BAMAAHk0MjADAABpMgIDAABxMgIyNAQDAAB1NDIwAwAAdTICAwAAZTICNDIwAwAAeTICAwAAZTICNDIwJgAAAAAAAAAEAAAQAP////8AAAABAAAAAAAAAAA=
 out_code_hex: |-
   0x8 -    3000069 - loadimm (00000069)
   0xc -    3000004 - loadimm (00000004)

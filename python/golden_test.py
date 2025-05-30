@@ -40,10 +40,10 @@ def test_translator_and_machine(golden, caplog):
     caplog.set_level(logging.DEBUG)
 
     with tempfile.TemporaryDirectory() as tmpdirname:
-        source = os.path.join(tmpdirname, "source.bf")
+        source = os.path.join(tmpdirname, "source.forth")
         input_stream = os.path.join(tmpdirname, "input.txt")
-        target = os.path.join(tmpdirname, "target.bin")
-        target_hex = os.path.join(tmpdirname, "target.bin.hex")
+        target = os.path.join(tmpdirname, "target_{golden.name}.bin")
+        target_hex = os.path.join(tmpdirname, "target_{golden.name}.bin.hex")
 
         # Записываем входные данные в файлы. Данные берутся из теста.
         with open(source, "w", encoding="utf-8") as file:
@@ -60,9 +60,13 @@ def test_translator_and_machine(golden, caplog):
             print("============================================================")
             machine.main(target, input_stream, memory_size, in_sim_mode, in_eam)
 
+        with open(target, "rb") as file:
+            code_bin = file.read()
         with open(target_hex, encoding="utf-8") as file:
             code_hex = file.read()
 
+        res = golden.out["out_code_bin"]
+        assert code_bin == golden.out["out_code_bin"]
         assert code_hex == golden.out["out_code_hex"]
         assert stdout.getvalue() == golden.out["out_stdout"]
         assert caplog.text == golden.out["out_log"] + "\n"

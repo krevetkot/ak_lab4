@@ -38,6 +38,8 @@ in_stdin: |-
 in_memory_size: 1000
 in_sim_mode: dec
 in_eam: False
+out_code_bin: !!binary |
+  AAAAAAAAAKADAAC9MgIDAADBNDIwAwAAAAMAAMEyAgMAAAAyNCQyEQAAUgMAAMEyAjYDAAABMjQGNgMAAAEyNAYDAADBNDIwMjQEMjQEEwAAGTYyNAgoAwAAvTICAwAAwTQyMAMAAAADAADBMgIDAAAAMjQkMhEAAJ8DAADBMgI2MjQIMjQEAwAAwTICAwAAATI0BgMAAME0MjATAABoKAUAAAgFAABXMjQGAwAAuTICNDIwJgAAAAAAAAAEAAAAZAAAAAE=
 out_stdout: |
   source LoC: 130 code instr: 102
   ============================================================

@@ -12,9 +12,9 @@
     counter @ 0 >
     WHILE
     counter @
-    dup 1 - dup 1 - counter ! + +
+    DUP 1 - DUP 1 - counter ! + +
     REPEAT
-    dup *
+    DUP *
 ;
 
 : SUM_OF_SQUARES
@@ -24,7 +24,7 @@
     counter @ 0 >
     WHILE
     counter @
-    dup * +
+    DUP * +
     counter @ 1 - counter !
     REPEAT
 ;

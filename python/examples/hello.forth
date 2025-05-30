@@ -5,7 +5,7 @@ S" Hello, world!" VARIABLE hello_world
 
 : PRINT_STRING
     BEGIN
-    dup @ dup 0 >
+    DUP @ DUP 0 >
     WHILE
     output_address @ !
     4 +

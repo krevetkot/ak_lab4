@@ -20,6 +20,8 @@ in_stdin: |-
 in_memory_size: 1000
 in_sim_mode: sym
 in_eam: False
+out_code_bin: !!binary |
+  AAAAAAAAAC02MgI2AwAAADI0JDIRAAAsAwAAOjICNDIwAwAABDI0BBMAAAgoAwAAPgUAAAgmAAAAAAAAAAQAAABIAAAAZQAAAGwAAABsAAAAbwAAACwAAAAgAAAAdwAAAG8AAAByAAAAbAAAAGQAAAAhAAAAAA==
 out_stdout: |
   source LoC: 44 code instr: 29
   ============================================================
