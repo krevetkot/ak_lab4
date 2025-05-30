@@ -178,7 +178,6 @@ class Translator:
     def translate_stage_1(self, text):  # noqa: C901
         """Первый этап трансляции.
         Убираются все токены, которые не отображаются напрямую в команды,
-        переменные заносятся в память (после кода),
         создается условная таблица линковки для лейблов функций и названий переменных.
         """
         terms = self.text_to_terms(text)
@@ -269,6 +268,7 @@ class Translator:
                 self.addresses_in_conditions[brackets_stack.pop()["address"]] = address
                 address -= 4
 
+            # обработка begin - while - repeat
             elif self.word_to_opcode(term.word) == Opcode.BEGIN:
                 last_begin.append(address)
                 address -= 4

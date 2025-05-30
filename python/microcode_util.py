@@ -1066,7 +1066,3 @@ if __name__ == "__main__":
     assert len(sys.argv) == 2, "Wrong arguments: translator.py <input_file> <target_file>"
     _, target = sys.argv
     save_to_bin(microcode, target)
-
-# уже в глазах двоится, проверю правильность заполнения позже
-# одна микроинструкция - 24 бита, значит mpc увеличивается на 3 каждый раз
-# также нужно добавить нулевую инструкцию - цикл выборки команды
