@@ -18,7 +18,7 @@ import sys
 from alu import ALU
 from isa import binary_to_opcode, to_hex
 from microcode_util import SIGNAL_ORDER, Signal, linking_table
-from translator import variables_map
+from translator import Translator
 
 # ура ура
 MEMORY_MAPPED_INPUT_ADDRESS = 0
@@ -190,8 +190,6 @@ class ControlUnit:
     управляет состоянием модели процессора, включая обработку данных (DataPath).
     """
 
-    stack = [0, 0, 0, 0, 0]  # noqa: RUF012
-
     microprogram = None
 
     mpc = None
@@ -353,7 +351,8 @@ class ControlUnit:
         else:
             command = {"address": index, "opcode": opcode}
 
-        instr_hex = to_hex([command], variables_map)
+        trans = Translator()
+        instr_hex = to_hex([command], trans.variables_map)
 
         return "{} {} [{}]".format(state_repr, instr_repr, instr_hex)
 
@@ -383,7 +382,7 @@ def simulation(binary_code, microcode, input_tokens, data_memory_size, code_size
     return data_path.output_buffer, control_unit.current_tick()
 
 
-def main(code_file, input_file, memory_size, sim_mode, eam):
+def main(code_file, input_file, memory_size, sim_mode, eam):  # noqa: C901
     """Функция запуска модели процессора. Параметры -- имена файлов с машинным
     кодом и с входными данными для симуляции.
     """

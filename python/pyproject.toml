@@ -1,8 +1,7 @@
 [tool.poetry]
-name = "brainfuck"
-version = "0.2.0"
-description = "An example project for Computer System Architecture class."
-authors = ["Aleksandr Penskoi <aleksandr.penskoi@gmail.com>"]
+name = "forth"
+version = "0.1.0"
+authors = ["Slonimskaya Kseniya"]
 license = "BSD"
 readme = "README.md"
 package-mode = false
