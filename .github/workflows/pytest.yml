@@ -49,7 +49,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install poetry
           poetry lock
-          poetry install
+          poetry install --no-root
 
       - name: Check code formatting with Ruff
         run: poetry run ruff format --check .
