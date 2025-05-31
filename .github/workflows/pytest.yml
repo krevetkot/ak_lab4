@@ -23,29 +23,12 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install poetry
+          poetry lock
           poetry install --no-root
 
-      - name: Run tests and collect coverage
+      - name: Run tests
         run: |
-          poetry run coverage run -m pytest .
-          poetry run coverage report -m
+          poetry run -m pytest .
         env:
           CI: true
 
-  lint:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.11
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install poetry
-          poetry install
