@@ -311,17 +311,17 @@ eam - режим арифметики. 1 - расширенный, 0 - обыч�
 - ALU -- сигнал команды для АЛУ. Пусть left - левый аргумент, right - правый. Тогда:
 | sigal  | operation       |
 |--------|-----------------|
-| 0      | left + 0        | 
+| 0      | left + 0        |
 | 1      | left + right    |
-| 2      | left - right    | 
+| 2      | left - right    |
 | 3      | left * right    |
-| 4      | left // right   | 
+| 4      | left // right   |
 | 5      | left % right    |   
-| 6      | left and right  | 
+| 6      | left and right  |
 | 7      | left or right   |
-| 8      | not right       | 
+| 8      | not right       |
 | 9      | left == right ? |
-| 10     | left < right ?  | 
+| 10     | left < right ?  |
 | 11     | left < right ?  |   
 
 Другие сигналы:
