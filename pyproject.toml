@@ -13,3 +13,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.group.dev.dependencies]
 pytest-golden = "^0.2.2"
+
+[tool.pytest.ini_options]
+enable_assertion_pass_hook = true
+log_format = "%(levelname)s   machine:simulation    %(message)s"
