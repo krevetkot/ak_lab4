@@ -417,6 +417,7 @@ $ cat out/target.bin.hex
 0x2a -         26 - halt
 0x2b -          0 - input_address
 0x2f -          4 - output_address
+```
 
 Пример использования модели процессора:
 
