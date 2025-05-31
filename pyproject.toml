@@ -5,7 +5,7 @@ description = "ak lab4"
 authors = ["krevetkot <ksenia.slonimskaya@yandex.ru>"]
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = "^3.11"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
