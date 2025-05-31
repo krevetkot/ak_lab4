@@ -134,4 +134,4 @@ out_log: |-
   DEBUG   machine:simulation    TICK: 165 PC:  85 DA: 120 AC: 4 DR: 4 CR: 875704358 BR: 92 RSP: 996 DSP: 120 popac [0x8 -         32 - popac]
   DEBUG   machine:simulation    TICK: 169 PC:  86 DA: 116 AC: 4 DR: 4 CR: 842016256 BR: 92 RSP: 996 DSP: 116 save [0x8 -         30 - save]
   DEBUG   machine:simulation    TICK: 173 PC:  87 DA:   4 AC: 0 DR: 4 CR: 807796736 BR: 92 RSP: 996 DSP: 112 halt [0x8 -         26 - halt]
-  INFO    machine:simulation    output_buffer: [4097, 0]
+  INFO   machine:simulation    output_buffer: [4097, 0]

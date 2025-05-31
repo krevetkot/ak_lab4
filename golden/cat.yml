@@ -325,4 +325,4 @@ out_log: |-
   DEBUG   machine:simulation    TICK: 1090 PC:  24 DA:  55 AC: 0 DR: 0 CR: 607260928 BR: 0 RSP: 996 DSP: 55 popac [0x8 -         32 - popac]
   DEBUG   machine:simulation    TICK: 1093 PC:  25 DA:  55 AC: 0 DR: 0 CR: 839974912 BR: 0 RSP: 996 DSP: 55 while 42 [0x8 -   1100002A - while (0000002A)]
   DEBUG   machine:simulation    TICK: 1098 PC:  42 DA:  42 AC: 0 DR: 0 CR: 285212714 BR: 42 RSP: 996 DSP: 51 halt [0x8 -         26 - halt]
-  INFO    machine:simulation    output_buffer: [105, 116, 32, 105, 115, 32, 99, 97, 116, 32, 116, 101, 115, 116]
+  INFO   machine:simulation    output_buffer: [105, 116, 32, 105, 115, 32, 99, 97, 116, 32, 116, 101, 115, 116]

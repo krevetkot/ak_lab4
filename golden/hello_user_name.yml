@@ -1131,4 +1131,4 @@ out_log: |-
   DEBUG   machine:simulation    TICK: 3639 PC:  44 DA:  44 AC: 0 DR: 0 CR: 285212716 BR: 44 RSP: 992 DSP: 409 return [0x8 -         28 - return]
   DEBUG   machine:simulation    TICK: 3642 PC:  45 DA:  45 AC: 0 DR: 0 CR: 671285249 BR: 44 RSP: 996 DSP: 409 loadimm 281 [0x8 -    3000119 - loadimm (00000119)]
   DEBUG   machine:simulation    TICK: 3645 PC: 164 DA: 164 AC: 0 DR: 0 CR: 164 BR: 164 RSP: 996 DSP: 409 halt [0x8 -         26 - halt]
-  INFO    machine:simulation    output_buffer: [87, 104, 97, 116, 32, 105, 115, 32, 121, 111, 117, 114, 32, 110, 97, 109, 101, 63, 32, 72, 101, 108, 108, 111, 44, 32, 75, 115, 101, 110, 105, 97, 33]
+  INFO   machine:simulation    output_buffer: [87, 104, 97, 116, 32, 105, 115, 32, 121, 111, 117, 114, 32, 110, 97, 109, 101, 63, 32, 72, 101, 108, 108, 111, 44, 32, 75, 115, 101, 110, 105, 97, 33]
