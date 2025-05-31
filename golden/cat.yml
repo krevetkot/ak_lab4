@@ -14,6 +14,7 @@ in_stdin: |-
 in_memory_size: 1000
 in_sim_mode: sym
 in_eam: False
+in_output_len: 1000
 out_code_bin: !!binary |
   AAAAAAAAAAgDAAArMgIyAjYDAAAAMjQkMhEAACoDAAAvMgI0MjATAAAIJgAAAAAAAAAE
 out_code_hex: |-

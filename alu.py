@@ -63,13 +63,24 @@ class ALU:
         max_int32 = 0x7FFFFFFF
         min_int32 = -0x80000000
 
-        self.c = result > max_uint32
+        if left < 0 and right > 0:
+            if abs(left) <= abs(right):
+                self.c = 1
+            else:
+                self.c = 0
+        elif left > 0 and right < 0:
+            if abs(right) <= abs(left):
+                self.c = 1
+            else:
+                self.c = 0
+        else:
+            self.c = result > max_uint32
         self.v = (right > 0 and left > 0 and result > max_int32) or (right < 0 and left < 0 and result < min_int32)
 
     def minus(self, right, left):
         """Вычитание с установкой флагов"""
         if self.eam:
-            result = left - right - self.C
+            result = left - right - self.c
         else:
             result = left - right
         self._update_nz(result)

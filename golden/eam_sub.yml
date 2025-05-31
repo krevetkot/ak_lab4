@@ -1,0 +1,136 @@
+in_source: |-
+  0 VARIABLE input_address
+  4 VARIABLE output_address
+  0x000100000000000 VARIABLE var1
+  0x1 VARIABLE var2
+  0 VARIABLE upper_result
+  0 VARIABLE lower_result
+
+  var1 4 + @
+  var2 @
+  - 
+  lower_result !
+
+  var1 @ 0 -
+  upper_result !
+
+  upper_result @ output_address @ !
+  lower_result @ output_address @ !
+
+  HALT
+in_stdin: |-
+in_memory_size: 1000
+in_sim_mode: hex
+in_eam: True
+in_output_len: 1000
+out_code_bin: !!binary |
+  AAAAAAAAAAgDAABgAwAABDI0BDICAwAAaDICMjQGAwAAcDQyMAMAAGAyAgMAAAAyNAYDAABsNDIwAwAAbDICAwAAXDICNDIwAwAAcDICAwAAXDICNDIwJgAAAAAAAAAEAAAQAAAAAAAAAAABAAAAAAAAAAA=
+out_code_hex: |-
+  0x8 -    3000060 - loadimm (00000060)
+  0xc -    3000004 - loadimm (00000004)
+  0x10 -         32 - popac
+  0x11 -         34 - popdr
+  0x12 -          4 - add
+  0x13 -         32 - popac
+  0x14 -          2 - load
+  0x15 -    3000068 - loadimm (00000068)
+  0x19 -         32 - popac
+  0x1a -          2 - load
+  0x1b -         32 - popac
+  0x1c -         34 - popdr
+  0x1d -          6 - sub
+  0x1e -    3000070 - loadimm (00000070)
+  0x22 -         34 - popdr
+  0x23 -         32 - popac
+  0x24 -         30 - save
+  0x25 -    3000060 - loadimm (00000060)
+  0x29 -         32 - popac
+  0x2a -          2 - load
+  0x2b -    3000000 - loadimm (00000000)
+  0x2f -         32 - popac
+  0x30 -         34 - popdr
+  0x31 -          6 - sub
+  0x32 -    300006C - loadimm (0000006C)
+  0x36 -         34 - popdr
+  0x37 -         32 - popac
+  0x38 -         30 - save
+  0x39 -    300006C - loadimm (0000006C)
+  0x3d -         32 - popac
+  0x3e -          2 - load
+  0x3f -    300005C - loadimm (0000005C)
+  0x43 -         32 - popac
+  0x44 -          2 - load
+  0x45 -         34 - popdr
+  0x46 -         32 - popac
+  0x47 -         30 - save
+  0x48 -    3000070 - loadimm (00000070)
+  0x4c -         32 - popac
+  0x4d -          2 - load
+  0x4e -    300005C - loadimm (0000005C)
+  0x52 -         32 - popac
+  0x53 -          2 - load
+  0x54 -         34 - popdr
+  0x55 -         32 - popac
+  0x56 -         30 - save
+  0x57 -         26 - halt
+  0x58 -          0 - input_address
+  0x5c -          4 - output_address
+  0x60 -       1000 - var1
+  0x64 -          0 - var1
+  0x68 -          1 - var2
+  0x6c -          0 - upper_result
+  0x70 -          0 - lower_result
+out_stdout: |
+  source LoC: 31 code instr: 53
+  ============================================================
+  ['0x00000FFF', '0xFFFFFFFF']
+  ticks: 175
+out_log: |-
+  DEBUG   machine:simulation    TICK:   0 PC:   8 DA:   8 AC: 0 DR: 0 CR: 0 BR: 0 RSP: 996 DSP: 112 loadimm 96 [0x8 -    3000060 - loadimm (00000060)]
+  DEBUG   machine:simulation    TICK:   3 PC:  12 DA: 116 AC: 96 DR: 0 CR: 50331744 BR: 96 RSP: 996 DSP: 116 loadimm 4 [0x8 -    3000004 - loadimm (00000004)]
+  DEBUG   machine:simulation    TICK:   6 PC:  16 DA: 120 AC: 4 DR: 0 CR: 50331652 BR: 4 RSP: 996 DSP: 120 popac [0x8 -         32 - popac]
+  DEBUG   machine:simulation    TICK:   9 PC:  17 DA: 120 AC: 4 DR: 0 CR: 842269746 BR: 4 RSP: 996 DSP: 120 popdr [0x8 -         34 - popdr]
+  DEBUG   machine:simulation    TICK:  13 PC:  18 DA: 116 AC: 4 DR: 0 CR: 872690178 BR: 4 RSP: 996 DSP: 116 add [0x8 -          4 - add]
+  DEBUG   machine:simulation    TICK:  17 PC:  19 DA: 116 AC: 100 DR: 96 CR: 70386179 BR: 4 RSP: 996 DSP: 116 popac [0x8 -         32 - popac]
+  DEBUG   machine:simulation    TICK:  20 PC:  20 DA: 116 AC: 100 DR: 96 CR: 838992640 BR: 4 RSP: 996 DSP: 116 load [0x8 -          2 - load]
+  DEBUG   machine:simulation    TICK:  24 PC:  21 DA: 100 AC: 100 DR: 96 CR: 33751040 BR: 4 RSP: 996 DSP: 112 loadimm 104 [0x8 -    3000068 - loadimm (00000068)]
+  DEBUG   machine:simulation    TICK:  29 PC:  25 DA: 120 AC: 104 DR: 96 CR: 50331752 BR: 104 RSP: 996 DSP: 120 popac [0x8 -         32 - popac]
+  DEBUG   machine:simulation    TICK:  32 PC:  26 DA: 120 AC: 104 DR: 96 CR: 839004724 BR: 104 RSP: 996 DSP: 120 load [0x8 -          2 - load]
+  DEBUG   machine:simulation    TICK:  36 PC:  27 DA: 104 AC: 104 DR: 96 CR: 36844550 BR: 104 RSP: 996 DSP: 116 popac [0x8 -         32 - popac]
+  DEBUG   machine:simulation    TICK:  41 PC:  28 DA: 120 AC: 1 DR: 96 CR: 842270211 BR: 104 RSP: 996 DSP: 120 popdr [0x8 -         34 - popdr]
+  DEBUG   machine:simulation    TICK:  45 PC:  29 DA: 116 AC: 1 DR: 96 CR: 872809216 BR: 104 RSP: 996 DSP: 116 sub [0x8 -          6 - sub]
+  DEBUG   machine:simulation    TICK:  49 PC:  30 DA: 116 AC: -1 DR: 0 CR: 100859904 BR: 104 RSP: 996 DSP: 116 loadimm 112 [0x8 -    3000070 - loadimm (00000070)]
+  DEBUG   machine:simulation    TICK:  52 PC:  34 DA: 120 AC: 112 DR: 0 CR: 50331760 BR: 112 RSP: 996 DSP: 120 popdr [0x8 -         34 - popdr]
+  DEBUG   machine:simulation    TICK:  55 PC:  35 DA: 120 AC: 112 DR: 0 CR: 875704323 BR: 112 RSP: 996 DSP: 120 popac [0x8 -         32 - popac]
+  DEBUG   machine:simulation    TICK:  59 PC:  36 DA: 116 AC: 112 DR: 112 CR: 842007296 BR: 112 RSP: 996 DSP: 116 save [0x8 -         30 - save]
+  DEBUG   machine:simulation    TICK:  63 PC:  37 DA: 112 AC: -1 DR: 112 CR: 805502976 BR: 112 RSP: 996 DSP: 112 loadimm 96 [0x8 -    3000060 - loadimm (00000060)]
+  DEBUG   machine:simulation    TICK:  66 PC:  41 DA: 116 AC: 96 DR: 112 CR: 50331744 BR: 96 RSP: 996 DSP: 116 popac [0x8 -         32 - popac]
+  DEBUG   machine:simulation    TICK:  69 PC:  42 DA: 116 AC: 96 DR: 112 CR: 838992640 BR: 96 RSP: 996 DSP: 116 load [0x8 -          2 - load]
+  DEBUG   machine:simulation    TICK:  73 PC:  43 DA:  96 AC: 96 DR: 112 CR: 33751040 BR: 96 RSP: 996 DSP: 112 loadimm 0 [0x8 -    3000000 - loadimm (00000000)]
+  DEBUG   machine:simulation    TICK:  78 PC:  47 DA: 120 AC: 0 DR: 112 CR: 50331648 BR: 0 RSP: 996 DSP: 120 popac [0x8 -         32 - popac]
+  DEBUG   machine:simulation    TICK:  81 PC:  48 DA: 120 AC: 0 DR: 112 CR: 842270211 BR: 0 RSP: 996 DSP: 120 popdr [0x8 -         34 - popdr]
+  DEBUG   machine:simulation    TICK:  85 PC:  49 DA: 116 AC: 0 DR: 112 CR: 872809216 BR: 0 RSP: 996 DSP: 116 sub [0x8 -          6 - sub]
+  DEBUG   machine:simulation    TICK:  89 PC:  50 DA: 116 AC: 4095 DR: 4096 CR: 100859904 BR: 0 RSP: 996 DSP: 116 loadimm 108 [0x8 -    300006C - loadimm (0000006C)]
+  DEBUG   machine:simulation    TICK:  92 PC:  54 DA: 120 AC: 108 DR: 4096 CR: 50331756 BR: 108 RSP: 996 DSP: 120 popdr [0x8 -         34 - popdr]
+  DEBUG   machine:simulation    TICK:  95 PC:  55 DA: 120 AC: 108 DR: 4096 CR: 875704323 BR: 108 RSP: 996 DSP: 120 popac [0x8 -         32 - popac]
+  DEBUG   machine:simulation    TICK:  99 PC:  56 DA: 116 AC: 108 DR: 108 CR: 842007296 BR: 108 RSP: 996 DSP: 116 save [0x8 -         30 - save]
+  DEBUG   machine:simulation    TICK: 103 PC:  57 DA: 108 AC: 4095 DR: 108 CR: 805502976 BR: 108 RSP: 996 DSP: 112 loadimm 108 [0x8 -    300006C - loadimm (0000006C)]
+  DEBUG   machine:simulation    TICK: 106 PC:  61 DA: 116 AC: 108 DR: 108 CR: 50331756 BR: 108 RSP: 996 DSP: 116 popac [0x8 -         32 - popac]
+  DEBUG   machine:simulation    TICK: 109 PC:  62 DA: 116 AC: 108 DR: 108 CR: 838992640 BR: 108 RSP: 996 DSP: 116 load [0x8 -          2 - load]
+  DEBUG   machine:simulation    TICK: 113 PC:  63 DA: 108 AC: 108 DR: 108 CR: 33751040 BR: 108 RSP: 996 DSP: 112 loadimm 92 [0x8 -    300005C - loadimm (0000005C)]
+  DEBUG   machine:simulation    TICK: 118 PC:  67 DA: 120 AC: 92 DR: 108 CR: 50331740 BR: 92 RSP: 996 DSP: 120 popac [0x8 -         32 - popac]
+  DEBUG   machine:simulation    TICK: 121 PC:  68 DA: 120 AC: 92 DR: 108 CR: 839005234 BR: 92 RSP: 996 DSP: 120 load [0x8 -          2 - load]
+  DEBUG   machine:simulation    TICK: 125 PC:  69 DA:  92 AC: 92 DR: 108 CR: 36975152 BR: 92 RSP: 996 DSP: 116 popdr [0x8 -         34 - popdr]
+  DEBUG   machine:simulation    TICK: 130 PC:  70 DA: 120 AC: 4 DR: 108 CR: 875704323 BR: 92 RSP: 996 DSP: 120 popac [0x8 -         32 - popac]
+  DEBUG   machine:simulation    TICK: 134 PC:  71 DA: 116 AC: 4 DR: 4 CR: 842007296 BR: 92 RSP: 996 DSP: 116 save [0x8 -         30 - save]
+  DEBUG   machine:simulation    TICK: 138 PC:  72 DA:   4 AC: 4095 DR: 4 CR: 805502976 BR: 92 RSP: 996 DSP: 112 loadimm 112 [0x8 -    3000070 - loadimm (00000070)]
+  DEBUG   machine:simulation    TICK: 141 PC:  76 DA: 116 AC: 112 DR: 4 CR: 50331760 BR: 112 RSP: 996 DSP: 116 popac [0x8 -         32 - popac]
+  DEBUG   machine:simulation    TICK: 144 PC:  77 DA: 116 AC: 112 DR: 4 CR: 838992640 BR: 112 RSP: 996 DSP: 116 load [0x8 -          2 - load]
+  DEBUG   machine:simulation    TICK: 148 PC:  78 DA: 112 AC: 112 DR: 4 CR: 33751040 BR: 112 RSP: 996 DSP: 112 loadimm 92 [0x8 -    300005C - loadimm (0000005C)]
+  DEBUG   machine:simulation    TICK: 153 PC:  82 DA: 120 AC: 92 DR: 4 CR: 50331740 BR: 92 RSP: 996 DSP: 120 popac [0x8 -         32 - popac]
+  DEBUG   machine:simulation    TICK: 156 PC:  83 DA: 120 AC: 92 DR: 4 CR: 839005234 BR: 92 RSP: 996 DSP: 120 load [0x8 -          2 - load]
+  DEBUG   machine:simulation    TICK: 160 PC:  84 DA:  92 AC: 92 DR: 4 CR: 36975152 BR: 92 RSP: 996 DSP: 116 popdr [0x8 -         34 - popdr]
+  DEBUG   machine:simulation    TICK: 165 PC:  85 DA: 120 AC: 4 DR: 4 CR: 875704358 BR: 92 RSP: 996 DSP: 120 popac [0x8 -         32 - popac]
+  DEBUG   machine:simulation    TICK: 169 PC:  86 DA: 116 AC: 4 DR: 4 CR: 842016256 BR: 92 RSP: 996 DSP: 116 save [0x8 -         30 - save]
+  DEBUG   machine:simulation    TICK: 173 PC:  87 DA:   4 AC: -1 DR: 4 CR: 807796736 BR: 92 RSP: 996 DSP: 112 halt [0x8 -         26 - halt]
+  INFO    machine:simulation    output_buffer: [4095, -1]

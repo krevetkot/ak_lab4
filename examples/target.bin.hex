@@ -1,22 +1,54 @@
-0x8 -    300002B - loadimm (0000002B)
-0xc -         32 - popac
-0xd -          2 - load
-0xe -         32 - popac
-0xf -          2 - load
-0x10 -         36 - dup
-0x11 -    3000000 - loadimm (00000000)
-0x15 -         32 - popac
-0x16 -         34 - popdr
-0x17 -         24 - greater
-0x18 -         32 - popac
-0x19 -   1100002A - while (0000002A)
-0x1d -    300002F - loadimm (0000002F)
-0x21 -         32 - popac
-0x22 -          2 - load
-0x23 -         34 - popdr
-0x24 -         32 - popac
-0x25 -         30 - save
-0x26 -   13000008 - repeat (00000008)
-0x2a -         26 - halt
-0x2b -          0 - input_address
-0x2f -          4 - output_address
+0x8 -    3000060 - loadimm (00000060)
+0xc -    3000004 - loadimm (00000004)
+0x10 -         32 - popac
+0x11 -         34 - popdr
+0x12 -          4 - add
+0x13 -         32 - popac
+0x14 -          2 - load
+0x15 -    3000068 - loadimm (00000068)
+0x19 -         32 - popac
+0x1a -          2 - load
+0x1b -         32 - popac
+0x1c -         34 - popdr
+0x1d -          4 - add
+0x1e -    3000070 - loadimm (00000070)
+0x22 -         34 - popdr
+0x23 -         32 - popac
+0x24 -         30 - save
+0x25 -    3000060 - loadimm (00000060)
+0x29 -         32 - popac
+0x2a -          2 - load
+0x2b -    3000000 - loadimm (00000000)
+0x2f -         32 - popac
+0x30 -         34 - popdr
+0x31 -          4 - add
+0x32 -    300006C - loadimm (0000006C)
+0x36 -         34 - popdr
+0x37 -         32 - popac
+0x38 -         30 - save
+0x39 -    300006C - loadimm (0000006C)
+0x3d -         32 - popac
+0x3e -          2 - load
+0x3f -    300005C - loadimm (0000005C)
+0x43 -         32 - popac
+0x44 -          2 - load
+0x45 -         34 - popdr
+0x46 -         32 - popac
+0x47 -         30 - save
+0x48 -    3000070 - loadimm (00000070)
+0x4c -         32 - popac
+0x4d -          2 - load
+0x4e -    300005C - loadimm (0000005C)
+0x52 -         32 - popac
+0x53 -          2 - load
+0x54 -         34 - popdr
+0x55 -         32 - popac
+0x56 -         30 - save
+0x57 -         26 - halt
+0x58 -          0 - input_address
+0x5c -          4 - output_address
+0x60 -       1000 - var1
+0x64 -   FFFFFFFF - var1 (0000005C)
+0x68 -          1 - var2
+0x6c -          0 - upper_result
+0x70 -          0 - lower_result

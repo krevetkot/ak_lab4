@@ -20,11 +20,10 @@ class Translator:
     addresses_in_conditions = None  # код, куда нужно вставить аргумент - аргумент
 
     def __init__(self):
-        self.variables_map = {}  # имя - адрес
+        self.variables_map = {}
         self.functions_map = {}
-        self.variables_queue = {}  # переменные будут сохранены в конце кода, после хальта,
-        # чтобы гарантированно не мешать коду; имя - значение
-        self.addresses_in_conditions = {}  # код, куда нужно вставить аргумент - аргумент
+        self.variables_queue = {}
+        self.addresses_in_conditions = {}
 
     def instructions(self):
         return {
@@ -409,6 +408,8 @@ def main(source, target):
         f.write(binary_code)
     with open(target + ".hex", "w") as f:
         f.write(hex_code)
+    with open(target + ".base64", "w") as f:
+        f.write(base64.b64encode(binary_code).decode("utf-8"))
 
     print("source LoC:", len(source.split(" ")), "code instr:", len(code))
 

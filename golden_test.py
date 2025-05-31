@@ -28,6 +28,7 @@ def test_translator_and_machine(golden, caplog):
     - `in_memory_size` -- размер памяти
     - `in_sim_mode` -- режим отображения результата: dec, sym, hex
     - `in_eam` -- режим математики (если True, то расширенный)
+    - `in_output_len` -- максимальное количество строк в журнале программы
 
     Выход:
 
@@ -38,6 +39,12 @@ def test_translator_and_machine(golden, caplog):
     """
     logging.basicConfig(level=logging.DEBUG, format="%(levelname)s:root:%(message)s")
     caplog.set_level(logging.DEBUG)
+
+    def get_last_n_lines(text: str, n: int) -> str:
+        lines = text.splitlines()
+        last_n_lines = lines[-n:] if len(lines) > n else lines
+        return "\n".join(last_n_lines)
+
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         source = os.path.join(tmpdirname, "source.forth")
@@ -54,6 +61,7 @@ def test_translator_and_machine(golden, caplog):
         memory_size = golden["in_memory_size"]
         in_sim_mode = golden["in_sim_mode"]
         in_eam = golden["in_eam"]
+        in_output_len = golden["in_output_len"]
 
         with contextlib.redirect_stdout(io.StringIO()) as stdout:
             translator.main(source, target)
@@ -65,8 +73,7 @@ def test_translator_and_machine(golden, caplog):
         with open(target_hex, encoding="utf-8") as file:
             code_hex = file.read()
 
-        res = golden.out["out_code_bin"]
         assert code_bin == golden.out["out_code_bin"]
         assert code_hex == golden.out["out_code_hex"]
         assert stdout.getvalue() == golden.out["out_stdout"]
-        assert caplog.text == golden.out["out_log"] + "\n"
+        assert get_last_n_lines(caplog.text, in_output_len) == golden.out["out_log"]
