@@ -20,15 +20,13 @@ from isa import binary_to_opcode, to_hex
 from microcode_util import SIGNAL_ORDER, Signal, linking_table
 from translator import Translator
 
-# ура ура
 MEMORY_MAPPED_INPUT_ADDRESS = 0
 MEMORY_MAPPED_OUTPUT_ADDRESS = 4
 MICROCOMAND_SIZE = 27
 
 
 class DataPath:
-    """Тракт данных (пассивный), включая: ввод/вывод, память и арифметику.
-    """
+    """Тракт данных (пассивный), включая: ввод/вывод, память и арифметику."""
 
     data_memory_size = None
     "Размер памяти данных."
@@ -64,7 +62,15 @@ class DataPath:
 
     output_buffer = None
 
-    def __init__(self, code, data_memory_size, code_size, first_exec_instr, input_buffer: list, eam):
+    def __init__(
+        self,
+        code,
+        data_memory_size,
+        code_size,
+        first_exec_instr,
+        input_buffer: list,
+        eam,
+    ):
         assert data_memory_size > 0, "Data_memory size should be non-zero"
         self.code_size = code_size
         self.data_memory_size = data_memory_size
@@ -84,7 +90,7 @@ class DataPath:
         self.output_buffer = []
         self.ALU = ALU(eam)
 
-    def signal_latch_PC(self, sel):  # noqa: N802
+    def signal_latch_PC(self, sel):
         if sel == 3:
             self.PC = self.PC
         elif sel == 2:
@@ -94,7 +100,7 @@ class DataPath:
         elif sel == 0:
             self.PC = self.BR
 
-    def signal_latch_CR(self):  # noqa: N802
+    def signal_latch_CR(self):
         if self.DA == MEMORY_MAPPED_INPUT_ADDRESS:
             element = self.input_buffer[0]
             if isinstance(element, int):
@@ -114,10 +120,10 @@ class DataPath:
                 | (self.data_memory[self.DA + 3])
             )
 
-    def signal_latch_IR(self):  # noqa: N802
+    def signal_latch_IR(self):
         self.IR = (self.CR >> 24) & 0xFF
 
-    def signal_latch_BR(self):  # noqa: N802
+    def signal_latch_BR(self):
         self.BR = (self.CR) & 0xFFFFFF
 
     def signal_do_alu(self, mux_sel, operation):
@@ -133,13 +139,13 @@ class DataPath:
             left = struct.unpack("i", struct.pack("I", left))[0]
         self.ALU.do_ALU(self.AC, left, operation)
 
-    def signal_latch_AC(self):  # noqa: N802
+    def signal_latch_AC(self):
         self.AC = self.ALU.get_result()
 
-    def signal_latch_DR(self):  # noqa: N802
+    def signal_latch_DR(self):
         self.DR = self.ALU.get_result()
 
-    def signal_latch_AR(self, sel):  # noqa: N802
+    def signal_latch_AR(self, sel):
         if sel == 0:
             self.AR = self.AC & 0xFFFFFF
         elif sel == 1:
@@ -149,14 +155,14 @@ class DataPath:
         else:
             self.AR = self.DR
 
-    def signal_latch_DA(self, sel):  # noqa: N802
+    def signal_latch_DA(self, sel):
         if sel == 0:
             self.DA = self.PC
         elif sel == 1:
             self.DA = self.AR
         assert 0 <= self.DA < self.data_memory_size, "out of memory: {}".format(self.DA)
 
-    def signal_latch_RSP(self, sel):  # noqa: N802
+    def signal_latch_RSP(self, sel):
         if sel == 0:
             self.RSP += 4
         elif sel == 1:
@@ -164,14 +170,13 @@ class DataPath:
         assert self.RSP < self.data_memory_size, "out of memory: {}".format(self.RSP)
         assert self.DSP < self.RSP, "stack overflow: {}".format(self.RSP)
 
-    def signal_latch_DSP(self, sel):  # noqa: N802
+    def signal_latch_DSP(self, sel):
         if sel == 0:
             self.DSP += 4
         elif sel == 1:
             self.DSP -= 4
         assert self.DSP >= self.code_size - 4, "out of memory: {}".format(self.DSP)
         assert self.DSP < self.RSP, "stack overflow: {}".format(self.DSP)
-
 
     def signal_wr(self):
         assert 0 <= self.AR < self.data_memory_size, "out of memory: {}".format(self.AR)
@@ -182,7 +187,6 @@ class DataPath:
             self.data_memory[self.AR + 1] = (self.AC >> 16) & 0xFF
             self.data_memory[self.AR + 2] = (self.AC >> 8) & 0xFF
             self.data_memory[self.AR + 3] = (self.AC) & 0xFF
-
 
 
 class ControlUnit:
@@ -234,7 +238,11 @@ class ControlUnit:
         pos = MICROCOMAND_SIZE
 
         for name in SIGNAL_ORDER:
-            if (name == Signal.MUXALU) or (name == Signal.MUXAR) or (name == Signal.MUXPC):
+            if (
+                (name == Signal.MUXALU)
+                or (name == Signal.MUXAR)
+                or (name == Signal.MUXPC)
+            ):
                 # 2 бита для Signal.MUXALU
                 pos -= 2
                 signals[name] = (instr >> pos) & 0b11
@@ -252,7 +260,7 @@ class ControlUnit:
 
         return signals
 
-    def process_next_tick(self):  # noqa: C901
+    def process_next_tick(self):
         micro_instr = (
             (self.microprogram[self.mpc] << 24)
             | (self.microprogram[self.mpc + 1] << 16)
@@ -297,9 +305,6 @@ class ControlUnit:
             self.data_path.signal_latch_DA(signals[Signal.LAR])
         if signals[Signal.LRSP] == 1:
             self.data_path.signal_latch_RSP(signals[Signal.MUXRSP])
-
-        # if signals[Signal.OE] == 1:
-        #     self.data_path.signal_oe()
         if signals[Signal.WR] == 1:
             self.data_path.signal_wr()
 
@@ -307,17 +312,6 @@ class ControlUnit:
             self.signal_latch_mpc(signals[Signal.MUXMPC])
         else:
             raise StopIteration()
-
-        # print(" ".join(str(x) for x in self.data_path.data_memory[232:240]))
-        # aboba = (self.data_path.data_memory[232] << 24) | (self.data_path.data_memory[233] << 16) | (self.data_path.data_memory[234] << 8) | (self.data_path.data_memory[235])
-        # print(aboba)
-        # aboba = (self.data_path.data_memory[236] << 24) | (self.data_path.data_memory[236+1] << 16) | (self.data_path.data_memory[236+2] << 8) | (self.data_path.data_memory[236+3])
-        # print(aboba)
-        # self.stack[0] = self.data_path.data_memory[self.data_path.DSP-9]
-        # self.stack[1] = self.data_path.data_memory[self.data_path.DSP-5]
-        # self.stack[2] = self.data_path.data_memory[self.data_path.DSP-1]
-        # self.stack[3] = self.data_path.data_memory[self.data_path.DSP+3]
-        # self.stack[4] = self.data_path.data_memory[self.data_path.DSP+7]
 
         self.tick()
 
@@ -357,10 +351,19 @@ class ControlUnit:
         return "{} {} [{}]".format(state_repr, instr_repr, instr_hex)
 
 
-def simulation(binary_code, microcode, input_tokens, data_memory_size, code_size, limit, eam):
-    first_exec_instr = (binary_code[4] << 24) | (binary_code[5] << 16) | (binary_code[6] << 8) | (binary_code[7])
+def simulation(
+    binary_code, microcode, input_tokens, data_memory_size, code_size, limit, eam
+):
+    first_exec_instr = (
+        (binary_code[4] << 24)
+        | (binary_code[5] << 16)
+        | (binary_code[6] << 8)
+        | (binary_code[7])
+    )
 
-    data_path = DataPath(binary_code, data_memory_size, code_size, first_exec_instr, input_tokens, eam)
+    data_path = DataPath(
+        binary_code, data_memory_size, code_size, first_exec_instr, input_tokens, eam
+    )
     control_unit = ControlUnit(microcode, data_path)
 
     prev_pc = -1
@@ -370,7 +373,7 @@ def simulation(binary_code, microcode, input_tokens, data_memory_size, code_size
             if prev_pc != control_unit.data_path.PC:
                 logging.debug("%s", control_unit)
                 prev_pc = control_unit.data_path.PC
-            control_unit.process_next_tick() 
+            control_unit.process_next_tick()
     except EOFError:
         logging.warning("Input buffer is empty!")
     except StopIteration:
@@ -382,7 +385,7 @@ def simulation(binary_code, microcode, input_tokens, data_memory_size, code_size
     return data_path.output_buffer, control_unit.current_tick()
 
 
-def main(code_file, input_file, memory_size, sim_mode, eam):  # noqa: C901
+def main(code_file, input_file, memory_size, sim_mode, eam):
     """Функция запуска модели процессора. Параметры -- имена файлов с машинным
     кодом и с входными данными для симуляции.
     """
@@ -422,7 +425,7 @@ def main(code_file, input_file, memory_size, sim_mode, eam):  # noqa: C901
         data_memory_size=memory_size,
         code_size=code_size,
         limit=20000,
-        eam=eam
+        eam=eam,
     )
 
     if sim_mode == "sym":
@@ -441,16 +444,23 @@ def main(code_file, input_file, memory_size, sim_mode, eam):  # noqa: C901
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG, format="%(levelname)s   machine:simulation    %(message)s",
-                        filename="machine.log",
-                        filemode="w")
-    assert len(sys.argv) == 6, "Signal.WRong arguments: machine.py <code_file> <input_file> <memory_size> <mode> <eam>"
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format="%(levelname)s   machine:simulation    %(message)s",
+        filename="machine.log",
+        filemode="w",
+    )
+    assert len(sys.argv) == 6, (
+        "Signal.WRong arguments: machine.py <code_file> <input_file> <memory_size> <mode> <eam>"
+    )
     code_file = sys.argv[1]
     input_file = sys.argv[2]
     memory_size = int(sys.argv[3])
     # mode: dec, sym, hex
     sim_mode = sys.argv[4]
-    assert sim_mode in ["dec", "sym", "hex"], "Simulation mode can be only: dec, sym, hex"
+    assert sim_mode in ["dec", "sym", "hex"], (
+        "Simulation mode can be only: dec, sym, hex"
+    )
     if sys.argv[5] == "True" or sys.argv[5] == "1":
         eam = True
     else:

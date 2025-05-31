@@ -22,7 +22,7 @@ class ALU:
         self.n = 1 if result < 0 else 0
         self.z = 1 if result == 0 else 0
 
-    def do_ALU(self, right, left, sel):  # noqa: C901, N802
+    def do_ALU(self, right, left, sel):
         if sel == 0:
             self.plus_zero(left)
         elif sel == 1:
@@ -75,7 +75,9 @@ class ALU:
                 self.c = 0
         else:
             self.c = result > max_uint32
-        self.v = (right > 0 and left > 0 and result > max_int32) or (right < 0 and left < 0 and result < min_int32)
+        self.v = (right > 0 and left > 0 and result > max_int32) or (
+            right < 0 and left < 0 and result < min_int32
+        )
 
     def minus(self, right, left):
         """Вычитание с установкой флагов"""
@@ -87,7 +89,9 @@ class ALU:
         self.c = left < right  # Перенос при вычитании (если left < right)
 
         # Переполнение для вычитания
-        self.v = (right >= 0 and left < 0 and result < 0) or (right < 0 and left >= 0 and result > 0)
+        self.v = (right >= 0 and left < 0 and result < 0) or (
+            right < 0 and left >= 0 and result > 0
+        )
 
     def multiply(self, right, left):
         """Умножение с установкой флагов"""

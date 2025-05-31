@@ -11,8 +11,6 @@ from isa import Opcode, Term, opcode_to_size, to_bytes, to_hex
 # комментарии разрешены только после #
 
 class Translator:
-
-
     variables_map = None # имя - адрес
     functions_map = None
     variables_queue = None  # переменные будут сохранены в конце кода, после хальта,
@@ -125,7 +123,7 @@ class Translator:
 
 
 
-    def text_to_terms(self, text):  # noqa: C901
+    def text_to_terms(self, text):
         """Трансляция текста в последовательность операторов языка (токенов).
 
         Включает в себя:
@@ -171,10 +169,7 @@ class Translator:
         return terms
 
 
-
-
-
-    def translate_stage_1(self, text):  # noqa: C901
+    def translate_stage_1(self, text):
         """Первый этап трансляции.
         Убираются все токены, которые не отображаются напрямую в команды,
         создается условная таблица линковки для лейблов функций и названий переменных.
@@ -347,7 +342,7 @@ class Translator:
         return code
 
 
-    def translate_stage_2(self, code):  # noqa: C901
+    def translate_stage_2(self, code):
         """
         Вместо лейблов подставляются адреса,
         в if и while подставляются адреса переходов,

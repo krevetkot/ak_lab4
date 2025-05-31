@@ -1015,7 +1015,12 @@ def encode_microinstruction(step: dict) -> int:
     bitstr = ""
     for name in SIGNAL_ORDER:
         val = step.get(name, 0)
-        if (name == Signal.MUXALU) or (name == Signal.MUXMPC) or (name == Signal.MUXAR) or (name == Signal.MUXPC):
+        if (
+            (name == Signal.MUXALU)
+            or (name == Signal.MUXMPC)
+            or (name == Signal.MUXAR)
+            or (name == Signal.MUXPC)
+        ):
             bitstr += f"{val:02b}"
         elif name == Signal.ALU:
             bitstr += f"{val:04b}"
@@ -1063,6 +1068,8 @@ def microcode_from_byte(target):
 
 
 if __name__ == "__main__":
-    assert len(sys.argv) == 2, "Wrong arguments: translator.py <input_file> <target_file>"
+    assert len(sys.argv) == 2, (
+        "Wrong arguments: translator.py <input_file> <target_file>"
+    )
     _, target = sys.argv
     save_to_bin(microcode, target)

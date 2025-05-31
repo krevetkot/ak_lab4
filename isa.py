@@ -84,36 +84,36 @@ opcode_to_binary = {
 }
 
 opcode_to_size = {
-    Opcode.LOAD: 1,  
-    Opcode.PLUS: 1, 
-    Opcode.MINUS: 1, 
-    Opcode.MULT: 1,  
-    Opcode.DIV: 1,  
-    Opcode.MOD: 1,  
-    Opcode.AND: 1,  
-    Opcode.OR: 1, 
+    Opcode.LOAD: 1,
+    Opcode.PLUS: 1,
+    Opcode.MINUS: 1,
+    Opcode.MULT: 1,
+    Opcode.DIV: 1,
+    Opcode.MOD: 1,
+    Opcode.AND: 1,
+    Opcode.OR: 1,
     Opcode.NOT: 1,
     Opcode.EQUAL: 1,
-    Opcode.LESS: 1, 
-    Opcode.GREATER: 1, 
-    Opcode.HALT: 1, 
-    Opcode.RETURN: 1, 
+    Opcode.LESS: 1,
+    Opcode.GREATER: 1,
+    Opcode.HALT: 1,
+    Opcode.RETURN: 1,
     Opcode.SAVE: 1,
-    Opcode.POP_AC: 1, 
-    Opcode.POP_DR: 1, 
-    Opcode.DUP: 1, 
-    Opcode.LOAD_IMM: 4,  
-    Opcode.CALL: 4, 
-    Opcode.IF: 4, 
-    Opcode.ELSE: 4,  
-    Opcode.WHILE: 4,  
-    Opcode.REPEAT: 4, 
+    Opcode.POP_AC: 1,
+    Opcode.POP_DR: 1,
+    Opcode.DUP: 1,
+    Opcode.LOAD_IMM: 4,
+    Opcode.CALL: 4,
+    Opcode.IF: 4,
+    Opcode.ELSE: 4,
+    Opcode.WHILE: 4,
+    Opcode.REPEAT: 4,
 }
 
 binary_to_opcode = {binary: opcode for opcode, binary in opcode_to_binary.items()}
 
 
-def to_bytes(code, first_ex_instr):  # noqa: C901
+def to_bytes(code, first_ex_instr):
     """Преобразует машинный код в бинарное представление.
 
     Бинарное представление инструкций:
@@ -137,11 +137,32 @@ def to_bytes(code, first_ex_instr):  # noqa: C901
         elif "arg" in instr:
             arg = instr.get("arg", 0)
             if isinstance(arg, int):
-                if not (-2**31 <= arg <= 2**31-1):
-                    binary_bytes.extend(((arg >> 56) & 0xFF, (arg >> 48) & 0xFF, (arg >> 40) & 0xFF, (arg >> 32) & 0xFF))
-                    binary_bytes.extend(((arg >> 24) & 0xFF, (arg >> 16) & 0xFF, (arg >> 8) & 0xFF, arg & 0xFF))
+                if not (-(2**31) <= arg <= 2**31 - 1):
+                    binary_bytes.extend(
+                        (
+                            (arg >> 56) & 0xFF,
+                            (arg >> 48) & 0xFF,
+                            (arg >> 40) & 0xFF,
+                            (arg >> 32) & 0xFF,
+                        )
+                    )
+                    binary_bytes.extend(
+                        (
+                            (arg >> 24) & 0xFF,
+                            (arg >> 16) & 0xFF,
+                            (arg >> 8) & 0xFF,
+                            arg & 0xFF,
+                        )
+                    )
                 else:
-                    binary_bytes.extend(((arg >> 24) & 0xFF, (arg >> 16) & 0xFF, (arg >> 8) & 0xFF, arg & 0xFF))
+                    binary_bytes.extend(
+                        (
+                            (arg >> 24) & 0xFF,
+                            (arg >> 16) & 0xFF,
+                            (arg >> 8) & 0xFF,
+                            arg & 0xFF,
+                        )
+                    )
             elif isinstance(arg, str):
                 for i in range(len(arg)):
                     binary_bytes += bytes(3)
@@ -150,7 +171,7 @@ def to_bytes(code, first_ex_instr):  # noqa: C901
     return bytes(binary_bytes)
 
 
-def to_hex(code, variables_map):  # noqa: C901
+def to_hex(code, variables_map):
     addr_to_var = {addr: name for name, addr in variables_map.items()}
     """Преобразует машинный код в текстовый файл c шестнадцатеричным представлением.
 
@@ -170,7 +191,12 @@ def to_hex(code, variables_map):  # noqa: C901
 
         address = i
         if after_halt:
-            word = (binary_code[i] << 24) | (binary_code[i + 1] << 16) | (binary_code[i + 2] << 8) | binary_code[i + 3]
+            word = (
+                (binary_code[i] << 24)
+                | (binary_code[i + 1] << 16)
+                | (binary_code[i + 2] << 8)
+                | binary_code[i + 3]
+            )
             if address in addr_to_var:
                 mnemonic = addr_to_var[address]
             i += 4
@@ -180,9 +206,16 @@ def to_hex(code, variables_map):  # noqa: C901
                 after_halt = True
             if has_argument:
                 word = (
-                    (binary_code[i] << 24) | (binary_code[i + 1] << 16) | (binary_code[i + 2] << 8) | binary_code[i + 3]
+                    (binary_code[i] << 24)
+                    | (binary_code[i + 1] << 16)
+                    | (binary_code[i + 2] << 8)
+                    | binary_code[i + 3]
                 )
-                arg = (binary_code[i + 1] << 16) | (binary_code[i + 2] << 8) | binary_code[i + 3]
+                arg = (
+                    (binary_code[i + 1] << 16)
+                    | (binary_code[i + 2] << 8)
+                    | binary_code[i + 3]
+                )
                 i += 4
             else:
                 word = binary_code[i]

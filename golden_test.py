@@ -18,9 +18,6 @@ MAX_LOG = 4000
 @pytest.mark.golden_test("golden/*.yml")
 def test_translator_and_machine(golden, caplog):
     """
-    Если вы меняете логику работы приложения -- то запускаете тесты с ключом:
-    `cd python && poetry run pytest . -v --update-goldens`
-
     Вход:
 
     - `in_source` -- исходный код
@@ -44,7 +41,6 @@ def test_translator_and_machine(golden, caplog):
         lines = text.splitlines()
         last_n_lines = lines[-n:] if len(lines) > n else lines
         return "\n".join(last_n_lines)
-
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         source = os.path.join(tmpdirname, "source.forth")
