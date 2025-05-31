@@ -21,7 +21,7 @@
 <!-- markdown-toc end -->
 
 ---
-
+# Выполнила: Слонимская Ксения Григорьевна, группа Р3231, ису: 409577
 - `forth | acc | neum | mc | tick | binary | stream | mem | cstr | prob2 | superscalar`
 
 ## Язык программирования
