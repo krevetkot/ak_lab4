@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""Транслятор brainfuck в машинный код."""
+"""Транслятор AccForth в машинный код."""
 
 import base64
 import os
