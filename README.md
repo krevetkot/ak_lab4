@@ -423,7 +423,7 @@ $ cat out/target.bin.hex
 ``` shell
 $ cat examples/input_file.txt
 foo
-$ ./machine.py examples/input_file.txt 1000 sym False
+$ ./machine.py examples/target.bin examples/input_file.txt 1000 sym False
 DEBUG   machine:simulation    TICK:   0 PC:   8 DA:   8 AC: 0 DR: 0 CR: 0 BR: 0 RSP: 996 DSP: 47 loadimm 43 [0x8 -    300002B - loadimm (0000002B)]
 DEBUG   machine:simulation    TICK:   3 PC:  12 DA:  51 AC: 43 DR: 0 CR: 50331691 BR: 43 RSP: 996 DSP: 51 popac [0x8 -         32 - popac]
 DEBUG   machine:simulation    TICK:   6 PC:  13 DA:  51 AC: 43 DR: 0 CR: 839004674 BR: 43 RSP: 996 DSP: 51 load [0x8 -          2 - load]
